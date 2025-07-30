@@ -1,0 +1,17 @@
+{
+  "initialized": true,
+  "mode": "file-router",
+  "projectName": "software-development-project",
+  "typescript": true,
+  "tailwind": true,
+  "git": true,
+  "packageManager": "npm",
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "shadcn",
+    "start",
+    "store",
+    "tanstack-query"
+  ]
+}
