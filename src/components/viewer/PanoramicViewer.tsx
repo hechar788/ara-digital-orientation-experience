@@ -1,24 +1,19 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
+import { PanoramicViewerControls } from './PanoramicViewerControls'
 
 interface PanoramicViewerProps {
   imageUrl: string
   className?: string
-  onZoomChange?: (fov: number) => void
-  onZoomIn?: () => void
-  onZoomOut?: () => void
-  onVRStateChange?: (isPresenting: boolean) => void
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({ 
   imageUrl, 
-  className = '',
-  onZoomChange,
-  onZoomIn,
-  onZoomOut,
-  onVRStateChange
+  className = ''
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [fov, setFov] = useState(75)
+  const [isVRMode, setIsVRMode] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<number>()
   const sceneDataRef = useRef<{
@@ -52,13 +47,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       const cameraLeft = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
       const cameraRight = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
       
-      // Eye separation for stereo effect (adjust for comfort)
-      const eyeSeparation = 0.064 // ~64mm average human eye separation
-
       // Position cameras at origin inside the sphere
       camera.position.set(0, 0, 0)
-      cameraLeft.position.set(-eyeSeparation / 2, 0, 0)
-      cameraRight.position.set(eyeSeparation / 2, 0, 0)
+      cameraLeft.position.set(-0.032, 0, 0) // ~32mm eye separation
+      cameraRight.position.set(0.032, 0, 0)
       
       // Set initial camera directions
       camera.lookAt(0, 0, 1)
@@ -81,30 +73,52 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       let onPointerDownLon = 0
       let onPointerDownLat = 0
 
-      // Mouse event handlers
-      const onPointerDown = (event: PointerEvent) => {
+      // Touch/Mouse event handlers
+      const onPointerDown = (event: PointerEvent | TouchEvent) => {
+        // Only handle if the event target is the mount element or canvas
+        if (event.target !== mount && event.target !== renderer.domElement) return
+        
         event.preventDefault()
         isMouseDown = true
-        onPointerDownPointerX = event.clientX
-        onPointerDownPointerY = event.clientY
+        const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
+        const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
+        onPointerDownPointerX = clientX
+        onPointerDownPointerY = clientY
         onPointerDownLon = lon
         onPointerDownLat = lat
         mount.style.cursor = 'grabbing'
+        
+        // Add document listeners only when dragging starts
+        document.addEventListener('pointermove', onPointerMove)
+        document.addEventListener('touchmove', onPointerMove, { passive: false })
+        document.addEventListener('pointerup', onPointerUp)
+        document.addEventListener('touchend', onPointerUp)
       }
 
-      const onPointerMove = (event: PointerEvent) => {
+      const onPointerMove = (event: PointerEvent | TouchEvent) => {
         if (!isMouseDown) return
+        
         event.preventDefault()
-
-        lon = (onPointerDownPointerX - event.clientX) * 0.2 + onPointerDownLon
-        lat = (event.clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
+        const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
+        const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
+        
+        lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
+        lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
         lat = Math.max(-85, Math.min(85, lat))
       }
 
-      const onPointerUp = (event: PointerEvent) => {
-        event.preventDefault()
+      const onPointerUp = (event: PointerEvent | TouchEvent) => {
+        if (isMouseDown) {
+          event.preventDefault()
+        }
         isMouseDown = false
         mount.style.cursor = 'grab'
+        
+        // Remove document listeners when dragging ends
+        document.removeEventListener('pointermove', onPointerMove)
+        document.removeEventListener('touchmove', onPointerMove)
+        document.removeEventListener('pointerup', onPointerUp)
+        document.removeEventListener('touchend', onPointerUp)
       }
 
       // Zoom handler
@@ -118,28 +132,35 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         camera.fov = fovRef.current
         camera.updateProjectionMatrix()
         
-        // Notify parent of zoom change
-        onZoomChange?.(fovRef.current)
+        // Update state
+        setFov(fovRef.current)
       }
 
       // Window resize handler
       const handleResize = () => {
         if (!mount) return
-        camera.aspect = mount.clientWidth / mount.clientHeight
+        // Force mount to take available height
+        const rect = mount.getBoundingClientRect()
+        camera.aspect = rect.width / rect.height
         camera.updateProjectionMatrix()
-        renderer.setSize(mount.clientWidth, mount.clientHeight)
+        renderer.setSize(rect.width, rect.height)
       }
 
       // Set initial cursor
       mount.style.cursor = 'grab'
       mount.style.userSelect = 'none'
 
-      // Add event listeners
+      // Add event listeners - only mount-specific ones initially
       mount.addEventListener('pointerdown', onPointerDown)
+      mount.addEventListener('touchstart', onPointerDown, { passive: false })
       mount.addEventListener('wheel', onWheel)
-      document.addEventListener('pointermove', onPointerMove)
-      document.addEventListener('pointerup', onPointerUp)
       window.addEventListener('resize', handleResize)
+
+      // Watch for container size changes
+      const resizeObserver = new ResizeObserver(() => {
+        handleResize()
+      })
+      resizeObserver.observe(mount)
 
       // Animation loop function - declared at proper scope
       const animate = () => {
@@ -196,24 +217,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         }
       }
 
-      // Stereo mode toggle function - declared at proper scope
-      (window as any).toggleStereoMode = (enabled: boolean) => {
-        stereoModeRef.current = enabled
-        onVRStateChange?.(enabled)
-        
-        if (enabled) {
-          // Adjust camera aspect for split screen
-          const aspect = (mount.clientWidth / 2) / mount.clientHeight
-          cameraLeft.aspect = aspect
-          cameraRight.aspect = aspect
-          cameraLeft.updateProjectionMatrix()
-          cameraRight.updateProjectionMatrix()
-        } else {
-          // Restore normal aspect
-          camera.aspect = mount.clientWidth / mount.clientHeight
-          camera.updateProjectionMatrix()
-        }
-      }
 
       // Load texture
       const loader = new THREE.TextureLoader()
@@ -242,10 +245,15 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Cleanup function for this setup
       return () => {
         mount.removeEventListener('pointerdown', onPointerDown)
+        mount.removeEventListener('touchstart', onPointerDown)
         mount.removeEventListener('wheel', onWheel)
+        // Clean up any remaining document listeners
         document.removeEventListener('pointermove', onPointerMove)
+        document.removeEventListener('touchmove', onPointerMove)
         document.removeEventListener('pointerup', onPointerUp)
+        document.removeEventListener('touchend', onPointerUp)
         window.removeEventListener('resize', handleResize)
+        resizeObserver.disconnect()
       }
     }, 0)
 
@@ -269,58 +277,47 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     }
   }, [imageUrl])
 
-  // Set up zoom and VR functions for parent to call
-  useEffect(() => {
-    if (onZoomIn) {
-      const zoomInHandler = () => {
-        if (sceneDataRef.current) {
-          fovRef.current = Math.max(10, fovRef.current - 10)
-          sceneDataRef.current.camera.fov = fovRef.current
-          sceneDataRef.current.camera.updateProjectionMatrix()
-          onZoomChange?.(fovRef.current)
-        }
-      }
-      // Store function reference for external use
-      (window as any).panoramicZoomIn = zoomInHandler
+  // Handler functions for controls
+  const handleZoomIn = () => {
+    const newFov = Math.max(10, fov - 10)
+    setFov(newFov)
+    fovRef.current = newFov
+    if (sceneDataRef.current) {
+      sceneDataRef.current.camera.fov = newFov
+      sceneDataRef.current.camera.updateProjectionMatrix()
     }
+  }
 
-    if (onZoomOut) {
-      const zoomOutHandler = () => {
-        if (sceneDataRef.current) {
-          fovRef.current = Math.min(120, fovRef.current + 10)
-          sceneDataRef.current.camera.fov = fovRef.current
-          sceneDataRef.current.camera.updateProjectionMatrix()
-          onZoomChange?.(fovRef.current)
-        }
-      }
-      // Store function reference for external use
-      (window as any).panoramicZoomOut = zoomOutHandler
+  const handleZoomOut = () => {
+    const newFov = Math.min(120, fov + 10)
+    setFov(newFov)
+    fovRef.current = newFov
+    if (sceneDataRef.current) {
+      sceneDataRef.current.camera.fov = newFov
+      sceneDataRef.current.camera.updateProjectionMatrix()
     }
+  }
 
-    // Stereo VR functions (works on any browser)
-    const enterVRHandler = () => {
-      (window as any).toggleStereoMode?.(true)
-    }
-
-    const exitVRHandler = () => {
-      (window as any).toggleStereoMode?.(false)
-    }
-
-    const isVRSupportedHandler = () => {
-      // Stereo VR always supported (no WebXR required)
-      return true
-    }
-
-    // Store VR function references for external use
-    (window as any).panoramicEnterVR = enterVRHandler;
-    (window as any).panoramicExitVR = exitVRHandler;
-    (window as any).panoramicIsVRSupported = isVRSupportedHandler;
-  }, [onZoomIn, onZoomOut, onZoomChange, onVRStateChange])
+  const handleVRToggle = () => {
+    const newVRMode = !isVRMode
+    setIsVRMode(newVRMode)
+    stereoModeRef.current = newVRMode
+  }
 
   return (
-    <div ref={mountRef} className={className}>
-      {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white">Loading...</div>}
-      {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400">Error loading image</div>}
+    <div className={`${className} flex flex-col`}>
+      <div ref={mountRef} className="flex-1 relative">
+        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white">Loading...</div>}
+        {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400">Error loading image</div>}
+      </div>
+      
+      <PanoramicViewerControls 
+        currentFov={fov}
+        isVRMode={isVRMode}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onVRToggle={handleVRToggle}
+      />
     </div>
   )
 }
