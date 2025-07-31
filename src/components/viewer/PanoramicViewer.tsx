@@ -305,13 +305,14 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   }
 
   return (
-    <div className={`${className} flex flex-col`}>
-      <div ref={mountRef} className="h-[92.5vh] max-[960px]:landscape:h-[88vh] relative">
-        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white">Loading...</div>}
-        {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400">Error loading image</div>}
+    <div className={`${className} relative`}>
+      <div ref={mountRef} className="h-screen w-screen absolute inset-0">
+        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white z-10">Loading...</div>}
+        {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400 z-10">Error loading image</div>}
       </div>
       
       <PanoramicViewerControls 
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] landscape:w-[95%] sm:w-[95%] z-20"
         currentFov={fov}
         isVRMode={isVRMode}
         onZoomIn={handleZoomIn}

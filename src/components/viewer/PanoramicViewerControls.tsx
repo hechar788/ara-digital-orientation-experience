@@ -24,10 +24,14 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
   }
 
   return (
-    <div className={`h-[7.5vh] max-[960px]:landscape:h-[12vh] bg-gray-800 rounded-lg p-1 landscape:p-2 sm:p-4 shadow-lg ${className}`}>
-      <div className="flex items-center justify-between gap-2 h-full">
-        <div className="flex items-center space-x-1 sm:space-x-4">
-          <span className="text-gray-400 text-xs sm:text-sm hidden sm:inline">Controls:</span>
+    <div 
+      className={`h-[7.5vh] max-[960px]:landscape:h-[12vh] bg-gray-800/90 backdrop-blur-sm p-1 landscape:p-2 sm:p-4 shadow-lg ${className}`}
+      style={{
+        clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)'
+      }}
+    >
+      <div className="flex items-center justify-between gap-2 h-full px-4 landscape:px-8 min-[961px]:px-12">
+        <div className="flex items-center space-x-1 sm:space-x-4 min-[961px]:ml-8">
           <Button
             onClick={onZoomIn}
             className="px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 text-xs landscape:text-sm sm:text-base cursor-pointer"
@@ -59,17 +63,8 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
           </Button>
         </div>
         
-        <div className="flex items-center space-x-1 sm:space-x-4 text-gray-400 text-xs sm:text-sm">
+        <div className="flex items-center text-gray-400 text-xs sm:text-sm min-[961px]:mr-8">
           <span>Zoom: {getZoomPercentage()}%</span>
-          {isVRMode ? (
-            <span className="text-green-400 ml-2">VR Active</span>
-          ) : (
-            <>
-              <span className="hidden lg:inline ml-2">Drag to look around • Scroll to zoom • VR Available</span>
-              <span className="hidden sm:inline lg:hidden portrait:inline ml-2">Drag • Scroll</span>
-              <span className="sm:hidden landscape:hidden ml-1">Touch</span>
-            </>
-          )}
         </div>
       </div>
     </div>
