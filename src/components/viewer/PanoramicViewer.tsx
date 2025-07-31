@@ -306,7 +306,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
   return (
     <div className={`${className} flex flex-col`}>
-      <div ref={mountRef} className="flex-1 relative">
+      <div ref={mountRef} className="h-[92.5vh] max-[960px]:landscape:h-[88vh] relative">
         {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white">Loading...</div>}
         {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400">Error loading image</div>}
       </div>

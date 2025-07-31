@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from '@/components/ui/button'
 
 interface PanoramicViewerControlsProps {
   className?: string
@@ -23,39 +24,39 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
   }
 
   return (
-    <div className={`mt-2 sm:mt-4 bg-gray-800 rounded-lg p-1 landscape:p-2 sm:p-4 shadow-lg ${className}`}>
-      <div className="flex items-center justify-between gap-2">
+    <div className={`h-[7.5vh] max-[960px]:landscape:h-[12vh] bg-gray-800 rounded-lg p-1 landscape:p-2 sm:p-4 shadow-lg ${className}`}>
+      <div className="flex items-center justify-between gap-2 h-full">
         <div className="flex items-center space-x-1 sm:space-x-4">
           <span className="text-gray-400 text-xs sm:text-sm hidden sm:inline">Controls:</span>
-          <button
+          <Button
             onClick={onZoomIn}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 rounded transition-colors flex items-center space-x-1 sm:space-x-2 text-xs landscape:text-sm sm:text-base"
+            className="px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 text-xs landscape:text-sm sm:text-base cursor-pointer"
             disabled={currentFov <= 10}
+            size="sm"
           >
             <span className="text-sm landscape:text-base sm:text-lg">🔍</span>
             <span>Zoom In</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onZoomOut}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 rounded transition-colors flex items-center space-x-1 sm:space-x-2 text-xs landscape:text-sm sm:text-base"
+            className="px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 text-xs landscape:text-sm sm:text-base cursor-pointer"
             disabled={currentFov >= 120}
+            size="sm"
           >
             <span className="text-sm landscape:text-base sm:text-lg">🔍</span>
             <span>Zoom Out</span>
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={onVRToggle}
-            className={`${
-              isVRMode 
-                ? 'bg-red-600 hover:bg-red-700' 
-                : 'bg-purple-600 hover:bg-purple-700'
-            } text-white px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 rounded transition-colors items-center space-x-1 sm:space-x-2 text-xs landscape:text-sm sm:text-base hidden landscape:flex sm:flex`}
+            className="px-1.5 py-0.5 landscape:px-2 landscape:py-1 sm:px-4 sm:py-2 text-xs landscape:text-sm sm:text-base hidden landscape:flex sm:flex cursor-pointer"
+            variant={isVRMode ? "destructive" : "secondary"}
+            size="sm"
           >
             <span className="text-sm landscape:text-base sm:text-lg">🥽</span>
             <span className="hidden sm:inline">{isVRMode ? 'Exit VR' : 'Enter VR'}</span>
             <span className="sm:hidden">VR</span>
-          </button>
+          </Button>
         </div>
         
         <div className="flex items-center space-x-1 sm:space-x-4 text-gray-400 text-xs sm:text-sm">
