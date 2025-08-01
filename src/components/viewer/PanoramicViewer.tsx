@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { Plus } from 'lucide-react'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
+import { PopoutMenu } from '../PopoutMenu'
 
 interface PanoramicViewerProps {
   imageUrl: string
@@ -16,7 +17,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const [fov, setFov] = useState(75)
   const [isVRMode, setIsVRMode] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
     camera: THREE.PerspectiveCamera  
@@ -335,6 +336,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         onZoomOut={handleZoomOut}
         onVRToggle={handleVRToggle}
       />
+      
+      <PopoutMenu />
     </div>
   )
 }
