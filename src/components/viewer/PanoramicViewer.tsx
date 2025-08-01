@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
+import { Plus } from 'lucide-react'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
 
 interface PanoramicViewerProps {
@@ -311,8 +312,23 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400 z-10">Error loading image</div>}
       </div>
       
+      {/* VR Crosshairs - only visible in VR mode */}
+      {isVRMode && (
+        <>
+          {/* Left eye crosshair */}
+          <div className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+            <Plus className="w-8 h-8 text-gray-400" />
+          </div>
+          
+          {/* Right eye crosshair */}
+          <div className="absolute top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+            <Plus className="w-8 h-8 text-gray-400" />
+          </div>
+        </>
+      )}
+      
       <PanoramicViewerControls 
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] landscape:w-[95%] sm:w-[95%] z-20"
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20"
         currentFov={fov}
         isVRMode={isVRMode}
         onZoomIn={handleZoomIn}
