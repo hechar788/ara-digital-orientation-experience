@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import React from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { ZoomIn, ZoomOut, Eye, Info } from 'lucide-react'
+import { ZoomIn, ZoomOut, Eye, Info, Bot } from 'lucide-react'
 
 interface PanoramicViewerControlsProps {
   className?: string
@@ -11,6 +10,7 @@ interface PanoramicViewerControlsProps {
   onZoomOut: () => void
   onVRToggle: () => void
   onInfo?: () => void
+  onAIChat?: () => void
 }
 
 export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = ({
@@ -20,9 +20,9 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
   onZoomIn,
   onZoomOut,
   onVRToggle,
-  onInfo
+  onInfo,
+  onAIChat
 }) => {
-  const [showInfoPopup, setShowInfoPopup] = useState(false)
 
   const getZoomPercentage = () => {
     return Math.round(((120 - currentFov) / (120 - 10)) * 100)
@@ -31,8 +31,12 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
   const handleInfoClick = () => {
     if (onInfo) {
       onInfo()
-    } else {
-      setShowInfoPopup(true)
+    }
+  }
+
+  const handleAIChatClick = () => {
+    if (onAIChat) {
+      onAIChat()
     }
   }
 
@@ -56,7 +60,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
                 <button
                   onClick={onZoomIn}
                   disabled={currentFov <= 10}
-                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
                 >
                   <ZoomIn className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
                   <span className="text-xs lg:hidden whitespace-nowrap">Zoom In</span>
@@ -72,7 +76,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
                 <button
                   onClick={onZoomOut}
                   disabled={currentFov >= 120}
-                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
                 >
                   <ZoomOut className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
                   <span className="text-xs lg:hidden whitespace-nowrap">Zoom Out</span>
@@ -87,7 +91,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
               <TooltipTrigger asChild>
                 <button
                   onClick={onVRToggle}
-                  className={`h-full w-full flex items-center justify-center gap-1 lg:gap-0 border-r border-gray-600/50 text-white hidden sm:flex min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 ${
+                  className={`h-full w-full flex items-center justify-center gap-1 lg:gap-0 border-r border-gray-600/50 text-white hidden sm:flex cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 ${
                     isVRMode 
                       ? 'bg-red-600/90 hover:bg-red-500/90' 
                       : 'bg-gray-800/90 hover:bg-gray-700/90'
@@ -105,8 +109,23 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
+                  onClick={handleAIChatClick}
+                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                >
+                  <Bot className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
+                  <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:block hidden">
+                <p>AI Chat</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
                   onClick={handleInfoClick}
-                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                  className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
                 >
                   <Info className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
                   <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
@@ -118,18 +137,6 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             </Tooltip>
         </div>
       </div>
-
-      {/* Info Dialog */}
-      <Dialog open={showInfoPopup} onOpenChange={setShowInfoPopup}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Information</DialogTitle>
-            <DialogDescription>
-              Hello! This is the info panel. You can add more detailed information about the panoramic viewer here.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </TooltipProvider>
   )
 }
