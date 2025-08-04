@@ -28,16 +28,16 @@ export function PopoutMenu({ className = '' }: PopoutMenuProps) {
               onClick={() => setIsOpen(false)}
               className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100 transition-colors z-10 cursor-pointer"
             >
-              <X className="w-4 h-4 text-gray-600" />
+              <X className="w-5 h-5 text-gray-600" />
             </button>
-            <div className="p-4 pt-8 space-y-2 flex-1">
-              <button className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer">
+            <div className="p-4 pt-14 space-y-2 flex-1">
+              <button className="w-full text-left px-4 py-4 rounded hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200 bg-gray-50 hover:bg-gray-100">
                 Button 1
               </button>
-              <button className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer">
+              <button className="w-full text-left px-4 py-4 rounded hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200 bg-gray-50 hover:bg-gray-100">
                 Button 2
               </button>
-              <button className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer">
+              <button className="w-full text-left px-4 py-4 rounded hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200 bg-gray-50 hover:bg-gray-100">
                 Button 3
               </button>
             </div>
@@ -47,7 +47,7 @@ export function PopoutMenu({ className = '' }: PopoutMenuProps) {
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-r-lg border border-l-0 px-2.5 py-7 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-r-lg border border-l-0 px-2 sm:px-2.5 py-7 hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <ChevronRight className="w-6 h-6 text-gray-600" />
           </button>
