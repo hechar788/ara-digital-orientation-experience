@@ -21,6 +21,15 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const [showAIChat, setShowAIChat] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
+
+  // Check for new session (hard refresh) and show info popup
+  useEffect(() => {
+    const hasSeenInSession = sessionStorage.getItem('hasSeenInfoPopup')
+    if (!hasSeenInSession) {
+      setShowInfo(true)
+      sessionStorage.setItem('hasSeenInfoPopup', 'true')
+    }
+  }, [])
   const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
@@ -32,6 +41,33 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   } | null>(null)
   const fovRef = useRef(75)
   const stereoModeRef = useRef(false)
+
+  // Orientation change handler to exit VR mode when rotating to portrait
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      // Check if screen is in portrait mode and VR is active
+      const isPortrait = window.innerHeight > window.innerWidth
+      if (isPortrait && isVRMode) {
+        setIsVRMode(false)
+        stereoModeRef.current = false
+      }
+    }
+
+    // Listen for resize events to detect orientation changes
+    window.addEventListener('resize', handleOrientationChange)
+    
+    // Also check on orientation change event if available
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', handleOrientationChange)
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange)
+      if (screen.orientation) {
+        screen.orientation.removeEventListener('change', handleOrientationChange)
+      }
+    }
+  }, [isVRMode])
 
   useEffect(() => {
     // Use setTimeout to ensure DOM is ready

@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-gray-900">
       <PanoramicViewer 
-        imageUrl="/test.jpg"
+        imageUrl="/test.JPG"
         className="w-full h-full"
       />
     </div>
