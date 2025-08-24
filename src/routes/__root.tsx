@@ -1,8 +1,6 @@
 import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import Header from '../components/Header'
-
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import '../styles.css'
@@ -32,12 +30,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
   component: () => (
     <RootDocument>
-      <Header />
-
       <Outlet />
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
 
-      <TanStackQueryLayout />
+      {/* <TanStackQueryLayout /> */}
     </RootDocument>
   ),
 })
@@ -48,7 +44,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="overflow-hidden">
         {children}
         <Scripts />
       </body>

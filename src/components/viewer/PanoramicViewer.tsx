@@ -1,6 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
+import { Plus } from 'lucide-react'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
+import { PopoutMenu } from '../PopoutMenu'
+import { AIChatPopup } from '../AIChatPopup'
+import { InformationPopup } from '../InformationPopup'
 
 interface PanoramicViewerProps {
   imageUrl: string
@@ -14,16 +18,56 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
   const [isVRMode, setIsVRMode] = useState(false)
+  const [showAIChat, setShowAIChat] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number>()
+
+  // Check for new session (hard refresh) and show info popup
+  useEffect(() => {
+    const hasSeenInSession = sessionStorage.getItem('hasSeenInfoPopup')
+    if (!hasSeenInSession) {
+      setShowInfo(true)
+      sessionStorage.setItem('hasSeenInfoPopup', 'true')
+    }
+  }, [])
+  const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
     camera: THREE.PerspectiveCamera  
     renderer: THREE.WebGLRenderer
     geometry: THREE.SphereGeometry
+    cameraLeft: THREE.PerspectiveCamera
+    cameraRight: THREE.PerspectiveCamera
   } | null>(null)
   const fovRef = useRef(75)
   const stereoModeRef = useRef(false)
+
+  // Orientation change handler to exit VR mode when rotating to portrait
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      // Check if screen is in portrait mode and VR is active
+      const isPortrait = window.innerHeight > window.innerWidth
+      if (isPortrait && isVRMode) {
+        setIsVRMode(false)
+        stereoModeRef.current = false
+      }
+    }
+
+    // Listen for resize events to detect orientation changes
+    window.addEventListener('resize', handleOrientationChange)
+    
+    // Also check on orientation change event if available
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', handleOrientationChange)
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange)
+      if (screen.orientation) {
+        screen.orientation.removeEventListener('change', handleOrientationChange)
+      }
+    }
+  }, [isVRMode])
 
   useEffect(() => {
     // Use setTimeout to ensure DOM is ready
@@ -62,7 +106,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       geometry.scale(-1, 1, 1) // Flip for inside view
 
       // Store scene data for cleanup
-      sceneDataRef.current = { scene, camera, renderer, geometry }
+      sceneDataRef.current = { scene, camera, renderer, geometry, cameraLeft, cameraRight }
 
       // Mouse control variables
       let isMouseDown = false
@@ -131,6 +175,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         
         camera.fov = fovRef.current
         camera.updateProjectionMatrix()
+        
+        // Update stereo cameras for VR mode
+        cameraLeft.fov = fovRef.current
+        cameraLeft.updateProjectionMatrix()
+        cameraRight.fov = fovRef.current
+        cameraRight.updateProjectionMatrix()
         
         // Update state
         setFov(fovRef.current)
@@ -285,6 +335,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     if (sceneDataRef.current) {
       sceneDataRef.current.camera.fov = newFov
       sceneDataRef.current.camera.updateProjectionMatrix()
+      sceneDataRef.current.cameraLeft.fov = newFov
+      sceneDataRef.current.cameraLeft.updateProjectionMatrix()
+      sceneDataRef.current.cameraRight.fov = newFov
+      sceneDataRef.current.cameraRight.updateProjectionMatrix()
     }
   }
 
@@ -295,6 +349,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     if (sceneDataRef.current) {
       sceneDataRef.current.camera.fov = newFov
       sceneDataRef.current.camera.updateProjectionMatrix()
+      sceneDataRef.current.cameraLeft.fov = newFov
+      sceneDataRef.current.cameraLeft.updateProjectionMatrix()
+      sceneDataRef.current.cameraRight.fov = newFov
+      sceneDataRef.current.cameraRight.updateProjectionMatrix()
     }
   }
 
@@ -304,19 +362,57 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     stereoModeRef.current = newVRMode
   }
 
+  const handleAIChatToggle = () => {
+    setShowAIChat(!showAIChat)
+  }
+
+  const handleInfoToggle = () => {
+    setShowInfo(!showInfo)
+  }
+
   return (
-    <div className={`${className} flex flex-col`}>
-      <div ref={mountRef} className="flex-1 relative">
-        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white">Loading...</div>}
-        {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400">Error loading image</div>}
+    <div className={`${className} relative`}>
+      <div ref={mountRef} className="h-screen w-screen absolute inset-0">
+        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white z-10">Loading...</div>}
+        {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400 z-10">Error loading image</div>}
       </div>
       
+      {/* VR Crosshairs - only visible in VR mode */}
+      {isVRMode && (
+        <>
+          {/* Left eye crosshair */}
+          <div className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+            <Plus className="w-8 h-8 text-gray-400" />
+          </div>
+          
+          {/* Right eye crosshair */}
+          <div className="absolute top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+            <Plus className="w-8 h-8 text-gray-400" />
+          </div>
+        </>
+      )}
+      
       <PanoramicViewerControls 
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20"
         currentFov={fov}
         isVRMode={isVRMode}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onVRToggle={handleVRToggle}
+        onAIChat={handleAIChatToggle}
+        onInfo={handleInfoToggle}
+      />
+      
+      <PopoutMenu />
+      
+      <AIChatPopup 
+        isOpen={showAIChat}
+        onClose={() => setShowAIChat(false)}
+      />
+      
+      <InformationPopup 
+        isOpen={showInfo}
+        onClose={() => setShowInfo(false)}
       />
     </div>
   )
