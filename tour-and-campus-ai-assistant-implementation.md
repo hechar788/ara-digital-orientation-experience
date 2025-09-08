@@ -364,6 +364,85 @@ Error Handling Tests:
 - **Weather Services**: Outdoor tour recommendations
 - **Accessibility Services**: Enhanced support for students with disabilities
 
+## Room & Building Directory Structure
+
+### Example Knowledge Source Content Format
+
+```markdown
+# Room & Building Directory Knowledge Source
+
+## Science Building Rooms
+
+### Room 204 - Biology Classroom
+**User Intent Keywords:** room 204, biology classroom, bio 204, science 204
+**Direct Navigation:** Jump to Science Building 2nd floor hallway photo (science-hallway-2nd-floor-east)
+**Room Location Description:** Room 204 is the door on your left with the blue sign marked "Biology 204"
+**Room Context:** This is a biology classroom with 30 student seats, lab benches, projector, and safety equipment. Biology 101, 102, and 201 classes are held here.
+**Nearby Facilities:** Chemistry Lab 202 (2 doors right), Biology Lab 206 (next door left), restrooms and water fountain at end of hall
+
+### Room 301 - Chemistry Lab
+**User Intent Keywords:** room 301, chemistry lab, chem lab, chemistry 301, science 301
+**Direct Navigation:** Jump to Science Building 3rd floor hallway photo (science-hallway-3rd-floor-west)
+**Room Location Description:** Room 301 is the third door on your right, marked "Chemistry Lab 301"
+**Room Context:** Fully equipped chemistry laboratory with fume hoods, lab benches, safety showers, and specialized equipment for organic and inorganic chemistry courses.
+**Nearby Facilities:** Professor offices 303-305, graduate student workspace, emergency eye wash stations
+
+## Library Study Areas
+
+### Study Room A
+**User Intent Keywords:** study room a, library study room, group study, study rooms
+**Direct Navigation:** Jump to Library main study area photo (library-study-area-main)
+**Room Location Description:** Study Room A is behind the glass door you can see ahead, marked "Group Study A"
+**Room Context:** Group study room accommodating 6-8 people with whiteboard, projector, and reservation system. Available 24/7 during semester with student ID access.
+**Nearby Facilities:** Individual study carrels, computer stations, reference desk, restrooms
+
+### Computer Lab Section
+**User Intent Keywords:** computer lab, computers, library computers, tech area
+**Direct Navigation:** Jump to Library computer section photo (library-computer-section)
+**Room Location Description:** Computer lab area is through the archway to your right, with 24 workstations visible
+**Room Context:** 24 desktop computers with full Microsoft Office suite, statistical software, and high-speed printing. Open access during library hours.
+**Nearby Facilities:** Help desk, scanner station, quiet study area
+
+## Building Directories
+
+### Science Building Layout
+**Floors and Room Ranges:**
+- 1st Floor: Rooms 101-120 (General classrooms, lecture halls, main office)
+- 2nd Floor: Rooms 201-225 (Biology classrooms and labs)
+- 3rd Floor: Rooms 301-315 (Chemistry labs and faculty offices)
+**Key Facilities:** Main elevator, stairs at both ends, restrooms on each floor, emergency exits
+**Accessibility:** Full elevator access, handicap restrooms on floors 1 and 2
+
+### Tech Building Layout  
+**Floors and Room Ranges:**
+- Basement: Computer labs, server room, IT support
+- 1st Floor: Rooms 101-115 (Computer Science classrooms)
+- 2nd Floor: Rooms 201-210 (Engineering labs and workshops)
+**Key Facilities:** Main entrance, elevator, 24/7 computer lab access with student ID
+**Accessibility:** Ramp access at main entrance, elevator to all floors
+
+## Navigation Instructions
+
+### General Building Access
+**Main Entrances:** All buildings accessible from main campus pathways shown in VR tour
+**After Hours Access:** Most academic buildings require student ID card access after 8 PM
+**Emergency Information:** Emergency exits marked in red, emergency phones on each floor
+**Accessibility Routes:** All buildings meet ADA requirements with elevator/ramp access
+
+### Room Finding Tips
+**Room Numbering:** First digit indicates floor (2xx = 2nd floor), last two digits indicate room sequence
+**Signage:** Look for blue signs for classrooms, green signs for labs, yellow signs for offices
+**Help Available:** Building directories at main entrances, information desk at student center
+```
+
+### Content Creation Guidelines for Room Directory
+- **Precise Location Descriptions**: Include specific visual landmarks visible in 360° photos
+- **Room Context Information**: Purpose, capacity, equipment, typical classes held there
+- **Nearby Facilities**: What students can find in the immediate area
+- **Building Navigation**: Floor layouts, room numbering systems, key facilities
+- **Accessibility Information**: Elevator access, handicap facilities, emergency procedures
+- **Visual Cues**: Reference specific signs, doors, architectural features visible in photos
+
 ---
 
 ## VR Interface Documentation Structure
