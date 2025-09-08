@@ -366,6 +366,88 @@ Error Handling Tests:
 
 ---
 
+## VR Interface Documentation Structure
+
+### Example Knowledge Source Content Format
+
+```markdown
+# VR Interface Controls & Actions Knowledge Source
+
+## Zoom Controls
+
+### Increase Zoom Level
+**User Intent Keywords:** zoom in, make bigger, closer view, increase zoom, enhance view
+**Manual Instructions:** To zoom in, click the + button located next to the zoom percentage display in the top right corner under the minimap. You can also use your mouse scroll wheel while holding the Ctrl key for gradual zoom adjustment.
+**Assistant Automation:** I can set a specific zoom level for you right now. What zoom percentage would work best for your view? I can set it to 75%, 100%, 150%, 200%, or any custom level you prefer.
+**Follow-up Context:** Higher zoom levels give you a closer, more detailed view of buildings and areas, which is great for examining architectural details or reading signs.
+
+### Decrease Zoom Level  
+**User Intent Keywords:** zoom out, make smaller, wider view, decrease zoom, see more area
+**Manual Instructions:** To zoom out, click the - button next to the zoom percentage in the top right corner under the minimap, or use Ctrl + scroll wheel down for gradual adjustment.
+**Assistant Automation:** I can adjust your zoom level to give you a wider view. Would you prefer a broader perspective? I can set it to 50%, 75%, or any level that helps you see more of the campus at once.
+**Follow-up Context:** Lower zoom levels help you see more of the campus layout and are useful for getting your bearings or planning your route between locations.
+
+## Camera Movement & Orientation
+
+### Look Around / Rotate View
+**User Intent Keywords:** look around, rotate, turn, change view, see different direction
+**Manual Instructions:** Click and drag anywhere on the screen to rotate your view in any direction. You can also use the arrow keys on your keyboard for precise movement: left/right arrows for horizontal rotation, up/down arrows for vertical adjustment.
+**Assistant Automation:** I can help orient your view toward a specific building or landmark. What would you like to face? I can point you toward the library, dining halls, student center, or any other campus location.
+**Follow-up Context:** You can rotate 360 degrees to see everything around your current position. This is helpful for exploring areas and finding nearby buildings or points of interest.
+
+### Reset Camera Orientation
+**User Intent Keywords:** reset view, go back to normal, fix camera, default position, center view
+**Manual Instructions:** Click the compass icon in the bottom right corner of your screen to reset your camera to the default viewing angle for your current location.
+**Assistant Automation:** I can reset your camera orientation to the default view right now. This will center your view and point you toward the main path or building entrance. Would you like me to do that?
+**Follow-up Context:** Resetting is helpful when you feel disoriented or want to return to the standard view that shows the most important features of your current location.
+
+## Navigation Controls
+
+### Navigate to Specific Location
+**User Intent Keywords:** go to, take me to, find, navigate to, show me, where is
+**Manual Instructions:** You can navigate in several ways: (1) Click directly on building markers on the minimap in the top right, (2) Use the location search bar at the top of the screen and type the building name, or (3) Look for directional arrows and pathways in your current view.
+**Assistant Automation:** I can navigate you directly to any campus location. Just tell me where you'd like to go - the library, dining halls, student center, academic buildings, dorms, or any specific department. I'll take you there with a smooth guided transition and provide information about the location when we arrive.
+**Follow-up Context:** Automated navigation includes contextual information about each location, including services available, hours of operation, and what you can do there.
+
+### Find Nearby Locations
+**User Intent Keywords:** what's nearby, around here, close to me, in this area
+**Manual Instructions:** Check the minimap in the top right corner to see nearby building markers and points of interest. Buildings with available tours will show clickable icons. You can also look around your current view for pathway indicators and directional signs.
+**Assistant Automation:** I can show you everything interesting near your current location and take you to whatever catches your interest. Right now you're near [dynamic location context]. Would you like to explore the dining options, academic buildings, or student services in this area?
+**Follow-up Context:** Each area of campus has different types of facilities - academic zones, residential areas, dining clusters, and recreation centers.
+
+## Troubleshooting & Technical Support
+
+### Performance Issues
+**User Intent Keywords:** slow, laggy, not working, freezing, loading problems
+**Manual Instructions:** If the tour is running slowly, try: (1) Closing other browser tabs, (2) Refreshing the page, (3) Checking your internet connection, or (4) Switching to a different browser like Chrome or Firefox for better performance.
+**Assistant Automation:** I can help optimize your experience. Let me check what might be causing the performance issues and guide you through some solutions. I can also adjust your tour settings for better performance on your device.
+**Follow-up Context:** The VR tour works best with a stable internet connection and modern browsers. Some older devices may benefit from lower quality settings.
+
+### Browser Compatibility
+**User Intent Keywords:** not working, won't load, browser issues, compatibility
+**Manual Instructions:** This VR tour works best in Chrome, Firefox, Safari, or Edge browsers. If you're having issues, try updating your browser to the latest version or switching to a different one. Make sure JavaScript is enabled in your browser settings.
+**Assistant Automation:** I can detect what browser you're using and provide specific optimization suggestions. I can also guide you through enabling the necessary browser features for the best VR tour experience.
+**Follow-up Context:** Modern browsers provide the best WebGL support needed for the 3D tour experience.
+```
+
+## Implementation Notes
+
+### Content Creation Guidelines
+- **Specific UI References**: Always mention exact button locations and visual landmarks
+- **Multiple Input Methods**: Provide both mouse and keyboard alternatives where possible  
+- **Automation Offers**: Include clear assistant action possibilities with user choice
+- **Contextual Follow-up**: Explain why users might want each action and what to expect
+- **Progressive Complexity**: Start with simple instructions, offer advanced options
+- **Error Prevention**: Include tips to avoid common mistakes or issues
+
+### Assistant Automation Triggers
+- **User Choice Language**: "I can [action] for you" rather than "Would you like me to [action]"
+- **Specific Options**: Provide concrete choices (zoom levels, specific locations) rather than open-ended questions
+- **Immediate Capability**: Frame automation as available right now, not future possibility
+- **Value Proposition**: Explain why automation might be preferable to manual action
+
+---
+
 ## Technical Requirements Summary
 
 - **Platform**: Microsoft Copilot Studio (single agent architecture)
