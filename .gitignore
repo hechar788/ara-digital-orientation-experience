@@ -9,3 +9,10 @@ dist-ssr
 .output
 .vinxi
 package-lock.json
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# Claude Code configuration
+.mcp.json
