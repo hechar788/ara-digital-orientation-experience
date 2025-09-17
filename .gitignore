@@ -16,3 +16,7 @@ package-lock.json
 
 # Claude Code configuration
 .mcp.json
+
+# 360 Photos - uncompressed originals
+public/360_photos_original/
+public/360_photos_group/

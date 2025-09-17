@@ -1,7 +1,7 @@
-# Software Development Project
+# VR Campus Tour with AI Assistant
 
 ## Overview
-This is a modern React web application built with TanStack Start, featuring file-based routing, state management, and data fetching capabilities. The project serves as a starter template with comprehensive demo examples.
+This is a modern React web application built with TanStack Start that provides an immersive 360° VR campus tour experience. The application features panoramic navigation, interactive campus exploration, and an integrated AI assistant powered by Microsoft Copilot Studio for intelligent location guidance.
 
 ## Tech Stack
 
@@ -22,6 +22,16 @@ This is a modern React web application built with TanStack Start, featuring file
 - **Lucide React** - Icon library
 - **shadcn/ui** - Component library built on Radix UI
 
+### VR & 3D
+- **Three.js** - 3D graphics and WebGL rendering
+- **Panoramic Viewer** - 360° image navigation
+- **Interactive Controls** - Camera movement and zoom
+
+### AI Integration
+- **Microsoft Copilot Studio** - AI assistant platform
+- **REST API Integration** - Real-time VR navigation control
+- **Chat Widget** - Embedded conversational interface
+
 ### Testing
 - **Vitest** - Testing framework
 - **Testing Library** - React testing utilities
@@ -33,15 +43,21 @@ This is a modern React web application built with TanStack Start, featuring file
 src/
 ├── components/          # Reusable UI components
 │   ├── Header.tsx      # Main navigation header
+│   ├── PanoramicViewer.tsx  # 360° VR tour viewer
 │   └── ui/             # shadcn/ui components
 ├── integrations/       # Third-party integrations
 │   └── tanstack-query/ # React Query setup
 ├── lib/                # Utilities and configuration
 │   ├── demo-store.ts   # TanStack Store examples
 │   └── utils.ts        # Utility functions
-├── routes/             # File-based routes
+├── routes/             # File-based routes & API endpoints
 │   ├── __root.tsx      # Root layout component
-│   ├── index.tsx       # Home page
+│   ├── index.tsx       # VR tour home page
+│   ├── api/            # API routes for AI integration
+│   │   └── vr/         # VR navigation endpoints
+│   │       ├── navigate.tsx     # POST /api/vr/navigate
+│   │       ├── locations.tsx    # GET /api/vr/locations
+│   │       └── current-location.tsx  # GET /api/vr/current-location
 │   └── demo.*          # Demo route examples
 ├── router.tsx          # Router configuration
 ├── routeTree.gen.ts    # Generated route tree
@@ -77,30 +93,74 @@ The project uses strict TypeScript configuration with:
 
 ## Key Features
 
-### File-Based Routing
-Routes are automatically generated from files in `src/routes/`. Each route file exports a component and route configuration.
+### VR Campus Tour
+- **360° Panoramic Navigation**: Immersive exploration of campus locations
+- **Interactive Controls**: Mouse/touch camera movement with zoom functionality
+- **Location-Based Routing**: Navigate between different campus areas and buildings
+- **High-Quality Imagery**: Professional 360° photography for realistic experience
 
-### Data Fetching
-- **Route Loaders**: Load data before route rendering
-- **TanStack Query**: Advanced server state management with caching
-- **Demo Examples**: Multiple data fetching patterns demonstrated
+### AI-Powered Assistant
+- **Natural Language Navigation**: Ask "take me to the library" or "show me room X208"
+- **Real-Time VR Control**: Assistant directly controls camera movement via API
+- **Campus Information**: Answers questions about policies, services, and facilities
+- **Contextual Help**: VR interface guidance and troubleshooting support
 
-### State Management
-- **TanStack Store**: Simple, reactive state management
-- **Derived State**: Computed values that update automatically
-- **Demo Store**: Counter example with derived state
+### Technical Architecture
+- **File-Based Routing**: Routes automatically generated from `src/routes/` directory
+- **API Integration**: RESTful endpoints for AI assistant communication
+- **State Management**: TanStack Store for tour navigation and camera state
+- **Responsive Design**: Optimized for desktop and mobile VR experiences
 
-### Styling System
-- **Tailwind CSS**: Utility-first styling
-- **Component Variants**: Using `class-variance-authority`
-- **Responsive Design**: Mobile-first approach
+## AI Assistant Integration
 
-## Demo Files
-Files prefixed with `demo` can be safely deleted - they demonstrate:
-- API requests and server functions
-- TanStack Query usage
-- Store management patterns
-- Route loading strategies
+### API Endpoints
+The application provides REST API endpoints for Microsoft Copilot Studio integration:
+
+#### Navigation Control
+```http
+POST /api/vr/navigate
+Content-Type: application/json
+
+{
+  "locationId": "library-main-entrance",
+  "transitionType": "smooth"
+}
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "currentLocation": "library-main-entrance",
+  "message": "Navigation completed",
+  "timestamp": "2025-01-15T10:30:00Z"
+}
+```
+
+#### Available Locations
+```http
+GET /api/vr/locations
+```
+
+Returns list of all navigable campus locations with metadata.
+
+#### Current Position
+```http
+GET /api/vr/current-location
+```
+
+Returns user's current position in the VR tour.
+
+### Copilot Studio Setup
+1. **Knowledge Sources**: Upload campus location directory and VR help documentation
+2. **Navigation Topic**: Configure location navigation with API flow integration
+3. **Agent Flow**: HTTP POST requests to `/api/vr/navigate` endpoint
+4. **Chat Widget**: Embed in VR application for seamless user interaction
+
+### Deployment
+- **Vercel Compatible**: API routes automatically deploy as serverless functions
+- **Production Ready**: CORS and error handling configured for live deployment
+- **Scalable**: Stateless design supports multiple concurrent users
 
 ## Configuration Files
 
@@ -122,6 +182,11 @@ Files prefixed with `demo` can be safely deleted - they demonstrate:
    ```
 
 3. Open http://localhost:3000
+
+4. Navigate the VR tour using:
+   - **Mouse/Touch**: Drag to look around, scroll to zoom
+   - **AI Assistant**: Ask "take me to [location]" for instant navigation
+   - **Interactive UI**: Use on-screen controls for manual navigation
 
 ## Production Deployment
 
