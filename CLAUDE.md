@@ -211,3 +211,76 @@ Returns user's current position in the VR tour.
 - React Query for efficient data caching
 - Tailwind CSS for optimized styling
 - Vite for fast development and builds
+
+## Code Documentation Standards
+
+**IMPORTANT**: All code written for this project must follow strict documentation standards for maintainability and readability.
+
+### Required Documentation Style
+
+**For Functions, Classes, Interfaces, Types, and ALL code constructs:**
+
+```typescript
+/**
+ * Brief description of what this function/interface/class does
+ *
+ * More detailed explanation if needed, including context about when to use it
+ * and how it fits into the larger system.
+ *
+ * @param paramName - Description of parameter and expected values
+ * @param optionalParam - Description of optional parameter (if applicable)
+ * @returns Description of return value and type
+ *
+ * @example
+ * ```typescript
+ * const result = myFunction('example', true)
+ * // Returns: expected output
+ * ```
+ */
+export function myFunction(paramName: string, optionalParam?: boolean): ReturnType {
+  // Clean implementation without inline comments
+}
+```
+
+**For Interfaces:**
+
+```typescript
+/**
+ * Brief description of what this interface represents
+ *
+ * Detailed explanation of the interface's purpose and usage context.
+ *
+ * @property propName - Description of property and expected values
+ * @property optionalProp - Description of optional property
+ * @property nestedObject - Description of nested object structure
+ * @property nestedObject.subProp - Description of nested properties when complex
+ */
+export interface MyInterface {
+  propName: string
+  optionalProp?: number
+  nestedObject: {
+    subProp: boolean
+  }
+}
+```
+
+### Documentation Requirements
+
+1. **Every export** must have JSDoc documentation
+2. **No inline comments** cluttering the code structure
+3. **Examples required** for complex functions and usage patterns
+4. **Parameter descriptions** must include expected value types/ranges
+5. **Return value documentation** must describe both type and meaning
+6. **Interface properties** documented with `@property` tags in JSDoc block
+7. **Clean separation** between documentation and implementation
+
+### Rationale
+
+This documentation standard ensures:
+- **Maintainability**: Future developers can understand code purpose immediately
+- **IDE Support**: Proper IntelliSense and hover documentation
+- **Team Collaboration**: Clear communication of intent and usage
+- **Code Quality**: Forces consideration of function/interface design
+- **Scalability**: Documentation scales with codebase complexity
+
+**This standard applies to ALL code written for this project - no exceptions.**
