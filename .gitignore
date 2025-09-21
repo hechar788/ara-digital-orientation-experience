@@ -15,6 +15,7 @@ package-lock.json
 .idea/
 
 # Claude Code configuration
+CLAUDE.md
 .mcp.json
 
 # 360 Photos - uncompressed originals
