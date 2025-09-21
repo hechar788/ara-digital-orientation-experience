@@ -1,0 +1,6 @@
+# Merge strategy for implementation documentation files
+# Always keep master's version (non-existent) when merging from development
+tour-photo-linking.md merge=ours
+tour-plus-minimap-implementation.md merge=ours
+tour-implementation.md merge=ours
+tour-and-campus-ai-assistant-implementation.md merge=ours
