@@ -91,7 +91,6 @@ export interface BuildingContext {
  * @property photos - Ordered array of photos that make up this area
  * @property buildingBlock - Building block identifier
  * @property floorLevel - Primary floor level for this area
- * @property accessibleFromAreas - Array of area IDs that connect to this area
  */
 export interface Area {
   id: string
@@ -99,5 +98,4 @@ export interface Area {
   photos: Photo[]
   buildingBlock: 'a' | 'n' | 's' | 'x'
   floorLevel: number
-  accessibleFromAreas: string[]
 }

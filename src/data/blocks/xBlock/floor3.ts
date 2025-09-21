@@ -1,0 +1,127 @@
+/**
+ * X Block Floor 3 Area Definition
+ *
+ * Defines the main hallway on the third floor of X Block, starting from a
+ * west entrance and proceeding through west wing, middle sections, to east wing.
+ * Features a side corridor branch accessible from the west wing.
+ *
+ * @fileoverview Contains route definition for X Block Floor 3 with
+ * navigation connections, building context, and access points.
+ */
+
+import type { Area } from '../../../types/tour'
+
+/**
+ * X Block Floor 3 Main Corridor Route
+ *
+ * Covers the main hallway on the third floor of X Block, starting from a
+ * west entrance and proceeding through west wing, middle sections, to east wing.
+ * Features a side corridor branch accessible from the west wing.
+ *
+ * Navigation flow:
+ * West Entry → West Wing → Middle Sections → East Wing
+ *
+ * Key features:
+ * - West entrance access point
+ * - Side corridor branch from west-1
+ * - Classroom and office areas throughout
+ * - Top floor of the building
+ */
+export const xBlockFloor3Area: Area = {
+  id: 'x-block-floor-3-main',
+  name: 'X Block',
+  buildingBlock: 'x',
+  floorLevel: 3,
+  photos: [
+    {
+      id: 'x-f3-west-entry',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_entry.webp',
+      connections: {
+        forward: 'x-f3-west-1'
+      },
+      buildingContext: {
+        wing: 'west',
+        facilities: ['entrance', 'elevator access']
+      }
+    },
+    {
+      id: 'x-f3-west-1',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_1.webp',
+      connections: {
+        forward: 'x-f3-west-2',
+        back: 'x-f3-west-entry',
+        left: 'x-f3-west-1-aside'
+      }
+    },
+    {
+      id: 'x-f3-west-1-aside',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_1_aside.webp',
+      connections: {
+        right: 'x-f3-west-1'
+      }
+    },
+    {
+      id: 'x-f3-west-2',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_2.webp',
+      connections: {
+        forward: 'x-f3-mid-3',
+        back: 'x-f3-west-1'
+      },
+      buildingContext: {
+        wing: 'west',
+        facilities: ['classrooms', 'offices']
+      }
+    },
+    {
+      id: 'x-f3-mid-3',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_3.webp',
+      connections: {
+        forward: 'x-f3-mid-4',
+        back: 'x-f3-west-2'
+      }
+    },
+    {
+      id: 'x-f3-mid-4',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_4.webp',
+      connections: {
+        forward: 'x-f3-mid-5',
+        back: 'x-f3-mid-3'
+      }
+    },
+    {
+      id: 'x-f3-mid-5',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_5.webp',
+      connections: {
+        forward: 'x-f3-east-6',
+        back: 'x-f3-mid-4'
+      }
+    },
+    {
+      id: 'x-f3-east-6',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_6.webp',
+      connections: {
+        forward: 'x-f3-east-7',
+        back: 'x-f3-mid-5'
+      }
+    },
+    {
+      id: 'x-f3-east-7',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_7.webp',
+      connections: {
+        forward: 'x-f3-east-8',
+        back: 'x-f3-east-6'
+      }
+    },
+    {
+      id: 'x-f3-east-8',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_8.webp',
+      connections: {
+        back: 'x-f3-east-7'
+      },
+      buildingContext: {
+        wing: 'east',
+        facilities: ['classrooms', 'offices', 'study areas']
+      }
+    }
+  ]
+}

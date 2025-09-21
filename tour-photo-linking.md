@@ -110,7 +110,6 @@ export interface Area {
   photos: Photo[]
   buildingBlock: 'a' | 'n' | 's' | 'x'
   floorLevel: number
-  accessibleFromAreas: string[] // Connected area IDs
 }
 ```
 
@@ -126,7 +125,6 @@ export interface Destination {
   category: 'entrance' | 'elevator' | 'corridor' | 'intersection' | 'facility'
   buildingBlock: 'a' | 'n' | 's' | 'x'
   floorLevel: number
-  accessibleFromAreas: string[]
 
   // Navigation shortcuts
   quickAccess: boolean // Show in main navigation menu
@@ -217,8 +215,7 @@ export const aBlockFloor1Area: Area = {
         facilities: ['restrooms', 'water fountain']
       }
     }
-  ],
-  accessibleFromAreas: ['a-block-floor-2-main', 'ns-block-connector']
+  ]
 }
 ```
 
@@ -253,8 +250,7 @@ export const crossBuildingConnections: Area[] = [
           right: 'ns-south-block'
         }
       }
-    ],
-    accessibleFromAreas: ['a-block-floor-1-main', 'ns-block-main']
+    ]
   }
 ]
 ```
@@ -304,12 +300,29 @@ export const elevatorNavigation: Area = {
         }
       ]
     }
-  ],
-  accessibleFromAreas: ['a-to-ns-connector', 'x-block-all-floors']
+  ]
 }
 ```
 
 ## Navigation Logic Implementation
+
+### How Hotspot Navigation Works
+
+The VR tour uses a two-layer navigation system that seamlessly connects visual interactions with data-driven movement. When a user views a 360° photo, the system automatically renders clickable hotspots for any available vertical navigation options (stairs and elevators).
+
+**The Navigation Flow:**
+
+1. **Hotspot Detection**: The frontend examines the current photo's `hotspots` array and finds any vertical navigation options. For example, if viewing the A Block Floor 1 north area near the stairs, it detects an "up" hotspot.
+
+2. **Visual Rendering**: Each hotspot is rendered as a clickable element positioned precisely in 3D space using the provided spherical coordinates (theta and phi values). This creates an intuitive experience where users click directly on stairs or elevator doors they can see in the image.
+
+3. **User Interaction**: When a user clicks a hotspot, the system captures the hotspot's direction (either "up" or "down") and passes it to the navigation handler.
+
+4. **Connection Lookup**: The navigation system uses the hotspot's direction to look up the corresponding connection in the current photo's `connections` object. For instance, clicking an "up" hotspot triggers a lookup of `connections.up` to find the destination photo ID.
+
+5. **Photo Transition**: The system navigates to the target photo by loading its 360° image and updating the current location. The user seamlessly moves between floors as if they physically used the stairs or elevator.
+
+This approach ensures that every visual hotspot corresponds to a real navigation path, while keeping the interaction natural and intuitive. Users don't need to understand the underlying data structure - they simply click on what they see and the system handles the logical navigation automatically.
 
 ### Movement Handler
 ```typescript
