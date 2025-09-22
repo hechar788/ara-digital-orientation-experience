@@ -1,0 +1,97 @@
+/**
+ * N Block Floor 2 Area Definition
+ *
+ * Defines the main hallway on the second floor of N Block, starting from
+ * the east section and proceeding through the middle section to the west wing.
+ *
+ * @fileoverview Contains route definition for N Block Floor 2 with
+ * navigation connections, building context, and access points.
+ */
+
+import type { Area } from '../../../types/tour'
+
+/**
+ * N Block Floor 2 Main Corridor Route
+ *
+ * Covers the main hallway on the second floor of N Block, starting from
+ * the east section and proceeding through middle to west sections.
+ *
+ * Navigation flow:
+ * East Section → Middle Section → West Section (2 photos)
+ *
+ * Key features:
+ * - Linear corridor layout with distinct sections
+ * - Access to classrooms and offices throughout
+ * - Second floor elevation with stair connections
+ */
+export const nBlockFloor2Area: Area = {
+  id: 'n-block-floor-2-main',
+  name: 'N Block',
+  buildingBlock: 'n',
+  floorLevel: 2,
+  photos: [
+    {
+      id: 'n-f2-east-4',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_east_4.webp',
+      connections: {
+        forward: 'n-f2-mid-3',
+        back: 'x-f2-west-1'
+      },
+      buildingContext: {
+        wing: 'east',
+        facilities: ['classrooms', 'offices']
+      }
+    },
+    {
+      id: 'n-f2-mid-3',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_mid_3.webp',
+      connections: {
+        forward: 'n-f2-west-2',
+        back: 'n-f2-east-4'
+      },
+      buildingContext: {
+        wing: 'middle',
+        facilities: ['elevators', 'restrooms']
+      }
+    },
+    {
+      id: 'n-f2-west-2',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_2.webp',
+      connections: {
+        forward: 'n-f2-west-1',
+        back: 'n-f2-mid-3'
+      }
+    },
+    {
+      id: 'n-f2-west-1',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_1.webp',
+      connections: {
+        back: 'n-f2-west-2',
+        forward: 'n-f2-elevator-entrance'
+      },
+      buildingContext: {
+        wing: 'west',
+        facilities: ['classrooms', 'faculty offices']
+      }
+    },
+    {
+      id: 'n-f2-elevator-entrance',
+      imageUrl: '/360_photos_compressed/n_s_block/n_s_2nd_floor_elevators_entrance.webp',
+      connections: {
+        back: 'n-f2-west-1',
+        forward: 's-f2-mid-1',
+        elevator: 'ns-block-elevator'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { theta: 180, phi: 85 }  // Central elevator access
+        }
+      ],
+      buildingContext: {
+        wing: 'central',
+        facilities: ['elevators', 'wayfinding', 'accessible access']
+      }
+    }
+  ]
+}

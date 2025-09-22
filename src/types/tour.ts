@@ -136,6 +136,7 @@ export interface ElevatorPhoto {
     floor1?: string
     floor2?: string
     floor3?: string
+    floor4?: string
   }
   hotspots?: ElevatorHotspot[]
 }
