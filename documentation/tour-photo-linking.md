@@ -71,6 +71,7 @@ export interface Photo {
     right?: string     // Right turn option (at intersections)
     up?: string | string[]        // Stairs/elevator up (array for multi-floor elevators)
     down?: string | string[]      // Stairs/elevator down (array for multi-floor elevators)
+    elevator?: string   // Connection to elevator system
   }
 
   // 3D hotspots for clickable navigation (stairs/elevators only)
@@ -89,7 +90,7 @@ export interface NearbyRoom {
 }
 
 export interface NavigationHotspot {
-  direction: 'up' | 'down'  // Only vertical navigation
+  direction: 'up' | 'down' | 'elevator'  // Vertical navigation and elevator access
   position: {
     theta: number  // horizontal rotation (0-360°)
     phi: number    // vertical rotation (0-180°, 90 = horizon)
@@ -129,6 +130,37 @@ export interface Destination {
   // Navigation shortcuts
   quickAccess: boolean // Show in main navigation menu
   searchKeywords: string[] // For room/location search
+}
+```
+
+### Elevator System Interface
+```typescript
+// Dedicated interfaces for elevator navigation systems
+
+export interface Elevator {
+  id: string
+  name: string  // Elevator name (e.g., "X Block Elevator")
+  buildingBlock: 'a' | 'n' | 's' | 'x'
+  photo: ElevatorPhoto  // Single 360° photo of elevator interior
+}
+
+export interface ElevatorPhoto {
+  id: string
+  imageUrl: string
+  floorConnections: {
+    floor1?: string    // Photo ID for floor 1 destination
+    floor2?: string    // Photo ID for floor 2 destination
+    floor3?: string    // Photo ID for floor 3 destination
+  }
+  hotspots?: ElevatorHotspot[]  // Floor selection buttons
+}
+
+export interface ElevatorHotspot {
+  floor: number  // Floor number this button represents
+  position: {
+    theta: number  // horizontal rotation (0-360°)
+    phi: number    // vertical rotation (0-180°, 90 = horizon)
+  }
 }
 ```
 
@@ -255,72 +287,115 @@ export const crossBuildingConnections: Area[] = [
 ]
 ```
 
-### Elevator Navigation System
+### X Block Elevator System
 ```typescript
-// N/S Block Elevator System
-export const elevatorNavigation: Area = {
-  id: 'ns-block-elevator-system',
-  name: 'N Block',
-  buildingBlock: 'n',
-  floorLevel: 2,
-  photos: [
-    {
-      id: 'ns-elevator-lobby',
-      sequence: 1,
-      imageUrl: '/360_photos_compressed/n_s_block/n_s_2nd_floor_elevators_entrance.webp',
-      connections: {
-        forward: 'ns-elevator-interior',
-        left: 'ns-north-wing',
-        right: 'ns-south-wing',
-        back: 'a-ns-connector-1' // Back to A block
-      },
-      hotspots: [
-        {
-          direction: 'up',
-          position: { theta: 0, phi: 90 }  // Elevator in center
-        }
-      ]
+// X Block Elevator with Modern Interface
+export const xBlockElevator: Elevator = {
+  id: 'x-block-elevator',
+  name: 'X Block Elevator',
+  buildingBlock: 'x',
+  photo: {
+    id: 'x-elevator-interior',
+    imageUrl: '/360_photos_compressed/x_block/x_elevator.webp',
+    floorConnections: {
+      floor1: 'x-f1-mid-6',   // Floor 1 corridor
+      floor2: 'x-f2-mid-7',   // Floor 2 intersection
+      floor3: 'x-f3-east-7'   // Floor 3 east wing
     },
-    {
-      id: 'ns-elevator-interior',
-      imageUrl: '/360_photos_compressed/n_s_block/inside_elevator.webp',
-      connections: {
-        back: 'ns-elevator-lobby',
-        up: ['x-block-floor-2', 'x-block-floor-3'], // Multi-floor elevator
-        down: 'x-block-floor-1'
+    hotspots: [
+      {
+        floor: 1,
+        position: { theta: 70, phi: 100 }   // Floor 1 button
       },
-      hotspots: [
-        {
-          direction: 'up',
-          position: { theta: 90, phi: 60 }  // Floor selection buttons
-        },
-        {
-          direction: 'down',
-          position: { theta: 90, phi: 120 } // Ground floor button
-        }
-      ]
-    }
-  ]
+      {
+        floor: 2,
+        position: { theta: 90, phi: 90 }    // Floor 2 button
+      },
+      {
+        floor: 3,
+        position: { theta: 110, phi: 80 }   // Floor 3 button
+      }
+    ]
+  }
 }
+
+// Floor photos with elevator access
+export const xBlockFloorPhotosWithElevator = [
+  {
+    id: 'x-f1-mid-6',
+    imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_6.webp',
+    connections: {
+      forward: 'x-f1-mid-7',
+      back: 'x-f1-mid-5',
+      elevator: 'x-block-elevator'  // Elevator connection
+    },
+    hotspots: [
+      {
+        direction: 'elevator',
+        position: { theta: 270, phi: 75 }  // Elevator entrance
+      }
+    ]
+  },
+  {
+    id: 'x-f2-mid-7',
+    imageUrl: '/360_photos_compressed/x_block/floor_2/x_mid_7.webp',
+    connections: {
+      forward: 'x-f2-mid-10',
+      back: 'x-f2-west-6',
+      left: 'x-f2-mid-8',
+      elevator: 'x-block-elevator'
+    },
+    hotspots: [
+      {
+        direction: 'elevator',
+        position: { theta: 180, phi: 80 }
+      }
+    ]
+  },
+  {
+    id: 'x-f3-east-7',
+    imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_7.webp',
+    connections: {
+      forward: 'x-f3-east-8',
+      back: 'x-f3-east-6',
+      elevator: 'x-block-elevator'
+    },
+    hotspots: [
+      {
+        direction: 'elevator',
+        position: { theta: 45, phi: 85 }
+      }
+    ]
+  }
+]
 ```
 
 ## Navigation Logic Implementation
 
 ### How Hotspot Navigation Works
 
-The VR tour uses a two-layer navigation system that seamlessly connects visual interactions with data-driven movement. When a user views a 360° photo, the system automatically renders clickable hotspots for any available vertical navigation options (stairs and elevators).
+The VR tour uses a two-layer navigation system that seamlessly connects visual interactions with data-driven movement. When a user views a 360° photo, the system automatically renders clickable hotspots for any available vertical navigation options (stairs, elevators, and elevator access points).
 
 **The Navigation Flow:**
 
-1. **Hotspot Detection**: The frontend examines the current photo's `hotspots` array and finds any vertical navigation options. For example, if viewing the A Block Floor 1 north area near the stairs, it detects an "up" hotspot.
+1. **Hotspot Detection**: The frontend examines the current photo's `hotspots` array and finds any navigation options. Examples include:
+   - Stairs: "up" or "down" hotspots for floor-to-floor movement
+   - Elevator Access: "elevator" hotspots to enter elevator systems
+   - Elevator Interior: Floor selection hotspots (floor 1, 2, 3, etc.)
 
-2. **Visual Rendering**: Each hotspot is rendered as a clickable element positioned precisely in 3D space using the provided spherical coordinates (theta and phi values). This creates an intuitive experience where users click directly on stairs or elevator doors they can see in the image.
+2. **Visual Rendering**: Each hotspot is rendered as a clickable element positioned precisely in 3D space using the provided spherical coordinates (theta and phi values). This creates an intuitive experience where users click directly on stairs, elevator doors, or floor buttons they can see in the image.
 
-3. **User Interaction**: When a user clicks a hotspot, the system captures the hotspot's direction (either "up" or "down") and passes it to the navigation handler.
+3. **User Interaction**: When a user clicks a hotspot, the system captures the hotspot's direction and passes it to the navigation handler. The system handles three types of navigation:
+   - **Direct Navigation**: up/down/left/right connections for immediate photo transitions
+   - **Elevator Access**: "elevator" connections that lead to elevator interior photos
+   - **Floor Selection**: ElevatorHotspot floor numbers that connect via floorConnections
 
-4. **Connection Lookup**: The navigation system uses the hotspot's direction to look up the corresponding connection in the current photo's `connections` object. For instance, clicking an "up" hotspot triggers a lookup of `connections.up` to find the destination photo ID.
+4. **Connection Lookup**: The navigation system uses different lookup strategies:
+   - Standard hotspots use `connections[direction]` (e.g., `connections.up`)
+   - Elevator access uses `connections.elevator` to enter elevator systems
+   - Floor selection uses `floorConnections[floorX]` for precise floor destinations
 
-5. **Photo Transition**: The system navigates to the target photo by loading its 360° image and updating the current location. The user seamlessly moves between floors as if they physically used the stairs or elevator.
+5. **Photo Transition**: The system navigates to the target photo by loading its 360° image and updating the current location. Users can seamlessly move between floors using stairs, enter elevators, and select specific floors for destination travel.
 
 This approach ensures that every visual hotspot corresponds to a real navigation path, while keeping the interaction natural and intuitive. Users don't need to understand the underlying data structure - they simply click on what they see and the system handles the logical navigation automatically.
 

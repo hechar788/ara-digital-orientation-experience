@@ -31,6 +31,7 @@ export interface Photo {
     right?: string
     up?: string | string[]
     down?: string | string[]
+    elevator?: string
   }
 
   hotspots?: NavigationHotspot[]
@@ -63,7 +64,7 @@ export interface NearbyRoom {
  * @property position.phi - Vertical rotation in degrees (0-180, where 90 is horizon)
  */
 export interface NavigationHotspot {
-  direction: 'up' | 'down'
+  direction: 'up' | 'down' | 'elevator'
   position: {
     theta: number  // horizontal (0-360°)
     phi: number    // vertical (0-180°, 90 = horizon)
@@ -98,4 +99,60 @@ export interface Area {
   photos: Photo[]
   buildingBlock: 'a' | 'n' | 's' | 'x'
   floorLevel: number
+}
+
+/**
+ * Represents an elevator system that connects multiple floors within a building.
+ * Elevators have their own interface separate from Areas to avoid property conflicts.
+ *
+ * @property id - Unique identifier for this elevator (e.g., "x-block-elevator")
+ * @property name - Display name for the elevator (e.g., "X Block Elevator")
+ * @property buildingBlock - Building block where this elevator is located
+ * @property photo - Single 360° photo showing the elevator interior
+ */
+export interface Elevator {
+  id: string
+  name: string
+  buildingBlock: 'a' | 'n' | 's' | 'x'
+  photo: ElevatorPhoto
+}
+
+/**
+ * Represents the interior view of an elevator with floor selection capabilities.
+ * Contains connections to specific floors and hotspots for floor selection buttons.
+ *
+ * @property id - Unique identifier for this elevator photo
+ * @property imageUrl - Path to the 360° elevator interior image
+ * @property floorConnections - Direct connections to specific floor photos
+ * @property floorConnections.floor1 - Photo ID for floor 1 destination
+ * @property floorConnections.floor2 - Photo ID for floor 2 destination
+ * @property floorConnections.floor3 - Photo ID for floor 3 destination
+ * @property hotspots - Clickable floor selection buttons positioned in 3D space
+ */
+export interface ElevatorPhoto {
+  id: string
+  imageUrl: string
+  floorConnections: {
+    floor1?: string
+    floor2?: string
+    floor3?: string
+  }
+  hotspots?: ElevatorHotspot[]
+}
+
+/**
+ * Represents a clickable floor selection button inside an elevator.
+ * Positioned precisely on the elevator panel using spherical coordinates.
+ *
+ * @property floor - Floor number that this button represents
+ * @property position - 3D coordinates on the sphere (spherical coordinates)
+ * @property position.theta - Horizontal rotation in degrees (0-360)
+ * @property position.phi - Vertical rotation in degrees (0-180, where 90 is horizon)
+ */
+export interface ElevatorHotspot {
+  floor: number
+  position: {
+    theta: number  // horizontal (0-360°)
+    phi: number    // vertical (0-180°, 90 = horizon)
+  }
 }

@@ -109,8 +109,15 @@ export const xBlockFloor3Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_7.webp',
       connections: {
         forward: 'x-f3-east-8',
-        back: 'x-f3-east-6'
-      }
+        back: 'x-f3-east-6',
+        elevator: 'x-block-elevator'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { theta: 45, phi: 85 }  // Elevator access point
+        }
+      ]
     },
     {
       id: 'x-f3-east-8',

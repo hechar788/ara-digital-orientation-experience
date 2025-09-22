@@ -1,16 +1,17 @@
 /**
  * X Block Area Collection
  *
- * Aggregates all X Block floor areas for export to the tour system.
- * Imports individual floor definitions and combines them into a single collection.
+ * Aggregates all X Block floor areas and elevator system for export to the tour system.
+ * Imports individual floor definitions and elevator configuration.
  *
- * @fileoverview Exports all X Block areas for use throughout the application.
+ * @fileoverview Exports all X Block areas and elevator for use throughout the application.
  */
 
-import type { Area } from '../../../types/tour'
+import type { Area, Elevator } from '../../../types/tour'
 import { xBlockFloor1Area } from './floor1'
 import { xBlockFloor2Area } from './floor2'
 import { xBlockFloor3Area } from './floor3'
+import { xBlockElevator } from './elevator'
 
 /**
  * Collection of all X Block areas (floors 1-3)
@@ -24,7 +25,8 @@ export const xBlockAreas: Area[] = [
   xBlockFloor3Area
 ]
 
-// Re-export individual areas for direct access
+// Re-export individual areas and elevator for direct access
 export { xBlockFloor1Area } from './floor1'
 export { xBlockFloor2Area } from './floor2'
 export { xBlockFloor3Area } from './floor3'
+export { xBlockElevator } from './elevator'

@@ -111,8 +111,15 @@ export const xBlockFloor2Area: Area = {
       connections: {
         forward: 'x-f2-mid-10',
         back: 'x-f2-west-6',
-        left: 'x-f2-mid-8'
-      }
+        left: 'x-f2-mid-8',
+        elevator: 'x-block-elevator'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { theta: 180, phi: 80 }  // Elevator access point
+        }
+      ]
     },
     {
       id: 'x-f2-mid-8',
