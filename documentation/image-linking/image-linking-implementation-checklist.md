@@ -149,9 +149,9 @@
 
 ---
 
-## Phase 2.5: Camera Orientation Preservation (1-2 hours)
+## Phase 1.5: Camera Orientation Preservation (1-2 hours)
 
-### Step 2.5.1: Update PanoramicViewer Props (30 minutes) ❌ TODO
+### Step 1.5.1: Update PanoramicViewer Props (30 minutes) ❌ TODO
 - [ ] Update `PanoramicViewerProps` interface in `src/components/viewer/PanoramicViewer.tsx`
 - [ ] Add `initialLon?: number` prop for starting horizontal orientation
 - [ ] Add `initialLat?: number` prop for starting vertical orientation
@@ -161,7 +161,7 @@
 - [ ] Add `onCameraChange?.(lon, lat)` call in `onPointerMove` function
 - [ ] Test that props are properly typed and passed
 
-### Step 2.5.2: Update Navigation Hook for Camera State (30 minutes) ❌ TODO
+### Step 1.5.2: Update Navigation Hook for Camera State (30 minutes) ❌ TODO
 - [ ] Add camera state to `useTourNavigation` hook in `src/hooks/useTourNavigation.ts`
 - [ ] Add `useState` for `cameraLon` and `cameraLat` (both default to 0)
 - [ ] Create `handleCameraChange` callback function with proper JSDoc
@@ -171,7 +171,7 @@
 - [ ] Update `jumpToPhoto` to preserve camera orientation for direct navigation
 - [ ] Test that camera state persists correctly between photo changes
 
-### Step 2.5.3: Update Main Route Component Integration (15 minutes) ❌ TODO
+### Step 1.5.3: Update Main Route Component Integration (15 minutes) ❌ TODO
 - [ ] Update `src/routes/index.tsx` to use camera orientation props
 - [ ] Destructure `cameraLon`, `cameraLat`, and `handleCameraChange` from hook
 - [ ] Pass `initialLon={cameraLon}` prop to `PanoramicViewer`
@@ -179,7 +179,7 @@
 - [ ] Pass `onCameraChange={handleCameraChange}` prop to `PanoramicViewer`
 - [ ] Test that camera orientation is properly connected between hook and viewer
 
-### Step 2.5.4: Testing Camera Orientation Persistence (30 minutes) ❌ TODO
+### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes) ❌ TODO
 - [ ] **A Block Navigation Test:**
   - [ ] Start at `a-f1-north-entrance`
   - [ ] Drag to face the intended "forward" direction (180° from default)
@@ -225,7 +225,7 @@
 - [ ] Controls are properly positioned and don't interfere with viewer
 - [ ] Both UI and keyboard navigation work seamlessly together
 
-### Phase 2.5 Complete When: ❌ NOT COMPLETE
+### Phase 1.5 Complete When: ❌ NOT COMPLETE
 - [ ] PanoramicViewer accepts and uses camera orientation props
 - [ ] Navigation hook manages camera state (lon/lat) properly
 - [ ] Camera orientation persists between photo transitions
@@ -239,10 +239,10 @@
 ## Progress Summary
 
 **Phase 1:** 3/5 steps completed (Steps 1.1 ✅, 1.2 ✅, 1.3 ✅)
+**Phase 1.5:** 0/4 steps completed
 **Phase 2:** 0/5 steps completed
-**Phase 2.5:** 0/4 steps completed
 **Overall:** 3/14 steps completed (21%)
 
-**Next Action:** Complete Step 1.4 - Test Basic Navigation
+**Next Action:** Complete Step 1.4 - Test Basic Navigation, then Phase 1.5
 
-**Note:** Phase 2.5 (Camera Orientation Preservation) should be implemented after Phase 2 to solve the A Block image orientation issue. This provides a user-friendly solution that maintains viewing direction during navigation, similar to Google Street View.
+**Note:** Phase 1.5 (Camera Orientation Preservation) should be implemented after Phase 1.4 and before Phase 2. This solves the A Block image orientation issue by providing Google Street View-style navigation continuity before building the UI controls.

@@ -1025,7 +1025,7 @@ function TourApp() {
 }
 ```
 
-### Step 2.5.4: Testing Camera Orientation Persistence (30 minutes)
+### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes)
 
 **Testing Scenarios:**
 
@@ -1055,7 +1055,7 @@ function TourApp() {
 
 ## Next Steps (Future Phases)
 
-After completing Phase 1, 2, and 2.5, the foundation will be ready for:
+After completing Phase 1, 1.5, and 2, the foundation will be ready for:
 
 - **Phase 3:** Hotspot Integration - 3D clickable elements for stairs/elevators
 - **Phase 4:** Location Menu - Quick jump navigation and building overview
