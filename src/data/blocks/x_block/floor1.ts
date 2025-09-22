@@ -56,7 +56,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 270, phi: 60 }  // Elevator/stairs on the left
+          position: { theta: 270, phi: 60 }  // Stairs
         }
       ]
     },
@@ -71,7 +71,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 90, phi: 55 }  // Elevator/stairs on the right
+          position: { theta: 90, phi: 55 }  // Stairs
         }
       ]
     },
@@ -102,7 +102,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { theta: 270, phi: 75 }  // Elevator access point
+          position: { theta: 270, phi: 75 }  // Elevator
         }
       ]
     },
@@ -150,7 +150,8 @@ export const xBlockFloor1Area: Area = {
       id: 'x-f1-west-12',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_12.webp',
       connections: {
-        back: 'x-f1-west-11'
+        back: 'x-f1-west-11',
+        forward: 'n-f1-x-entry'
       },
       buildingContext: {
         wing: 'west',

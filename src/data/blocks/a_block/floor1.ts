@@ -78,7 +78,7 @@ export const aBlockFloor1Area: Area = {
       id: 'a-f1-north-3-side',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3_side.webp',
       connections: {
-        right: 'a-f1-north-3',
+        back: 'a-f1-north-3',
         up: 'a-f2-north-stairs-entrance'
       },
       hotspots: [

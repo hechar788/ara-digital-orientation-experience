@@ -50,7 +50,8 @@ export const xBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_1.webp',
       connections: {
         forward: 'x-f2-west-2',
-        back: 'x-f2-north-entry'
+        back: 'x-f2-north-entry',
+        right: 'n-f2-east-4'
       }
     },
     {
@@ -90,7 +91,7 @@ export const xBlockFloor2Area: Area = {
       id: 'x-f2-west-5-aside',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_5_aside.webp',
       connections: {
-        right: 'x-f2-west-5'
+        back: 'x-f2-west-5'
       }
     },
     {
@@ -126,7 +127,7 @@ export const xBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_mid_8.webp',
       connections: {
         forward: 'x-f2-north-9',
-        right: 'x-f2-mid-7'
+        back: 'x-f2-mid-7'
       }
     },
     {

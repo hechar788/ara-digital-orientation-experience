@@ -114,24 +114,6 @@ export interface Area {
 }
 ```
 
-### Destination Mapping
-```typescript
-// src/data/destinationData.ts
-
-export interface Destination {
-  id: string
-  name: string
-  imageUrl: string
-  description: string
-  category: 'entrance' | 'elevator' | 'corridor' | 'intersection' | 'facility'
-  buildingBlock: 'a' | 'n' | 's' | 'x'
-  floorLevel: number
-
-  // Navigation shortcuts
-  quickAccess: boolean // Show in main navigation menu
-  searchKeywords: string[] // For room/location search
-}
-```
 
 ### Elevator System Interface
 ```typescript

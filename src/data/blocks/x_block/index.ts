@@ -19,10 +19,11 @@ import { xBlockElevator } from './elevator'
  * Contains all floor areas with complete photo sequences and navigation
  * connections. Used as the primary export for X Block navigation.
  */
-export const xBlockAreas: Area[] = [
+export const xBlockAreas: [Area, Area, Area, Elevator] = [
   xBlockFloor1Area,
   xBlockFloor2Area,
-  xBlockFloor3Area
+  xBlockFloor3Area,
+  xBlockElevator
 ]
 
 // Re-export individual areas and elevator for direct access
