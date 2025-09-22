@@ -63,7 +63,7 @@ Photo ||--|| BuildingContext : "describes building/floor/facilities at this loca
 aBlockFloor1Area --|> Area : "implements"
 aBlockFloor2Area --|> Area : "implements"
 
-note right of NavigationHotspot : "For vertical navigation\n(stairs/elevators)\nStores 3D spherical coordinates\nfor Three.js clickable hotspots"
+note right of NavigationHotspot : "For vertical navigation\n(stairs)\nStores 3D spherical coordinates\nfor Three.js clickable hotspots"
 
 note right of Photo : "Core navigation properties:\n\nconnections: {\n  forward?: string\n  back?: string\n  left?: string\n  right?: string\n  up?: string | string[]\n  down?: string | string[]\n  elevator?: string\n}\n\nContext inherited from parent Area\n(buildingBlock, floorLevel)"
 
