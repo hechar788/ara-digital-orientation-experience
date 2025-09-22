@@ -55,6 +55,117 @@ export const aBlockFloor1Area: Area = {
 }
 ```
 
+## TypeScript Interface Definitions
+
+The tour system uses the following TypeScript interfaces defined in `src/types/tour.ts`:
+
+### Photo Interface
+```typescript
+/**
+ * Represents a single 360° photo in the VR tour with navigation connections
+ * and contextual information about the location.
+ */
+export interface Photo {
+  id: string
+  imageUrl: string
+  position?: { lat: number; lng: number }
+
+  connections: {
+    forward?: string
+    back?: string
+    left?: string
+    right?: string
+    up?: string | string[]
+    down?: string | string[]
+    elevator?: string
+  }
+
+  hotspots?: NavigationHotspot[]
+  nearbyRooms?: NearbyRoom[]
+  buildingContext?: BuildingContext
+}
+```
+
+### Supporting Interfaces
+```typescript
+/**
+ * Describes a room that is visible from a photo location.
+ */
+export interface NearbyRoom {
+  roomNumber: string
+  roomType: 'classroom' | 'lab' | 'office' | 'facility' | 'restroom'
+}
+
+/**
+ * Represents a clickable hotspot in a 360° photo for vertical navigation.
+ */
+export interface NavigationHotspot {
+  direction: 'up' | 'down' | 'elevator'
+  position: {
+    theta: number  // horizontal (0-360°)
+    phi: number    // vertical (0-180°, 90 = horizon)
+  }
+}
+
+/**
+ * Provides location-specific contextual information within a photo location.
+ */
+export interface BuildingContext {
+  wing?: string
+  facilities: string[]
+}
+
+/**
+ * Represents a logical area containing connected photos that form a navigable space.
+ */
+export interface Area {
+  id: string
+  name: string
+  photos: Photo[]
+  buildingBlock: 'a' | 'n' | 's' | 'x'
+  floorLevel: number
+}
+```
+
+### Elevator System Interfaces
+```typescript
+/**
+ * Represents an elevator system that connects multiple floors within a building.
+ */
+export interface Elevator {
+  id: string
+  name: string
+  buildingBlock: 'a' | 'n' | 's' | 'x'
+  photo: ElevatorPhoto
+}
+
+/**
+ * Represents the interior view of an elevator with floor selection capabilities.
+ */
+export interface ElevatorPhoto {
+  id: string
+  imageUrl: string
+  floorConnections: {
+    floor1?: string
+    floor2?: string
+    floor3?: string
+    floor4?: string
+  }
+  hotspots?: ElevatorHotspot[]
+}
+
+/**
+ * Represents a clickable floor selection button inside an elevator.
+ */
+export interface ElevatorHotspot {
+  floor: number
+  position: {
+    theta: number  // horizontal (0-360°)
+    phi: number    // vertical (0-180°, 90 = horizon)
+  }
+}
+```
+
 ### 2. Navigation Connections
 
 Each photo defines how users can move to other photos using directional connections:

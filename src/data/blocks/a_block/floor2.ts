@@ -34,9 +34,24 @@ export const aBlockFloor2Area: Area = {
   floorLevel: 2,
   photos: [
     {
+      id: 'a-f2-north-stairs-entrance',
+      imageUrl: '/360_photos_compressed/a_block/floor_2/a_north_stairs_entrance.webp',
+      connections: {
+        forward: 'a-f2-north-1',
+        down: 'a-f1-north-3'
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { theta: 180, phi: 135 }
+        }
+      ]
+    },
+    {
       id: 'a-f2-north-1',
       imageUrl: '/360_photos_compressed/a_block/floor_2/a_north_1.webp',
       connections: {
+        back: 'a-f2-north-stairs-entrance',
         forward: 'a-f2-north-2'
       },
       buildingContext: {
@@ -48,31 +63,16 @@ export const aBlockFloor2Area: Area = {
       id: 'a-f2-north-2',
       imageUrl: '/360_photos_compressed/a_block/floor_2/a_north_2.webp',
       connections: {
-        forward: 'a-f2-north-stairs-entrance',
+        forward: 'a-f2-mid-3',
         back: 'a-f2-north-1'
       }
-    },
-    {
-      id: 'a-f2-north-stairs-entrance',
-      imageUrl: '/360_photos_compressed/a_block/floor_2/a_north_stairs_entrance.webp',
-      connections: {
-        forward: 'a-f2-mid-3',
-        back: 'a-f2-north-2',
-        down: 'a-f1-north-3'
-      },
-      hotspots: [
-        {
-          direction: 'down',
-          position: { theta: 180, phi: 135 }
-        }
-      ]
     },
     {
       id: 'a-f2-mid-3',
       imageUrl: '/360_photos_compressed/a_block/floor_2/a_mid_3.webp',
       connections: {
         forward: 'a-f2-mid-4',
-        back: 'a-f2-north-stairs-entrance'
+        back: 'a-f2-north-2'
       }
     },
     {

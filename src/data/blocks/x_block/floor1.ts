@@ -77,7 +77,7 @@ export const xBlockFloor1Area: Area = {
     },
     {
       id: 'x-f1-east-4',
-      imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_ 4.webp',
+      imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_4.webp',
       connections: {
         forward: 'x-f1-mid-5',
         back: 'x-f1-east-3'
