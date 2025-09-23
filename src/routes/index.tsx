@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
+import { DirectionalNavigation } from '../components/tour/DirectionalNavigation'
 import { useTourNavigation } from '../hooks/useTourNavigation'
 
 export const Route = createFileRoute('/')({
@@ -100,6 +101,14 @@ function App() {
         initialLon={cameraLon}
         initialLat={cameraLat}
         onCameraChange={handleCameraChange}
+      />
+
+      {/* Directional navigation buttons */}
+      <DirectionalNavigation
+        currentPhoto={currentPhoto}
+        cameraLon={cameraLon}
+        onNavigate={navigateDirection}
+        isLoading={isLoading}
       />
     </div>
   )
