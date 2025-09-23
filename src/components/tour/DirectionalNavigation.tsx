@@ -10,7 +10,7 @@ import type { Photo } from '../../types/tour'
 /**
  * Props for DirectionalNavigation component
  *
- * @property currentPhoto - Currently displayed photo with connection data
+ * @property currentPhoto - Currently displayed photo with direction data
  * @property cameraLon - Current camera horizontal rotation in degrees
  * @property onNavigate - Callback function for handling navigation actions
  * @property isLoading - Whether navigation is currently in progress
@@ -26,26 +26,16 @@ interface DirectionalNavigationProps {
  * Determines if user is looking in a specific direction based on camera orientation
  *
  * @param cameraLon - Current camera horizontal rotation in degrees
- * @param direction - Direction to check
- * @param orientationOffset - Photo's orientation offset in degrees (default 0)
+ * @param targetAngle - The angle where the direction button should appear
  * @returns Whether user is looking in that direction (within 45° threshold)
  */
-function isLookingInDirection(cameraLon: number, direction: 'forward' | 'back' | 'left' | 'right', orientationOffset: number = 0): boolean {
-  // Apply orientation offset to camera longitude
-  const adjustedCameraLon = cameraLon + orientationOffset
+function isLookingInDirection(
+  cameraLon: number,
+  targetAngle: number
+): boolean {
+  // Normalize camera longitude to 0-360 range
+  const normalizedLon = ((cameraLon % 360) + 360) % 360
 
-  // Normalize adjusted camera longitude to 0-360 range
-  const normalizedLon = ((adjustedCameraLon % 360) + 360) % 360
-
-  // Define target angles for each direction
-  const directionAngles = {
-    forward: 0,    // Looking straight ahead
-    right: 90,     // Looking right
-    back: 180,     // Looking backward
-    left: 270      // Looking left
-  }
-
-  const targetAngle = directionAngles[direction]
   let angleDiff = Math.abs(normalizedLon - targetAngle)
 
   // Handle wraparound (e.g., 350° to 10° should be 20°, not 340°)
@@ -77,20 +67,17 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
 }) => {
   if (!currentPhoto) return null
 
-  const { connections } = currentPhoto
+  const { directions } = currentPhoto
 
-  // Get orientation offset for this photo (if available)
-  const orientationOffset = currentPhoto.orientationOffset || 0
-
-  // Determine which directions to show based on camera orientation and available connections
-  const showForward = connections.forward && isLookingInDirection(cameraLon, 'forward', orientationOffset)
-  const showBack = connections.back && isLookingInDirection(cameraLon, 'back', orientationOffset)
-  const showLeft = connections.left && isLookingInDirection(cameraLon, 'left', orientationOffset)
-  const showRight = connections.right && isLookingInDirection(cameraLon, 'right', orientationOffset)
+  // Determine which directions to show based on camera orientation and available directions
+  const showForward = directions.forward && isLookingInDirection(cameraLon, directions.forward.angle)
+  const showBack = directions.back && isLookingInDirection(cameraLon, directions.back.angle)
+  const showLeft = directions.left && isLookingInDirection(cameraLon, directions.left.angle)
+  const showRight = directions.right && isLookingInDirection(cameraLon, directions.right.angle)
 
   // Always show up/down if available (not direction dependent)
-  const showUp = !!connections.up
-  const showDown = !!connections.down
+  const showUp = !!directions.up
+  const showDown = !!directions.down
 
   // Don't render if no directions are available
   if (!showForward && !showBack && !showLeft && !showRight && !showUp && !showDown) {
