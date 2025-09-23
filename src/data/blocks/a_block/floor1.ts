@@ -105,6 +105,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-5',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_5.webp',
+      orientationOffset: 270,
       connections: {
         forward: 'a-f1-south-6',
         back: 'a-f1-mid-4'
