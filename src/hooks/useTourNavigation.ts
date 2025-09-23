@@ -69,7 +69,17 @@ export function useTourNavigation() {
   const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
     if (!currentPhoto || isLoading) return
 
-    const targetPhotoId = currentPhoto.connections[direction]
+    let targetPhotoId: string | string[] | undefined
+
+    // Handle new directions interface for horizontal movement
+    if (direction === 'forward' || direction === 'back' || direction === 'left' || direction === 'right') {
+      const directionDef = currentPhoto.directions[direction]
+      targetPhotoId = directionDef?.connection
+    } else {
+      // Handle vertical movement (up/down) - still uses simple string/array format
+      targetPhotoId = currentPhoto.directions[direction]
+    }
+
     if (targetPhotoId) {
       setIsLoading(true)
 
@@ -81,10 +91,8 @@ export function useTourNavigation() {
       if (targetPhoto) {
         const img = new Image()
         img.onload = () => {
-          setTimeout(() => {
-            setCurrentPhotoId(finalTargetId)
-            setIsLoading(false)
-          }, 200) // Smooth transition delay
+          setCurrentPhotoId(finalTargetId)
+          setIsLoading(false)
         }
         img.onerror = () => {
           setIsLoading(false)
@@ -115,10 +123,8 @@ export function useTourNavigation() {
 
       const img = new Image()
       img.onload = () => {
-        setTimeout(() => {
-          setCurrentPhotoId(photoId)
-          setIsLoading(false)
-        }, 300)
+        setCurrentPhotoId(photoId)
+        setIsLoading(false)
       }
       img.onerror = () => {
         setIsLoading(false)
@@ -141,15 +147,15 @@ export function useTourNavigation() {
   const getAvailableDirections = useCallback(() => {
     if (!currentPhoto) return {}
 
-    const { connections } = currentPhoto
+    const { directions } = currentPhoto
     return {
-      forward: !!connections.forward,
-      back: !!connections.back,
-      left: !!connections.left,
-      right: !!connections.right,
-      up: !!connections.up,
-      down: !!connections.down,
-      elevator: !!connections.elevator
+      forward: !!directions.forward,
+      back: !!directions.back,
+      left: !!directions.left,
+      right: !!directions.right,
+      up: !!directions.up,
+      down: !!directions.down,
+      elevator: !!directions.elevator
     }
   }, [currentPhoto])
 
