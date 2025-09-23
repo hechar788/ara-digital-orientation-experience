@@ -35,7 +35,7 @@ export const nBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_east_4.webp',
       connections: {
         forward: 'n-f2-mid-3',
-        back: 'x-f2-west-1'
+        back: 'x-f2-north-entry'
       },
       buildingContext: {
         wing: 'east',

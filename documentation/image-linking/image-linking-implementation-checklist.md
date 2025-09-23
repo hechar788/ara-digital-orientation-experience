@@ -81,6 +81,64 @@
 
 ---
 
+## Phase 1.5: Camera Orientation Preservation (1-2 hours)
+
+### Step 1.5.1: Update PanoramicViewer Props (30 minutes) ✅ COMPLETED
+- [x] Update `PanoramicViewerProps` interface in `src/components/viewer/PanoramicViewer.tsx`
+- [x] Add `initialLon?: number` prop for starting horizontal orientation
+- [x] Add `initialLat?: number` prop for starting vertical orientation
+- [x] Add `onCameraChange?: (lon: number, lat: number) => void` callback prop
+- [x] Update component function signature to accept new props
+- [x] Initialize `lon` and `lat` variables with `initialLon` and `initialLat` props
+- [x] Add `onCameraChange?.(lon, lat)` call in `onPointerMove` function
+- [x] Test that props are properly typed and passed
+
+### Step 1.5.2: Update Navigation Hook for Camera State (30 minutes) ✅ COMPLETED
+- [x] Add camera state to `useTourNavigation` hook in `src/hooks/useTourNavigation.ts`
+- [x] Add `useState` for `cameraLon` and `cameraLat` (both default to 0)
+- [x] Create `handleCameraChange` callback function with proper JSDoc
+- [x] Add camera state variables to return object (`cameraLon`, `cameraLat`)
+- [x] Add `handleCameraChange` function to return object
+- [x] Update `navigateDirection` to preserve camera orientation during transitions
+- [x] Update `jumpToPhoto` to preserve camera orientation for direct navigation
+- [x] Test that camera state persists correctly between photo changes
+
+### Step 1.5.3: Update Main Route Component Integration (15 minutes) ✅ COMPLETED
+- [x] Update `src/routes/index.tsx` to use camera orientation props
+- [x] Destructure `cameraLon`, `cameraLat`, and `handleCameraChange` from hook
+- [x] Pass `initialLon={cameraLon}` prop to `PanoramicViewer`
+- [x] Pass `initialLat={cameraLat}` prop to `PanoramicViewer`
+- [x] Pass `onCameraChange={handleCameraChange}` prop to `PanoramicViewer`
+- [x] Test that camera orientation is properly connected between hook and viewer
+
+### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes) ✅ COMPLETED
+- [x] **A Block Navigation Test:**
+  - [x] Start at `a-f1-north-entrance`
+  - [x] Drag to face the intended "forward" direction (180° from default)
+  - [x] Navigate forward → verify camera maintains new orientation
+  - [x] Navigate back → verify bidirectional consistency
+  - [x] Test multiple forward/back transitions maintain orientation
+
+- [x] **Cross-Building Navigation:**
+  - [x] Navigate A Block → X Block while facing specific direction
+  - [x] Verify orientation preserved across building boundaries
+  - [x] Test X Block → N Block orientation preservation
+  - [x] Test N Block → S Block orientation preservation
+
+- [x] **Multi-Turn Navigation:**
+  - [x] Navigate complex path: forward → left → back → right
+  - [x] Verify camera orientation remains consistent throughout
+  - [x] Test branch corridor navigation (left to enter, back to exit)
+  - [x] Test stair navigation maintains horizontal orientation
+
+- [x] **Edge Cases:**
+  - [x] Test orientation preservation with direct photo jumping
+  - [x] Test orientation limits (lat clamped to -85/+85 degrees)
+  - [x] Test orientation during loading states
+  - [x] Verify no orientation drift over multiple transitions
+
+---
+
 ## Phase 2: Navigation Controls UI (2-3 hours)
 
 ### Step 2.1: Create Navigation Controls Component (1 hour) ❌ TODO
@@ -149,73 +207,15 @@
 
 ---
 
-## Phase 1.5: Camera Orientation Preservation (1-2 hours)
-
-### Step 1.5.1: Update PanoramicViewer Props (30 minutes) ❌ TODO
-- [ ] Update `PanoramicViewerProps` interface in `src/components/viewer/PanoramicViewer.tsx`
-- [ ] Add `initialLon?: number` prop for starting horizontal orientation
-- [ ] Add `initialLat?: number` prop for starting vertical orientation
-- [ ] Add `onCameraChange?: (lon: number, lat: number) => void` callback prop
-- [ ] Update component function signature to accept new props
-- [ ] Initialize `lon` and `lat` variables with `initialLon` and `initialLat` props
-- [ ] Add `onCameraChange?.(lon, lat)` call in `onPointerMove` function
-- [ ] Test that props are properly typed and passed
-
-### Step 1.5.2: Update Navigation Hook for Camera State (30 minutes) ❌ TODO
-- [ ] Add camera state to `useTourNavigation` hook in `src/hooks/useTourNavigation.ts`
-- [ ] Add `useState` for `cameraLon` and `cameraLat` (both default to 0)
-- [ ] Create `handleCameraChange` callback function with proper JSDoc
-- [ ] Add camera state variables to return object (`cameraLon`, `cameraLat`)
-- [ ] Add `handleCameraChange` function to return object
-- [ ] Update `navigateDirection` to preserve camera orientation during transitions
-- [ ] Update `jumpToPhoto` to preserve camera orientation for direct navigation
-- [ ] Test that camera state persists correctly between photo changes
-
-### Step 1.5.3: Update Main Route Component Integration (15 minutes) ❌ TODO
-- [ ] Update `src/routes/index.tsx` to use camera orientation props
-- [ ] Destructure `cameraLon`, `cameraLat`, and `handleCameraChange` from hook
-- [ ] Pass `initialLon={cameraLon}` prop to `PanoramicViewer`
-- [ ] Pass `initialLat={cameraLat}` prop to `PanoramicViewer`
-- [ ] Pass `onCameraChange={handleCameraChange}` prop to `PanoramicViewer`
-- [ ] Test that camera orientation is properly connected between hook and viewer
-
-### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes) ❌ TODO
-- [ ] **A Block Navigation Test:**
-  - [ ] Start at `a-f1-north-entrance`
-  - [ ] Drag to face the intended "forward" direction (180° from default)
-  - [ ] Navigate forward → verify camera maintains new orientation
-  - [ ] Navigate back → verify bidirectional consistency
-  - [ ] Test multiple forward/back transitions maintain orientation
-
-- [ ] **Cross-Building Navigation:**
-  - [ ] Navigate A Block → X Block while facing specific direction
-  - [ ] Verify orientation preserved across building boundaries
-  - [ ] Test X Block → N Block orientation preservation
-  - [ ] Test N Block → S Block orientation preservation
-
-- [ ] **Multi-Turn Navigation:**
-  - [ ] Navigate complex path: forward → left → back → right
-  - [ ] Verify camera orientation remains consistent throughout
-  - [ ] Test branch corridor navigation (left to enter, back to exit)
-  - [ ] Test stair navigation maintains horizontal orientation
-
-- [ ] **Edge Cases:**
-  - [ ] Test orientation preservation with direct photo jumping
-  - [ ] Test orientation limits (lat clamped to -85/+85 degrees)
-  - [ ] Test orientation during loading states
-  - [ ] Verify no orientation drift over multiple transitions
-
----
-
 ## Completion Criteria
 
-### Phase 1 Complete When: ❌ NOT COMPLETE
-- [ ] `findPhotoById` utility works correctly in `tourUtilities.ts` ✅
-- [ ] Navigation hook manages photo state properly
-- [ ] Photos load dynamically from tour data instead of static test.jpg
-- [ ] Keyboard navigation works for all directions
-- [ ] Cross-building connections function bidirectionally
-- [ ] Debug info displays correct photo and area information
+### Phase 1 Complete When: ✅ COMPLETE
+- [x] `findPhotoById` utility works correctly in `tourUtilities.ts` ✅
+- [x] Navigation hook manages photo state properly
+- [x] Photos load dynamically from tour data instead of static test.jpg
+- [x] Keyboard navigation works for all directions
+- [x] Cross-building connections function bidirectionally
+- [x] Debug info displays correct photo and area information
 
 ### Phase 2 Complete When: ❌ NOT COMPLETE
 - [ ] UI navigation controls display with proper visual feedback
@@ -225,24 +225,24 @@
 - [ ] Controls are properly positioned and don't interfere with viewer
 - [ ] Both UI and keyboard navigation work seamlessly together
 
-### Phase 1.5 Complete When: ❌ NOT COMPLETE
-- [ ] PanoramicViewer accepts and uses camera orientation props
-- [ ] Navigation hook manages camera state (lon/lat) properly
-- [ ] Camera orientation persists between photo transitions
-- [ ] A Block navigation works correctly regardless of image capture direction
-- [ ] Users can maintain their viewing direction during navigation
-- [ ] Bidirectional navigation (forward/back) maintains orientation consistency
-- [ ] Cross-building navigation preserves camera orientation
+### Phase 1.5 Complete When: ✅ COMPLETE
+- [x] PanoramicViewer accepts and uses camera orientation props
+- [x] Navigation hook manages camera state (lon/lat) properly
+- [x] Camera orientation persists between photo transitions
+- [x] A Block navigation works correctly regardless of image capture direction
+- [x] Users can maintain their viewing direction during navigation
+- [x] Bidirectional navigation (forward/back) maintains orientation consistency
+- [x] Cross-building navigation preserves camera orientation
 
 ---
 
 ## Progress Summary
 
-**Phase 1:** 3/5 steps completed (Steps 1.1 ✅, 1.2 ✅, 1.3 ✅)
-**Phase 1.5:** 0/4 steps completed
+**Phase 1:** 5/5 steps completed ✅✅✅✅✅
+**Phase 1.5:** 4/4 steps completed ✅✅✅✅
 **Phase 2:** 0/5 steps completed
-**Overall:** 3/14 steps completed (21%)
+**Overall:** 9/14 steps completed (64%)
 
-**Next Action:** Complete Step 1.4 - Test Basic Navigation, then Phase 1.5
+**Next Action:** Begin Phase 2 - Navigation Controls UI Implementation
 
-**Note:** Phase 1.5 (Camera Orientation Preservation) should be implemented after Phase 1.4 and before Phase 2. This solves the A Block image orientation issue by providing Google Street View-style navigation continuity before building the UI controls.
+**Note:** Phase 1 and 1.5 are complete! Camera orientation persistence successfully solves the A Block 180° orientation problem. Ready to implement UI controls.

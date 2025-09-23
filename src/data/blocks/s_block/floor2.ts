@@ -63,34 +63,34 @@ export const sBlockFloor2Area: Area = {
       id: 's-f2-mid-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_4.webp',
       connections: {
-        forward: 's-f2-mid-5',
+        forward: 's-f2-south-5',
         back: 's-f2-mid-3'
       }
     },
     {
-      id: 's-f2-mid-5',
-      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_5.webp',
+      id: 's-f2-south-5',
+      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_5.webp',
       connections: {
-        forward: 's-f2-mid-6',
+        forward: 's-f2-south-6',
         back: 's-f2-mid-4'
       }
     },
     {
-      id: 's-f2-mid-6',
-      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_6.webp',
+      id: 's-f2-south-6',
+      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_6.webp',
       connections: {
-        forward: 's-f2-mid-7',
-        back: 's-f2-mid-5'
+        forward: 's-f2-south-7',
+        back: 's-f2-south-5'
       }
     },
     {
-      id: 's-f2-mid-7',
-      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_7.webp',
+      id: 's-f2-south-7',
+      imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_7.webp',
       connections: {
-        back: 's-f2-mid-6'
+        back: 's-f2-south-6'
       },
       buildingContext: {
-        wing: 'middle',
+        wing: 'south',
         facilities: ['classrooms', 'offices', 'study areas']
       }
     }

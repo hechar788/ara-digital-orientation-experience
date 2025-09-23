@@ -13,7 +13,10 @@ function App() {
     currentArea,
     isLoading,
     navigateDirection,
-    currentPhotoId
+    currentPhotoId,
+    cameraLon,
+    cameraLat,
+    handleCameraChange
   } = useTourNavigation()
 
   // Temporary keyboard controls for Phase 1 testing
@@ -94,6 +97,9 @@ function App() {
       <PanoramicViewer
         imageUrl={currentPhoto?.imageUrl}
         className="w-full h-full"
+        initialLon={cameraLon}
+        initialLat={cameraLat}
+        onCameraChange={handleCameraChange}
       />
     </div>
   )

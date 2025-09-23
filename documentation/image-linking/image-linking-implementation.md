@@ -463,6 +463,206 @@ function TourApp() {
 
 ---
 
+## Phase 1.5: Camera Orientation Preservation (1-2 hours)
+
+### Goal
+Implement camera orientation persistence between photo transitions to solve the A Block image orientation issue and provide Google Street View-style navigation continuity.
+
+### Problem Statement
+Currently, when navigating between photos, the camera orientation resets to a default position (0°, 0°). This causes several issues:
+
+1. **A Block Orientation Issue**: A Block photos were captured facing 180° opposite to the intended navigation direction
+2. **User Disorientation**: Users lose their viewing direction when transitioning between photos
+3. **Unnatural Navigation**: Unlike Google Street View, users must reorient themselves after each move
+
+### Solution: Persistent Camera Orientation
+Preserve the user's camera rotation (longitude/latitude) when navigating between photos, allowing them to maintain their viewing direction naturally.
+
+### Step 1.5.1: Update PanoramicViewer Props (30 minutes)
+
+**File: `src/components/viewer/PanoramicViewer.tsx`**
+
+Add camera orientation props to the component interface:
+
+```typescript
+interface PanoramicViewerProps {
+  imageUrl: string
+  className?: string
+  initialLon?: number
+  initialLat?: number
+  onCameraChange?: (lon: number, lat: number) => void
+}
+```
+
+Update component to use initial orientation and emit changes:
+
+```typescript
+export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
+  imageUrl,
+  className = '',
+  initialLon = 0,
+  initialLat = 0,
+  onCameraChange
+}) => {
+  // Initialize camera position with props
+  let lon = initialLon
+  let lat = initialLat
+
+  // Emit camera changes during mouse/touch movement
+  const onPointerMove = (event: PointerEvent | TouchEvent) => {
+    if (!isMouseDown) return
+
+    event.preventDefault()
+    const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
+    const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
+
+    lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
+    lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
+    lat = Math.max(-85, Math.min(85, lat))
+
+    // Emit camera change for persistence
+    onCameraChange?.(lon, lat)
+  }
+}
+```
+
+### Step 1.5.2: Update Navigation Hook for Camera State (30 minutes)
+
+**File: `src/hooks/useTourNavigation.ts`**
+
+Add camera orientation state management to the navigation hook:
+
+```typescript
+export function useTourNavigation() {
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  const [isLoading, setIsLoading] = useState(false)
+  const [cameraLon, setCameraLon] = useState(0)
+  const [cameraLat, setCameraLat] = useState(0)
+
+  /**
+   * Handle camera orientation changes from the panoramic viewer
+   *
+   * Stores the current camera orientation for persistence during navigation.
+   * Called whenever the user drags to look around in the 360° view.
+   */
+  const handleCameraChange = useCallback((lon: number, lat: number) => {
+    setCameraLon(lon)
+    setCameraLat(lat)
+  }, [])
+
+  /**
+   * Navigate maintaining camera orientation
+   *
+   * Preserves the user's viewing direction when transitioning between photos,
+   * providing continuity similar to Google Street View navigation.
+   */
+  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
+    if (!currentPhoto || isLoading) return
+
+    const targetPhotoId = currentPhoto.connections[direction]
+    if (targetPhotoId) {
+      setIsLoading(true)
+      const finalTargetId = Array.isArray(targetPhotoId) ? targetPhotoId[0] : targetPhotoId
+
+      const targetPhoto = findPhotoById(finalTargetId)
+      if (targetPhoto) {
+        const img = new Image()
+        img.onload = () => {
+          setTimeout(() => {
+            setCurrentPhotoId(finalTargetId)
+            // Camera orientation (cameraLon, cameraLat) is preserved automatically
+            setIsLoading(false)
+          }, 200)
+        }
+        img.onerror = () => {
+          setIsLoading(false)
+          console.error('Failed to load image:', targetPhoto.imageUrl)
+        }
+        img.src = targetPhoto.imageUrl
+      }
+    }
+  }, [currentPhoto, isLoading, cameraLon, cameraLat])
+
+  return {
+    // State
+    currentPhotoId,
+    currentPhoto,
+    currentArea,
+    isLoading,
+    cameraLon,
+    cameraLat,
+
+    // Navigation functions
+    navigateDirection,
+    jumpToPhoto,
+    getAvailableDirections,
+    handleCameraChange
+  }
+}
+```
+
+### Step 1.5.3: Update Main Route Component Integration (15 minutes)
+
+**File: `src/routes/index.tsx`**
+
+Connect the camera orientation preservation:
+
+```typescript
+function TourApp() {
+  const {
+    currentPhoto,
+    currentArea,
+    isLoading,
+    navigateDirection,
+    cameraLon,
+    cameraLat,
+    handleCameraChange
+  } = useTourNavigation()
+
+  return (
+    <div className="h-screen w-screen overflow-hidden bg-gray-900 relative">
+      <PanoramicViewer
+        imageUrl={currentPhoto?.imageUrl}
+        className="w-full h-full"
+        initialLon={cameraLon}
+        initialLat={cameraLat}
+        onCameraChange={handleCameraChange}
+      />
+
+      {/* Navigation controls and location display remain the same */}
+    </div>
+  )
+}
+```
+
+### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes)
+
+**Testing Scenarios:**
+
+1. **A Block Navigation Test:**
+   - Start at `a-f1-north-entrance`
+   - Drag to face the "forward" direction (opposite of image default)
+   - Navigate forward → verify camera maintains orientation
+   - Navigate back → verify bidirectional consistency
+
+2. **Cross-Building Navigation:**
+   - Navigate from A Block to X Block while facing a specific direction
+   - Verify orientation is preserved across building boundaries
+
+3. **Multi-Turn Navigation:**
+   - Navigate through complex paths (forward → left → back → right)
+   - Verify camera orientation remains consistent with user's intended direction
+
+### Benefits of This Solution
+
+1. **Solves A Block Issue**: Users can orient themselves correctly regardless of how photos were captured
+2. **Natural Navigation**: Maintains viewing direction like Google Street View
+3. **Bidirectional Consistency**: Works correctly for both forward and backward navigation
+4. **User-Friendly**: No need to retake photos or manually rotate images
+5. **Scalable**: Works for any building block with orientation inconsistencies
+
+---
+
 ## Phase 2: Navigation Controls UI (2-3 hours)
 
 ### Goal
@@ -850,206 +1050,6 @@ useEffect(() => {
 - ✅ Loading states provide smooth user experience
 - ✅ Controls are properly positioned and don't interfere with viewer
 - ✅ Both UI and keyboard navigation work seamlessly together
-
----
-
-## Phase 1.5: Camera Orientation Preservation (1-2 hours)
-
-### Goal
-Implement camera orientation persistence between photo transitions to solve the A Block image orientation issue and provide Google Street View-style navigation continuity.
-
-### Problem Statement
-Currently, when navigating between photos, the camera orientation resets to a default position (0°, 0°). This causes several issues:
-
-1. **A Block Orientation Issue**: A Block photos were captured facing 180° opposite to the intended navigation direction
-2. **User Disorientation**: Users lose their viewing direction when transitioning between photos
-3. **Unnatural Navigation**: Unlike Google Street View, users must reorient themselves after each move
-
-### Solution: Persistent Camera Orientation
-Preserve the user's camera rotation (longitude/latitude) when navigating between photos, allowing them to maintain their viewing direction naturally.
-
-### Step 1.5.1: Update PanoramicViewer Props (30 minutes)
-
-**File: `src/components/viewer/PanoramicViewer.tsx`**
-
-Add camera orientation props to the component interface:
-
-```typescript
-interface PanoramicViewerProps {
-  imageUrl: string
-  className?: string
-  initialLon?: number
-  initialLat?: number
-  onCameraChange?: (lon: number, lat: number) => void
-}
-```
-
-Update component to use initial orientation and emit changes:
-
-```typescript
-export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
-  imageUrl,
-  className = '',
-  initialLon = 0,
-  initialLat = 0,
-  onCameraChange
-}) => {
-  // Initialize camera position with props
-  let lon = initialLon
-  let lat = initialLat
-
-  // Emit camera changes during mouse/touch movement
-  const onPointerMove = (event: PointerEvent | TouchEvent) => {
-    if (!isMouseDown) return
-
-    event.preventDefault()
-    const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
-    const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
-
-    lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
-    lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
-    lat = Math.max(-85, Math.min(85, lat))
-
-    // Emit camera change for persistence
-    onCameraChange?.(lon, lat)
-  }
-}
-```
-
-### Step 1.5.2: Update Navigation Hook for Camera State (30 minutes)
-
-**File: `src/hooks/useTourNavigation.ts`**
-
-Add camera orientation state management to the navigation hook:
-
-```typescript
-export function useTourNavigation() {
-  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
-  const [isLoading, setIsLoading] = useState(false)
-  const [cameraLon, setCameraLon] = useState(0)
-  const [cameraLat, setCameraLat] = useState(0)
-
-  /**
-   * Handle camera orientation changes from the panoramic viewer
-   *
-   * Stores the current camera orientation for persistence during navigation.
-   * Called whenever the user drags to look around in the 360° view.
-   */
-  const handleCameraChange = useCallback((lon: number, lat: number) => {
-    setCameraLon(lon)
-    setCameraLat(lat)
-  }, [])
-
-  /**
-   * Navigate maintaining camera orientation
-   *
-   * Preserves the user's viewing direction when transitioning between photos,
-   * providing continuity similar to Google Street View navigation.
-   */
-  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
-    if (!currentPhoto || isLoading) return
-
-    const targetPhotoId = currentPhoto.connections[direction]
-    if (targetPhotoId) {
-      setIsLoading(true)
-      const finalTargetId = Array.isArray(targetPhotoId) ? targetPhotoId[0] : targetPhotoId
-
-      const targetPhoto = findPhotoById(finalTargetId)
-      if (targetPhoto) {
-        const img = new Image()
-        img.onload = () => {
-          setTimeout(() => {
-            setCurrentPhotoId(finalTargetId)
-            // Camera orientation (cameraLon, cameraLat) is preserved automatically
-            setIsLoading(false)
-          }, 200)
-        }
-        img.onerror = () => {
-          setIsLoading(false)
-          console.error('Failed to load image:', targetPhoto.imageUrl)
-        }
-        img.src = targetPhoto.imageUrl
-      }
-    }
-  }, [currentPhoto, isLoading, cameraLon, cameraLat])
-
-  return {
-    // State
-    currentPhotoId,
-    currentPhoto,
-    currentArea,
-    isLoading,
-    cameraLon,
-    cameraLat,
-
-    // Navigation functions
-    navigateDirection,
-    jumpToPhoto,
-    getAvailableDirections,
-    handleCameraChange
-  }
-}
-```
-
-### Step 1.5.3: Update Main Route Component Integration (15 minutes)
-
-**File: `src/routes/index.tsx`**
-
-Connect the camera orientation preservation:
-
-```typescript
-function TourApp() {
-  const {
-    currentPhoto,
-    currentArea,
-    isLoading,
-    navigateDirection,
-    cameraLon,
-    cameraLat,
-    handleCameraChange
-  } = useTourNavigation()
-
-  return (
-    <div className="h-screen w-screen overflow-hidden bg-gray-900 relative">
-      <PanoramicViewer
-        imageUrl={currentPhoto?.imageUrl}
-        className="w-full h-full"
-        initialLon={cameraLon}
-        initialLat={cameraLat}
-        onCameraChange={handleCameraChange}
-      />
-
-      {/* Navigation controls and location display remain the same */}
-    </div>
-  )
-}
-```
-
-### Step 1.5.4: Testing Camera Orientation Persistence (30 minutes)
-
-**Testing Scenarios:**
-
-1. **A Block Navigation Test:**
-   - Start at `a-f1-north-entrance`
-   - Drag to face the "forward" direction (opposite of image default)
-   - Navigate forward → verify camera maintains orientation
-   - Navigate back → verify bidirectional consistency
-
-2. **Cross-Building Navigation:**
-   - Navigate from A Block to X Block while facing a specific direction
-   - Verify orientation is preserved across building boundaries
-
-3. **Multi-Turn Navigation:**
-   - Navigate through complex paths (forward → left → back → right)
-   - Verify camera orientation remains consistent with user's intended direction
-
-### Benefits of This Solution
-
-1. **Solves A Block Issue**: Users can orient themselves correctly regardless of how photos were captured
-2. **Natural Navigation**: Maintains viewing direction like Google Street View
-3. **Bidirectional Consistency**: Works correctly for both forward and backward navigation
-4. **User-Friendly**: No need to retake photos or manually rotate images
-5. **Scalable**: Works for any building block with orientation inconsistencies
 
 ---
 

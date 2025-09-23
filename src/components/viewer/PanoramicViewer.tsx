@@ -9,11 +9,17 @@ import { InformationPopup } from '../InformationPopup'
 interface PanoramicViewerProps {
   imageUrl: string
   className?: string
+  initialLon?: number
+  initialLat?: number
+  onCameraChange?: (lon: number, lat: number) => void
 }
 
-export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({ 
-  imageUrl, 
-  className = ''
+export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
+  imageUrl,
+  className = '',
+  initialLon = 0,
+  initialLat = 0,
+  onCameraChange
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
@@ -110,8 +116,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
       // Mouse control variables
       let isMouseDown = false
-      let lon = 0
-      let lat = 0
+      let lon = initialLon
+      let lat = initialLat
       let onPointerDownPointerX = 0
       let onPointerDownPointerY = 0
       let onPointerDownLon = 0
@@ -149,6 +155,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
         lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
         lat = Math.max(-85, Math.min(85, lat))
+
+        // Emit camera change for persistence
+        onCameraChange?.(lon, lat)
       }
 
       const onPointerUp = (event: PointerEvent | TouchEvent) => {

@@ -31,6 +31,8 @@ import type { Photo, Area } from '../types/tour'
 export function useTourNavigation() {
   const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
   const [isLoading, setIsLoading] = useState(false)
+  const [cameraLon, setCameraLon] = useState(0)
+  const [cameraLat, setCameraLat] = useState(0)
 
   // Get current photo using centralized lookup
   const currentPhoto = useMemo(() => {
@@ -41,6 +43,20 @@ export function useTourNavigation() {
   const currentArea = useMemo(() => {
     return getAreaForPhoto(currentPhotoId)
   }, [currentPhotoId])
+
+  /**
+   * Handle camera orientation changes from the panoramic viewer
+   *
+   * Stores the current camera orientation for persistence during navigation.
+   * Called whenever the user drags to look around in the 360° view.
+   *
+   * @param lon - Camera longitude (horizontal rotation)
+   * @param lat - Camera latitude (vertical rotation)
+   */
+  const handleCameraChange = useCallback((lon: number, lat: number) => {
+    setCameraLon(lon)
+    setCameraLat(lat)
+  }, [])
 
   /**
    * Navigate in a specific direction based on current photo connections
@@ -143,10 +159,13 @@ export function useTourNavigation() {
     currentPhoto,
     currentArea,
     isLoading,
+    cameraLon,
+    cameraLat,
 
     // Navigation functions
     navigateDirection,
     jumpToPhoto,
-    getAvailableDirections
+    getAvailableDirections,
+    handleCameraChange
   }
 }
