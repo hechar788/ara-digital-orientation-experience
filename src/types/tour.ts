@@ -8,6 +8,8 @@
  * @property id - Unique identifier for this photo (e.g., "a-f1-north-entrance")
  * @property imageUrl - Path to the 360° image file
  * @property position - GPS coordinates if available (optional)
+ * @property orientationOffset - Degrees to rotate directional logic to account for camera facing direction when photo was taken
+ * @property swapLeftRight - Whether to swap left and right directions for this photo
  * @property connections - Navigation connections to adjacent photos
  * @property connections.forward - Next photo when moving forward
  * @property connections.back - Previous photo when moving backward
@@ -23,6 +25,8 @@ export interface Photo {
   id: string
   imageUrl: string
   position?: { lat: number; lng: number }
+  orientationOffset?: number
+  swapLeftRight?: boolean
 
   connections: {
     forward?: string

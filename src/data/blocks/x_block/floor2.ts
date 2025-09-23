@@ -38,7 +38,8 @@ export const xBlockFloor2Area: Area = {
       id: 'x-f2-north-entry',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_n_entry.webp',
       connections: {
-        forward: 'x-f2-west-1'
+        forward: 'x-f2-west-1',
+        back: 'n-f2-east-4'
       },
       buildingContext: {
         wing: 'north',
@@ -50,8 +51,7 @@ export const xBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_1.webp',
       connections: {
         forward: 'x-f2-west-2',
-        back: 'x-f2-north-entry',
-        right: 'n-f2-east-4'
+        back: 'x-f2-north-entry'
       }
     },
     {

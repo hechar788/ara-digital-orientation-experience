@@ -32,7 +32,7 @@ export const nBlockFloor1Area: Area = {
   photos: [
     {
       id: 'n-f1-x-entry',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_x_entry.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_x_entry.webp',
       connections: {
         forward: 'n-f1-east-1',
         back: 'x-f1-west-12'
@@ -44,7 +44,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-1',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_1.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_1.webp',
       connections: {
         forward: 'n-f1-east-2',
         back: 'n-f1-x-entry'
@@ -52,7 +52,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-2',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_2.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_2.webp',
       connections: {
         forward: 'n-f1-east-5',
         back: 'n-f1-east-1',
@@ -61,7 +61,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-south-3',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_south_3.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_south_3.webp',
       connections: {
         forward: 'n-f1-east-south-4',
         back: 'n-f1-east-2'
@@ -69,7 +69,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-south-4',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_south_4.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_south_4.webp',
       connections: {
         back: 'n-f1-east-south-3'
       },
@@ -80,7 +80,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-5',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_5.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_5.webp',
       connections: {
         forward: 'n-f1-east-6',
         back: 'n-f1-east-2'
@@ -88,7 +88,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-east-6',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_east_6.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_6.webp',
       connections: {
         forward: 'n-f1-mid-7',
         back: 'n-f1-east-5'
@@ -96,7 +96,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-mid-7',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_mid_7.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_mid_7.webp',
       connections: {
         forward: 'n-f1-west-8',
         back: 'n-f1-east-6',
@@ -115,7 +115,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-west-8',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_west_8.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_8.webp',
       connections: {
         forward: 'n-f1-west-9',
         back: 'n-f1-mid-7'
@@ -123,7 +123,7 @@ export const nBlockFloor1Area: Area = {
     },
     {
       id: 'n-f1-west-9',
-      imageUrl: '/360_photos_compressed/n_s_block/n_block/n_west_9.webp',
+      imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_9.webp',
       connections: {
         back: 'n-f1-west-8',
         forward: 's-f1-north-4'

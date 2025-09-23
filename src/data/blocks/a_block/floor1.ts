@@ -34,6 +34,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-entrance',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
+      orientationOffset: 180,
       connections: {
         forward: 'a-f1-north-1'
       },
@@ -45,6 +46,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-1',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_1.webp',
+      orientationOffset: 180,
       connections: {
         forward: 'a-f1-north-2',
         back: 'a-f1-north-entrance'
@@ -53,6 +55,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-2',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_2.webp',
+      orientationOffset: 180,
       connections: {
         forward: 'a-f1-north-3',
         back: 'a-f1-north-1'
@@ -61,6 +64,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3.webp',
+      orientationOffset: 180,
       connections: {
         forward: 'a-f1-mid-4',
         back: 'a-f1-north-2',
@@ -77,6 +81,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3-side',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3_side.webp',
+      orientationOffset: -90,
       connections: {
         back: 'a-f1-north-3',
         up: 'a-f2-north-stairs-entrance'
@@ -91,6 +96,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-4',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_4.webp',
+      orientationOffset: 300,
       connections: {
         forward: 'a-f1-mid-5',
         back: 'a-f1-north-3'
