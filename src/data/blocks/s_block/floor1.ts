@@ -33,9 +33,9 @@ export const sBlockFloor1Area: Area = {
     {
       id: 's-f1-north-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_1/s_north_4.webp',
-      connections: {
-        forward: 's-f1-mid-3',
-        back: 'n-f1-west-9'
+      directions: {
+        forward: { angle: 0, connection: 's-f1-mid-3' },
+        back: { angle: 180, connection: 'n-f1-west-9' }
       },
       buildingContext: {
         wing: 'north',
@@ -45,9 +45,9 @@ export const sBlockFloor1Area: Area = {
     {
       id: 's-f1-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_1/s_mid_3.webp',
-      connections: {
-        forward: 's-f1-south-2',
-        back: 's-f1-north-4'
+      directions: {
+        forward: { angle: 0, connection: 's-f1-south-2' },
+        back: { angle: 180, connection: 's-f1-north-4' }
       },
       buildingContext: {
         wing: 'middle',
@@ -57,16 +57,16 @@ export const sBlockFloor1Area: Area = {
     {
       id: 's-f1-south-2',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_1/s_south_2.webp',
-      connections: {
-        forward: 's-f1-south-entrance',
-        back: 's-f1-mid-3'
+      directions: {
+        forward: { angle: 0, connection: 's-f1-south-entrance' },
+        back: { angle: 180, connection: 's-f1-mid-3' }
       }
     },
     {
       id: 's-f1-south-entrance',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_1/s_south_entrance.webp',
-      connections: {
-        back: 's-f1-south-2'
+      directions: {
+        back: { angle: 180, connection: 's-f1-south-2' }
       },
       buildingContext: {
         wing: 'south',

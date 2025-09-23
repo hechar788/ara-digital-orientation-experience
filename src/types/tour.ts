@@ -2,21 +2,31 @@
 // Shared TypeScript interfaces for tour navigation system
 
 /**
+ * Represents a directional navigation option with angle and destination.
+ *
+ * @property angle - Camera angle where button appears (0-360 degrees)
+ * @property connection - Photo ID to navigate to when button is clicked
+ */
+export interface DirectionDefinition {
+  angle: number
+  connection: string
+}
+
+/**
  * Represents a single 360° photo in the VR tour with navigation connections
  * and contextual information about the location.
  *
  * @property id - Unique identifier for this photo (e.g., "a-f1-north-entrance")
  * @property imageUrl - Path to the 360° image file
- * @property position - GPS coordinates if available (optional)
- * @property orientationOffset - Degrees to rotate directional logic to account for camera facing direction when photo was taken
- * @property swapLeftRight - Whether to swap left and right directions for this photo
- * @property connections - Navigation connections to adjacent photos
- * @property connections.forward - Next photo when moving forward
- * @property connections.back - Previous photo when moving backward
- * @property connections.left - Photo ID when turning left (only at intersections)
- * @property connections.right - Photo ID when turning right (only at intersections)
- * @property connections.up - Photo ID(s) when going up (stairs/elevator) - array for multi-floor elevators
- * @property connections.down - Photo ID(s) when going down (stairs/elevator) - array for multi-floor elevators
+ * @property startingAngle - Initial camera orientation angle in degrees (0-360, where 0 is north)
+ * @property directions - Unified direction definitions with angles and connections
+ * @property directions.forward - Forward navigation with angle and destination
+ * @property directions.back - Backward navigation with angle and destination
+ * @property directions.left - Left navigation with angle and destination
+ * @property directions.right - Right navigation with angle and destination
+ * @property directions.up - Photo ID(s) when going up (stairs/elevator) - array for multi-floor elevators
+ * @property directions.down - Photo ID(s) when going down (stairs/elevator) - array for multi-floor elevators
+ * @property directions.elevator - Photo ID for elevator access
  * @property hotspots - Clickable areas for vertical navigation (stairs/elevators)
  * @property nearbyRooms - Rooms visible or accessible from this photo location
  * @property buildingContext - Information about the building and floor context
@@ -24,15 +34,12 @@
 export interface Photo {
   id: string
   imageUrl: string
-  position?: { lat: number; lng: number }
-  orientationOffset?: number
-  swapLeftRight?: boolean
-
-  connections: {
-    forward?: string
-    back?: string
-    left?: string
-    right?: string
+  startingAngle?: number
+  directions: {
+    forward?: DirectionDefinition
+    back?: DirectionDefinition
+    left?: DirectionDefinition
+    right?: DirectionDefinition
     up?: string | string[]
     down?: string | string[]
     elevator?: string

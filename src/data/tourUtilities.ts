@@ -67,7 +67,7 @@ export const findPhotoById = (photoId: string): Photo | null => {
         return {
           id: elevator.photo.id,
           imageUrl: elevator.photo.imageUrl,
-          connections: {
+          directions: {
             // Handle elevator floor connections differently
             // Could be extended to support elevator navigation
           }

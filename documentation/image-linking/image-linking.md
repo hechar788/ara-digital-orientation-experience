@@ -62,19 +62,26 @@ The tour system uses the following TypeScript interfaces defined in `src/types/t
 ### Photo Interface
 ```typescript
 /**
+ * Represents a directional navigation option with angle and destination.
+ */
+export interface DirectionDefinition {
+  angle: number
+  connection: string
+}
+
+/**
  * Represents a single 360° photo in the VR tour with navigation connections
  * and contextual information about the location.
  */
 export interface Photo {
   id: string
   imageUrl: string
-  position?: { lat: number; lng: number }
-
-  connections: {
-    forward?: string
-    back?: string
-    left?: string
-    right?: string
+  startingAngle?: number
+  directions: {
+    forward?: DirectionDefinition
+    back?: DirectionDefinition
+    left?: DirectionDefinition
+    right?: DirectionDefinition
     up?: string | string[]
     down?: string | string[]
     elevator?: string
@@ -168,17 +175,18 @@ export interface ElevatorHotspot {
 
 ### 2. Navigation Connections
 
-Each photo defines how users can move to other photos using directional connections:
+Each photo defines how users can move to other photos using the unified directions interface:
 
 ```typescript
 {
   id: 'a-f1-north-2',
   imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_2.webp',
-  connections: {
-    forward: 'a-f1-north-3',    // Move forward along corridor
-    back: 'a-f1-north-1',       // Move backward along corridor
-    left: 'a-f1-side-branch',   // Turn left at intersection
-    up: 'a-f2-stairs'           // Go upstairs
+  startingAngle: 180,                                       // Start facing south (180°)
+  directions: {
+    forward: { angle: 0, connection: 'a-f1-north-3' },     // Move forward along corridor
+    back: { angle: 180, connection: 'a-f1-north-1' },      // Move backward along corridor
+    left: { angle: 270, connection: 'a-f1-side-branch' },  // Turn left at intersection
+    up: 'a-f2-stairs'                                       // Go upstairs (simple string)
   }
 }
 ```
@@ -210,7 +218,11 @@ Photos can include information about nearby rooms and facilities:
 {
   id: 'a-f1-north-entrance',
   imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
-  connections: { /* navigation */ },
+  startingAngle: 180,                                       // Start facing south
+  directions: {
+    forward: { angle: 0, connection: 'a-f1-north-1' },
+    left: { angle: 270, connection: 'a-f1-info-desk' }
+  },
   nearbyRooms: [
     {
       roomNumber: 'A101',
@@ -229,6 +241,35 @@ Photos can include information about nearby rooms and facilities:
 ```
 
 The `NearbyRooms` interface helps users understand what's accessible from their current location, while `buildingContext` provides broader area information.
+
+### 5. Starting Camera Orientation
+
+Each photo can specify an initial camera orientation using the `startingAngle` property:
+
+```typescript
+{
+  id: 'a-f1-north-entrance',
+  imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
+  startingAngle: 180,  // Start facing south (180 degrees)
+  directions: {
+    forward: { angle: 160, connection: 'a-f1-north-1' }
+  }
+}
+```
+
+**Angle Reference:**
+- `0°` - North (default if not specified)
+- `90°` - East
+- `180°` - South
+- `270°` - West
+
+**Use Cases:**
+- **Entrance Orientation**: When entering a building, face the interior rather than the entrance
+- **Flow Direction**: Align with the expected movement direction through corridors
+- **Contextual Views**: Show the most relevant view for each location's purpose
+
+**Example: A Block Floor 1**
+All A Block Floor 1 photos use `startingAngle: 180` to face south, creating a consistent orientation as users move through the building from north to south.
 
 ## Implementation Steps
 
@@ -275,10 +316,10 @@ Stairs provide direct floor-to-floor connections in A and X blocks:
 // A Block stair connection
 {
   id: 'a-f1-north-3',
-  connections: {
-    forward: 'a-f1-mid-4',
-    back: 'a-f1-north-2',
-    up: 'a-f2-north-stairs-entrance'  // Direct stair access
+  directions: {
+    forward: { angle: 0, connection: 'a-f1-mid-4' },
+    back: { angle: 180, connection: 'a-f1-north-2' },
+    up: 'a-f2-north-stairs-entrance'  // Direct stair access (simple string)
   },
   hotspots: [
     {
@@ -291,9 +332,9 @@ Stairs provide direct floor-to-floor connections in A and X blocks:
 // Corresponding floor 2 connection
 {
   id: 'a-f2-north-stairs-entrance',
-  connections: {
-    down: 'a-f1-north-3',  // Back down the stairs
-    forward: 'a-f2-mid-3'
+  directions: {
+    down: 'a-f1-north-3',  // Back down the stairs (simple string)
+    forward: { angle: 0, connection: 'a-f2-mid-3' }
   },
   hotspots: [
     {

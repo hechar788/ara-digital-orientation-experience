@@ -5,10 +5,12 @@ import { PanoramicViewerControls } from './PanoramicViewerControls'
 import { PopoutMenu } from '../PopoutMenu'
 import { AIChatPopup } from '../AIChatPopup'
 import { InformationPopup } from '../InformationPopup'
+import { Spinner } from '../ui/shadcn-io/spinner'
 
 interface PanoramicViewerProps {
   imageUrl: string
   className?: string
+  startingAngle?: number
   initialLon?: number
   initialLat?: number
   onCameraChange?: (lon: number, lat: number) => void
@@ -17,6 +19,7 @@ interface PanoramicViewerProps {
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   imageUrl,
   className = '',
+  startingAngle = 0,
   initialLon = 0,
   initialLat = 0,
   onCameraChange
@@ -39,11 +42,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
-    camera: THREE.PerspectiveCamera  
+    camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
     geometry: THREE.SphereGeometry
     cameraLeft: THREE.PerspectiveCamera
     cameraRight: THREE.PerspectiveCamera
+    sphere: THREE.Mesh
   } | null>(null)
   const fovRef = useRef(75)
   const stereoModeRef = useRef(false)
@@ -75,11 +79,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     }
   }, [isVRMode])
 
+  // Scene setup - runs once on mount
   useEffect(() => {
     // Use setTimeout to ensure DOM is ready
     const timer = setTimeout(() => {
       const mount = mountRef.current
-      
+
       if (!mount) {
         return
       }
@@ -88,7 +93,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
       const renderer = new THREE.WebGLRenderer({ antialias: true })
-      
+
       renderer.setSize(mount.clientWidth, mount.clientHeight)
       renderer.setPixelRatio(window.devicePixelRatio)
       mount.appendChild(renderer.domElement)
@@ -96,12 +101,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Stereo cameras for VR mode
       const cameraLeft = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
       const cameraRight = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
-      
+
       // Position cameras at origin inside the sphere
       camera.position.set(0, 0, 0)
       cameraLeft.position.set(-0.032, 0, 0) // ~32mm eye separation
       cameraRight.position.set(0.032, 0, 0)
-      
+
       // Set initial camera directions
       camera.lookAt(0, 0, 1)
       cameraLeft.lookAt(0, 0, 1)
@@ -111,12 +116,20 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       const geometry = new THREE.SphereGeometry(10, 32, 16)
       geometry.scale(-1, 1, 1) // Flip for inside view
 
-      // Store scene data for cleanup
-      sceneDataRef.current = { scene, camera, renderer, geometry, cameraLeft, cameraRight }
+      // Create sphere with placeholder material
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x000000, // Black placeholder
+        side: THREE.FrontSide
+      })
+      const sphere = new THREE.Mesh(geometry, material)
+      scene.add(sphere)
 
-      // Mouse control variables
+      // Store scene data for cleanup
+      sceneDataRef.current = { scene, camera, renderer, geometry, cameraLeft, cameraRight, sphere }
+
+      // Mouse control variables - use startingAngle if provided, otherwise initialLon
       let isMouseDown = false
-      let lon = initialLon
+      let lon = startingAngle || initialLon
       let lat = initialLat
       let onPointerDownPointerX = 0
       let onPointerDownPointerY = 0
@@ -224,7 +237,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Animation loop function - declared at proper scope
       const animate = () => {
         animationRef.current = requestAnimationFrame(animate)
-        
+
         // Update camera rotation based on mouse position
         const phi = THREE.MathUtils.degToRad(90 - lat)
         const theta = THREE.MathUtils.degToRad(lon)
@@ -236,37 +249,37 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
         // Always update main camera rotation first
         camera.lookAt(target)
-        
+
         if (stereoModeRef.current) {
           // Set up stereo cameras with eye separation
           cameraLeft.position.copy(camera.position)
           cameraRight.position.copy(camera.position)
           cameraLeft.rotation.copy(camera.rotation)
           cameraRight.rotation.copy(camera.rotation)
-          
+
           // Add stereo offset
           cameraLeft.position.x -= 0.032
           cameraRight.position.x += 0.032
-          
+
           const width = mount.clientWidth
           const height = mount.clientHeight
-          
+
           // Clear entire buffer
           renderer.setViewport(0, 0, width, height)
           renderer.clear()
-          
+
           // Left eye - use scissor test
           renderer.setViewport(0, 0, width / 2, height)
           renderer.setScissor(0, 0, width / 2, height)
           renderer.setScissorTest(true)
           renderer.render(scene, cameraLeft)
-          
+
           // Right eye
           renderer.setViewport(width / 2, 0, width / 2, height)
           renderer.setScissor(width / 2, 0, width / 2, height)
           renderer.setScissorTest(true)
           renderer.render(scene, cameraRight)
-          
+
           // Reset everything
           renderer.setScissorTest(false)
           renderer.setViewport(0, 0, width, height)
@@ -276,30 +289,33 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         }
       }
 
+      // Start animation loop
+      animate()
 
-      // Load texture
-      const loader = new THREE.TextureLoader()
-      
-      loader.load(
-        imageUrl,
-        (texture) => {
-          const material = new THREE.MeshBasicMaterial({ 
-            map: texture,
-            side: THREE.FrontSide // Use FrontSide with inverted geometry
-          })
-          const sphere = new THREE.Mesh(geometry, material)
-          scene.add(sphere)
-          
-          // Start animation - function is now properly accessible
-          animate()
-          
-          setStatus('ready')
-        },
-        undefined,
-        (error) => {
-          setStatus('error')
-        }
-      )
+      // Load initial texture if imageUrl is available
+      if (imageUrl) {
+        setStatus('loading')
+        const loader = new THREE.TextureLoader()
+        loader.load(
+          imageUrl,
+          (texture) => {
+            if (sceneDataRef.current) {
+              const { sphere } = sceneDataRef.current
+              sphere.material = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.FrontSide
+              })
+              setStatus('ready')
+              setInitialLoadComplete(true)
+            }
+          },
+          undefined,
+          (error) => {
+            console.error('Failed to load initial texture:', error)
+            setStatus('error')
+          }
+        )
+      }
 
       // Cleanup function for this setup
       return () => {
@@ -325,7 +341,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       if (sceneDataRef.current) {
         const { renderer, geometry } = sceneDataRef.current
         const mount = mountRef.current
-        
+
         if (mount && renderer.domElement.parentNode === mount) {
           mount.removeChild(renderer.domElement)
         }
@@ -334,7 +350,44 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         sceneDataRef.current = null
       }
     }
-  }, [imageUrl])
+  }, []) // Only run on mount
+
+  // Texture loading effect - runs when imageUrl changes (but not on initial load)
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
+
+  useEffect(() => {
+    // Skip if this is the initial load (handled in scene setup) or scene not ready
+    if (!initialLoadComplete || !imageUrl || !sceneDataRef.current) return
+
+    setStatus('loading')
+
+    const loader = new THREE.TextureLoader()
+
+    loader.load(
+      imageUrl,
+      (texture) => {
+        if (sceneDataRef.current) {
+          const { sphere } = sceneDataRef.current
+          // Dispose of old material to prevent memory leaks
+          if (sphere.material && sphere.material.map) {
+            sphere.material.map.dispose()
+            sphere.material.dispose()
+          }
+          // Update existing sphere's material with new texture
+          sphere.material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.FrontSide
+          })
+          setStatus('ready')
+        }
+      },
+      undefined,
+      (error) => {
+        console.error('Failed to load texture:', error)
+        setStatus('error')
+      }
+    )
+  }, [imageUrl, initialLoadComplete])
 
   // Handler functions for controls
   const handleZoomIn = () => {
@@ -382,7 +435,11 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   return (
     <div className={`${className} relative`}>
       <div ref={mountRef} className="h-screen w-screen absolute inset-0">
-        {status === 'loading' && <div className="absolute inset-0 flex items-center justify-center text-white z-10">Loading...</div>}
+        {status === 'loading' && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <Spinner className="text-gray-500" size={48} />
+          </div>
+        )}
         {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400 z-10">Error loading image</div>}
       </div>
       

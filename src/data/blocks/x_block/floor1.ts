@@ -36,9 +36,9 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-1',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_1.webp',
-      connections: {
-        forward: 'x-f1-east-2',
-        back: 'a-f1-south-6'
+      directions: {
+        forward: { angle: 90, connection: 'x-f1-east-2' },
+        back: { angle: 180, connection: 'a-f1-south-6' }
       },
       buildingContext: {
         wing: 'east',
@@ -48,9 +48,9 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-2',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_2.webp',
-      connections: {
-        forward: 'x-f1-east-3',
-        back: 'x-f1-east-1',
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-east-3' },
+        back: { angle: 180, connection: 'x-f1-east-1' },
         up: 'x-f2-east-13'
       },
       hotspots: [
@@ -63,9 +63,9 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-3',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_3.webp',
-      connections: {
-        forward: 'x-f1-east-4',
-        back: 'x-f1-east-2',
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-east-4' },
+        back: { angle: 180, connection: 'x-f1-east-2' },
         up: 'x-f2-east-13'
       },
       hotspots: [
@@ -78,25 +78,25 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-4',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_4.webp',
-      connections: {
-        forward: 'x-f1-mid-5',
-        back: 'x-f1-east-3'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-mid-5' },
+        back: { angle: 180, connection: 'x-f1-east-3' }
       }
     },
     {
       id: 'x-f1-mid-5',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_5.webp',
-      connections: {
-        forward: 'x-f1-mid-6',
-        back: 'x-f1-east-4'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-mid-6' },
+        back: { angle: 180, connection: 'x-f1-east-4' }
       }
     },
     {
       id: 'x-f1-mid-6',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_6.webp',
-      connections: {
-        forward: 'x-f1-mid-7',
-        back: 'x-f1-mid-5',
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-mid-7' },
+        back: { angle: 180, connection: 'x-f1-mid-5' },
         elevator: 'x-block-elevator'
       },
       hotspots: [
@@ -109,49 +109,49 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-mid-7',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_7.webp',
-      connections: {
-        forward: 'x-f1-mid-8',
-        back: 'x-f1-mid-6'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-mid-8' },
+        back: { angle: 180, connection: 'x-f1-mid-6' }
       }
     },
     {
       id: 'x-f1-mid-8',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_8.webp',
-      connections: {
-        forward: 'x-f1-west-9',
-        back: 'x-f1-mid-7'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-west-9' },
+        back: { angle: 180, connection: 'x-f1-mid-7' }
       }
     },
     {
       id: 'x-f1-west-9',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_9.webp',
-      connections: {
-        forward: 'x-f1-west-10',
-        back: 'x-f1-mid-8'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-west-10' },
+        back: { angle: 180, connection: 'x-f1-mid-8' }
       }
     },
     {
       id: 'x-f1-west-10',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_10.webp',
-      connections: {
-        forward: 'x-f1-west-11',
-        back: 'x-f1-west-9'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-west-11' },
+        back: { angle: 180, connection: 'x-f1-west-9' }
       }
     },
     {
       id: 'x-f1-west-11',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_11.webp',
-      connections: {
-        forward: 'x-f1-west-12',
-        back: 'x-f1-west-10'
+      directions: {
+        forward: { angle: 0, connection: 'x-f1-west-12' },
+        back: { angle: 180, connection: 'x-f1-west-10' }
       }
     },
     {
       id: 'x-f1-west-12',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_12.webp',
-      connections: {
-        back: 'x-f1-west-11',
-        forward: 'n-f1-x-entry'
+      directions: {
+        forward: { angle: 0, connection: 'n-f1-x-entry' },
+        back: { angle: 180, connection: 'x-f1-west-11' }
       },
       buildingContext: {
         wing: 'west',

@@ -33,9 +33,9 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-east-4',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_east_4.webp',
-      connections: {
-        forward: 'n-f2-mid-3',
-        back: 'x-f2-north-entry'
+      directions: {
+        forward: { angle: 0, connection: 'n-f2-mid-3' },
+        back: { angle: 180, connection: 'x-f2-north-entry' }
       },
       buildingContext: {
         wing: 'east',
@@ -45,9 +45,9 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_mid_3.webp',
-      connections: {
-        forward: 'n-f2-west-2',
-        back: 'n-f2-east-4'
+      directions: {
+        forward: { angle: 0, connection: 'n-f2-west-2' },
+        back: { angle: 180, connection: 'n-f2-east-4' }
       },
       buildingContext: {
         wing: 'middle',
@@ -57,17 +57,17 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-west-2',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_2.webp',
-      connections: {
-        forward: 'n-f2-west-1',
-        back: 'n-f2-mid-3'
+      directions: {
+        forward: { angle: 0, connection: 'n-f2-west-1' },
+        back: { angle: 180, connection: 'n-f2-mid-3' }
       }
     },
     {
       id: 'n-f2-west-1',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_1.webp',
-      connections: {
-        back: 'n-f2-west-2',
-        forward: 'n-f2-elevator-entrance'
+      directions: {
+        forward: { angle: 0, connection: 'n-f2-elevator-entrance' },
+        back: { angle: 180, connection: 'n-f2-west-2' }
       },
       buildingContext: {
         wing: 'west',
@@ -77,9 +77,9 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-elevator-entrance',
       imageUrl: '/360_photos_compressed/n_s_block/n_s_2nd_floor_elevators_entrance.webp',
-      connections: {
-        back: 'n-f2-west-1',
-        forward: 's-f2-mid-1',
+      directions: {
+        forward: { angle: 0, connection: 's-f2-mid-1' },
+        back: { angle: 180, connection: 'n-f2-west-1' },
         elevator: 'ns-block-elevator'
       },
       hotspots: [

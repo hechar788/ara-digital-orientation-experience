@@ -73,13 +73,6 @@ function App() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-gray-900 relative">
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="text-white text-xl font-medium">Loading...</div>
-        </div>
-      )}
-
       {/* Debug info - remove after Phase 1 testing */}
       <div className="absolute top-4 left-4 z-50 text-white bg-black/70 p-3 rounded-lg text-sm">
         <div><strong>Photo:</strong> {currentPhotoId}</div>
@@ -98,6 +91,7 @@ function App() {
       <PanoramicViewer
         imageUrl={currentPhoto?.imageUrl}
         className="w-full h-full"
+        startingAngle={currentPhoto?.startingAngle}
         initialLon={cameraLon}
         initialLat={cameraLat}
         onCameraChange={handleCameraChange}

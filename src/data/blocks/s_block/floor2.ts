@@ -34,9 +34,9 @@ export const sBlockFloor2Area: Area = {
     {
       id: 's-f2-mid-1',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_1.webp',
-      connections: {
-        forward: 's-f2-mid-2',
-        back: 'n-f2-elevator-entrance'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-mid-2' },
+        back: { angle: 180, connection: 'n-f2-elevator-entrance' }
       },
       buildingContext: {
         wing: 'middle',
@@ -46,48 +46,48 @@ export const sBlockFloor2Area: Area = {
     {
       id: 's-f2-mid-2',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_2.webp',
-      connections: {
-        forward: 's-f2-mid-3',
-        back: 's-f2-mid-1'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-mid-3' },
+        back: { angle: 180, connection: 's-f2-mid-1' }
       }
     },
     {
       id: 's-f2-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_3.webp',
-      connections: {
-        forward: 's-f2-mid-4',
-        back: 's-f2-mid-2'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-mid-4' },
+        back: { angle: 180, connection: 's-f2-mid-2' }
       }
     },
     {
       id: 's-f2-mid-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_4.webp',
-      connections: {
-        forward: 's-f2-south-5',
-        back: 's-f2-mid-3'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-south-5' },
+        back: { angle: 180, connection: 's-f2-mid-3' }
       }
     },
     {
       id: 's-f2-south-5',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_5.webp',
-      connections: {
-        forward: 's-f2-south-6',
-        back: 's-f2-mid-4'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-south-6' },
+        back: { angle: 180, connection: 's-f2-mid-4' }
       }
     },
     {
       id: 's-f2-south-6',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_6.webp',
-      connections: {
-        forward: 's-f2-south-7',
-        back: 's-f2-south-5'
+      directions: {
+        forward: { angle: 0, connection: 's-f2-south-7' },
+        back: { angle: 180, connection: 's-f2-south-5' }
       }
     },
     {
       id: 's-f2-south-7',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_7.webp',
-      connections: {
-        back: 's-f2-south-6'
+      directions: {
+        back: { angle: 180, connection: 's-f2-south-6' }
       },
       buildingContext: {
         wing: 'south',
