@@ -9,6 +9,174 @@ import { findPhotoById, getAreaForPhoto } from '../data/tourUtilities'
 import type { Photo, Area } from '../types/tour'
 
 /**
+ * Navigation type classification for orientation handling
+ */
+type NavigationType = 'same-corridor' | 'same-building-corner' | 'cross-building' | 'turn'
+
+/**
+ * Navigation analysis result
+ */
+interface NavigationAnalysis {
+  navigationType: NavigationType
+  preserveOrientation: boolean
+}
+
+/**
+ * Analyzes navigation context to determine orientation handling approach
+ *
+ * Uses bidirectional connection analysis and corridor geometry to classify
+ * navigation types for appropriate orientation handling.
+ *
+ * @param currentPhoto - Source photo being navigated from
+ * @param destinationPhoto - Target photo being navigated to
+ * @param direction - Navigation direction being used
+ * @returns Navigation analysis with type classification
+ */
+function analyzeNavigation(
+  currentPhoto: Photo,
+  destinationPhoto: Photo,
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down'
+): NavigationAnalysis {
+  // Handle turns and vertical navigation
+  if (direction !== 'forward' && direction !== 'back') {
+    return { navigationType: 'turn', preserveOrientation: false }
+  }
+
+  // Extract building prefixes from photo IDs (e.g., 'a-f1' from 'a-f1-north-1')
+  const currentBuilding = currentPhoto.id.split('-').slice(0, 2).join('-')
+  const destinationBuilding = destinationPhoto.id.split('-').slice(0, 2).join('-')
+
+  // Cross-building navigation
+  if (currentBuilding !== destinationBuilding) {
+    return { navigationType: 'cross-building', preserveOrientation: false }
+  }
+
+  // Check for bidirectional forward/back connections
+  const currentConnection = currentPhoto.directions[direction]?.connection
+  const reverseDirection = direction === 'forward' ? 'back' : 'forward'
+  const destinationConnection = destinationPhoto.directions[reverseDirection]?.connection
+
+  // Not bidirectional connections
+  if (currentConnection !== destinationPhoto.id || destinationConnection !== currentPhoto.id) {
+    return { navigationType: 'same-building-corner', preserveOrientation: false }
+  }
+
+  // Check corridor orientation consistency
+  const currentForward = currentPhoto.directions.forward?.angle
+  const currentBack = currentPhoto.directions.back?.angle
+  const destinationForward = destinationPhoto.directions.forward?.angle
+  const destinationBack = destinationPhoto.directions.back?.angle
+
+  if (currentForward !== undefined && currentBack !== undefined &&
+      destinationForward !== undefined && destinationBack !== undefined) {
+
+    // Helper function to calculate angular difference with wraparound
+    const angleDiff = (a1: number, a2: number) => {
+      let diff = Math.abs(a1 - a2)
+      if (diff > 180) diff = 360 - diff
+      return diff
+    }
+
+    // Check if both forward and back directions are similar between photos
+    const forwardDiff = angleDiff(currentForward, destinationForward)
+    const backDiff = angleDiff(currentBack, destinationBack)
+
+    // If corridor geometry differs significantly, it's a corner/direction change
+    if (forwardDiff > 30 || backDiff > 30) {
+      return { navigationType: 'same-building-corner', preserveOrientation: false }
+    }
+  }
+
+  // Same corridor with consistent geometry
+  return { navigationType: 'same-corridor', preserveOrientation: true }
+}
+
+/**
+ * Calculates camera orientation based on navigation context and directional intent
+ *
+ * Provides unified orientation calculation for all navigation types, ensuring
+ * consistent directional intent preservation across different scenarios.
+ *
+ * @param currentCameraAngle - User's current camera angle in degrees
+ * @param currentPhoto - Source photo with corridor direction info
+ * @param destinationPhoto - Target photo with corridor direction info
+ * @param direction - Navigation direction being used
+ * @param navigationType - Type of navigation being performed
+ * @returns New camera angle that respects directional intent
+ */
+function calculateNavigationAngle(
+  currentCameraAngle: number,
+  currentPhoto: Photo,
+  destinationPhoto: Photo,
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down',
+  navigationType: NavigationType
+): number {
+  switch (navigationType) {
+    case 'same-corridor':
+      return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+
+    case 'cross-building':
+      // Use directional intent: forward movement faces forward, backward movement faces backward
+      if (direction === 'forward') {
+        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else if (direction === 'back') {
+        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      }
+      break
+
+    case 'same-building-corner':
+    case 'turn':
+    default:
+      // Use photo's startingAngle for corners, turns, and fallback cases
+      return destinationPhoto.startingAngle ?? 0
+  }
+
+  // Fallback
+  return destinationPhoto.startingAngle ?? 0
+}
+
+/**
+ * Calculates preserved camera orientation for same-corridor navigation
+ *
+ * Maintains the user's relative orientation to the corridor direction when
+ * moving between photos with bidirectional connections.
+ *
+ * @param currentCameraAngle - User's current camera angle in degrees
+ * @param currentPhoto - Source photo with corridor direction info
+ * @param destinationPhoto - Target photo with corridor direction info
+ * @returns New camera angle that preserves relative orientation
+ */
+function calculatePreservedOrientation(
+  currentCameraAngle: number,
+  currentPhoto: Photo,
+  destinationPhoto: Photo
+): number {
+  const currentForward = currentPhoto.directions.forward?.angle
+  const destForward = destinationPhoto.directions.forward?.angle
+
+  // Fallback to simple preservation if direction data is missing
+  if (currentForward === undefined || destForward === undefined) {
+    return currentCameraAngle
+  }
+
+  // Calculate user's relative orientation to current corridor
+  let relativeAngle = currentCameraAngle - currentForward
+
+  // Normalize angle to -180 to 180 range
+  while (relativeAngle > 180) relativeAngle -= 360
+  while (relativeAngle < -180) relativeAngle += 360
+
+  // Apply same relative orientation to destination corridor
+  let newAngle = destForward + relativeAngle
+
+  // Normalize result to 0-360 range
+  while (newAngle < 0) newAngle += 360
+  while (newAngle >= 360) newAngle -= 360
+
+  return newAngle
+}
+
+/**
  * Hook for managing VR tour navigation state
  *
  * Provides state management for current photo, navigation between photos,
@@ -31,8 +199,9 @@ import type { Photo, Area } from '../types/tour'
 export function useTourNavigation() {
   const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
   const [isLoading, setIsLoading] = useState(false)
-  const [cameraLon, setCameraLon] = useState(0)
+  const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)
+  const [calculatedCameraAngle, setCalculatedCameraAngle] = useState<number | undefined>(undefined)
 
   // Get current photo using centralized lookup
   const currentPhoto = useMemo(() => {
@@ -89,9 +258,21 @@ export function useTourNavigation() {
       // Preload image before navigation
       const targetPhoto = findPhotoById(finalTargetId)
       if (targetPhoto) {
+        // Calculate camera orientation for navigation
+        let calculatedAngle: number | undefined
+
+        if (shouldPreserveOrientation(currentPhoto, targetPhoto, direction)) {
+          // Preserve user's relative orientation within same corridor
+          calculatedAngle = calculatePreservedOrientation(cameraLon, currentPhoto, targetPhoto)
+        } else {
+          // Use photo's startingAngle for different corridors, turns, or vertical navigation
+          calculatedAngle = targetPhoto.startingAngle
+        }
+
         const img = new Image()
         img.onload = () => {
           setCurrentPhotoId(finalTargetId)
+          setCalculatedCameraAngle(calculatedAngle)
           setIsLoading(false)
         }
         img.onerror = () => {
@@ -104,7 +285,7 @@ export function useTourNavigation() {
         console.error('Target photo not found:', finalTargetId)
       }
     }
-  }, [currentPhoto, isLoading])
+  }, [currentPhoto, isLoading, cameraLon])
 
   /**
    * Jump directly to a specific photo by ID
@@ -124,6 +305,8 @@ export function useTourNavigation() {
       const img = new Image()
       img.onload = () => {
         setCurrentPhotoId(photoId)
+        // For direct jumps, always use startingAngle if available
+        setCalculatedCameraAngle(targetPhoto.startingAngle)
         setIsLoading(false)
       }
       img.onerror = () => {
@@ -167,6 +350,7 @@ export function useTourNavigation() {
     isLoading,
     cameraLon,
     cameraLat,
+    calculatedCameraAngle,
 
     // Navigation functions
     navigateDirection,

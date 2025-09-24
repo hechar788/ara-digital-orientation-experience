@@ -11,6 +11,7 @@ interface PanoramicViewerProps {
   imageUrl: string
   className?: string
   startingAngle?: number
+  calculatedCameraAngle?: number
   initialLon?: number
   initialLat?: number
   onCameraChange?: (lon: number, lat: number) => void
@@ -20,6 +21,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   imageUrl,
   className = '',
   startingAngle = 0,
+  calculatedCameraAngle,
   initialLon = 0,
   initialLat = 0,
   onCameraChange
@@ -51,6 +53,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   } | null>(null)
   const fovRef = useRef(75)
   const stereoModeRef = useRef(false)
+  const cameraControlRef = useRef<{ lon: number; lat: number }>({
+    lon: calculatedCameraAngle !== undefined
+      ? calculatedCameraAngle
+      : (startingAngle !== undefined ? startingAngle : initialLon),
+    lat: initialLat
+  })
 
   // Orientation change handler to exit VR mode when rotating to portrait
   useEffect(() => {
@@ -127,10 +135,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Store scene data for cleanup
       sceneDataRef.current = { scene, camera, renderer, geometry, cameraLeft, cameraRight, sphere }
 
-      // Mouse control variables - use startingAngle if provided, otherwise initialLon
+      // Mouse control variables - camera orientation is managed by cameraControlRef
       let isMouseDown = false
-      let lon = startingAngle || initialLon
-      let lat = initialLat
       let onPointerDownPointerX = 0
       let onPointerDownPointerY = 0
       let onPointerDownLon = 0
@@ -147,8 +153,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
         onPointerDownPointerX = clientX
         onPointerDownPointerY = clientY
-        onPointerDownLon = lon
-        onPointerDownLat = lat
+        onPointerDownLon = cameraControlRef.current.lon
+        onPointerDownLat = cameraControlRef.current.lat
         mount.style.cursor = 'grabbing'
         
         // Add document listeners only when dragging starts
@@ -165,12 +171,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
         
-        lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
-        lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
-        lat = Math.max(-85, Math.min(85, lat))
+        cameraControlRef.current.lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
+        cameraControlRef.current.lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
+        cameraControlRef.current.lat = Math.max(-85, Math.min(85, cameraControlRef.current.lat))
 
         // Emit camera change for persistence
-        onCameraChange?.(lon, lat)
+        onCameraChange?.(cameraControlRef.current.lon, cameraControlRef.current.lat)
       }
 
       const onPointerUp = (event: PointerEvent | TouchEvent) => {
@@ -239,8 +245,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         animationRef.current = requestAnimationFrame(animate)
 
         // Update camera rotation based on mouse position
-        const phi = THREE.MathUtils.degToRad(90 - lat)
-        const theta = THREE.MathUtils.degToRad(lon)
+        const phi = THREE.MathUtils.degToRad(90 - cameraControlRef.current.lat)
+        const theta = THREE.MathUtils.degToRad(cameraControlRef.current.lon)
 
         const target = new THREE.Vector3()
         target.x = 500 * Math.sin(phi) * Math.cos(theta)
@@ -378,6 +384,27 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
             map: texture,
             side: THREE.FrontSide
           })
+
+          // Reset camera orientation AFTER texture is loaded to prevent flash
+          // Priority: calculatedCameraAngle > startingAngle > initialLon
+          let targetLon: number
+          let targetLat: number
+
+          if (calculatedCameraAngle !== undefined) {
+            targetLon = calculatedCameraAngle
+            targetLat = 0
+          } else if (startingAngle !== undefined) {
+            targetLon = startingAngle
+            targetLat = 0
+          } else {
+            targetLon = initialLon
+            targetLat = initialLat
+          }
+
+          cameraControlRef.current.lon = targetLon
+          cameraControlRef.current.lat = targetLat
+          onCameraChange?.(targetLon, targetLat)
+
           setStatus('ready')
         }
       },

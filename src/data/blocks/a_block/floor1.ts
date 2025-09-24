@@ -37,7 +37,7 @@ export const aBlockFloor1Area: Area = {
       startingAngle: 180,
       directions: {
         forward: { angle: 160, connection: 'a-f1-north-1' }
-      },
+      }, 
       buildingContext: {
         wing: 'north',
         facilities: ['main entrance', 'information desk']
@@ -81,7 +81,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3-side',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3_side.webp',
-      startingAngle: 180,
+      startingAngle: 0,
       directions: {
         back: { angle: 270, connection: 'a-f1-north-3' },
         up: 'a-f2-north-stairs-entrance'
@@ -96,7 +96,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-4',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_4.webp',
-      startingAngle: 180,
+      startingAngle: 90,
       directions: {
         forward: { angle: 70, connection: 'a-f1-mid-5' },
         back: { angle: 250, connection: 'a-f1-north-3' }
@@ -105,10 +105,10 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-5',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_5.webp',
-      startingAngle: 180,
+      startingAngle: 90,
       directions: {
-        forward: { angle: 40, connection: 'a-f1-south-6' },
-        back: { angle: 220, connection: 'a-f1-mid-4' }
+        forward: { angle: 70, connection: 'a-f1-south-6' },
+        back: { angle: 250, connection: 'a-f1-mid-4' }
       }
     },
     {
