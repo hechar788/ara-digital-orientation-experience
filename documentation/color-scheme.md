@@ -150,12 +150,6 @@ text-blue-500 hover:text-blue-400
 - Focus states: `focus:ring-blue-500/50`, `focus:border-blue-500`
 - Button colors: `text-blue-500 hover:text-blue-400`
 
-### PopoutMenu
-- Background: `bg-white`
-- Buttons: `bg-gray-50 hover:bg-gray-100`
-- Borders: `border-gray-200`
-- Text: `text-gray-600`
-- Close button: `hover:bg-gray-100`
 
 ## Theme Configuration
 

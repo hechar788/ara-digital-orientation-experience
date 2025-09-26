@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { Plus } from 'lucide-react'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
-import { PopoutMenu } from '../PopoutMenu'
 import { AIChatPopup } from '../AIChatPopup'
 import { InformationPopup } from '../InformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
@@ -494,9 +493,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         onVRToggle={handleVRToggle}
         onAIChat={handleAIChatToggle}
         onInfo={handleInfoToggle}
-      />
-      
-      <PopoutMenu />
+      />      
       
       <AIChatPopup 
         isOpen={showAIChat}
