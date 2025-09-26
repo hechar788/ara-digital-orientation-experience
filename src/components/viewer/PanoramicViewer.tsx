@@ -173,7 +173,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         
         cameraControlRef.current.lon = (onPointerDownPointerX - clientX) * 0.2 + onPointerDownLon
         cameraControlRef.current.lat = (clientY - onPointerDownPointerY) * 0.2 + onPointerDownLat
-        cameraControlRef.current.lat = Math.max(-85, Math.min(85, cameraControlRef.current.lat))
+        cameraControlRef.current.lat = Math.max(-25, Math.min(85, cameraControlRef.current.lat))
 
         // Emit camera change for persistence
         onCameraChange?.(cameraControlRef.current.lon, cameraControlRef.current.lat)
