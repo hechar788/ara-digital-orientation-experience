@@ -102,7 +102,7 @@ export const nBlockFloor1Area: Area = {
       directions: {
         forward: { angle: 0, connection: 'n-f1-west-8' },
         back: { angle: 180, connection: 'n-f1-east-6' },
-        elevator: 'ns-block-elevator'
+        elevator: 'ns-elevator-interior'
       },
       hotspots: [
         {

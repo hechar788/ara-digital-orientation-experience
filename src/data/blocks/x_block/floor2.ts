@@ -118,7 +118,7 @@ export const xBlockFloor2Area: Area = {
         back: { angle: 0, connection: 'x-f2-mid-10' },
         forward: { angle: 180, connection: 'x-f2-west-6' },
         left: { angle: 270, connection: 'x-f2-mid-8' },
-        elevator: 'x-block-elevator'
+        elevator: 'x-elevator-interior'
       },
       hotspots: [
         {

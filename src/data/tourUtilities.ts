@@ -12,6 +12,7 @@ import { xBlockAreas } from './blocks/x_block'
 import { nBlockAreas } from './blocks/n_block'
 import { sBlockAreas } from './blocks/s_block'
 import { nsBlockElevator } from './blocks/n_s_shared/elevator'
+import { xBlockElevator } from './blocks/x_block/elevator'
 import type { Photo, Area, Elevator } from '../types/tour'
 
 /**
@@ -29,7 +30,8 @@ const getAllAreas = (): any[] => {
     ...xBlockAreas,
     ...nBlockAreas,
     ...sBlockAreas,
-    nsBlockElevator
+    nsBlockElevator,
+    xBlockElevator
   ]
 }
 
@@ -63,14 +65,31 @@ export const findPhotoById = (photoId: string): Photo | null => {
       // Elevator
       const elevator = item as Elevator
       if (elevator.photo.id === photoId) {
-        // Convert elevator photo to regular photo format
+        // Convert elevator photo to regular photo format with floor navigation
+        const directions: any = {}
+
+        // Add floor connections as up/down directions based on available floors
+        if (elevator.photo.floorConnections.floor1) {
+          directions['floor1'] = elevator.photo.floorConnections.floor1
+        }
+        if (elevator.photo.floorConnections.floor2) {
+          directions['floor2'] = elevator.photo.floorConnections.floor2
+        }
+        if (elevator.photo.floorConnections.floor3) {
+          directions['floor3'] = elevator.photo.floorConnections.floor3
+        }
+        if (elevator.photo.floorConnections.floor4) {
+          directions['floor4'] = elevator.photo.floorConnections.floor4
+        }
+
         return {
           id: elevator.photo.id,
           imageUrl: elevator.photo.imageUrl,
-          directions: {
-            // Handle elevator floor connections differently
-            // Could be extended to support elevator navigation
-          }
+          directions: directions,
+          hotspots: elevator.photo.hotspots ? elevator.photo.hotspots.map(h => ({
+            direction: `floor${h.floor}` as any,
+            position: h.position
+          })) : undefined
         }
       }
     }

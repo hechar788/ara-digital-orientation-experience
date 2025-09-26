@@ -27,6 +27,10 @@ export interface DirectionDefinition {
  * @property directions.up - Photo ID(s) when going up (stairs/elevator) - array for multi-floor elevators
  * @property directions.down - Photo ID(s) when going down (stairs/elevator) - array for multi-floor elevators
  * @property directions.elevator - Photo ID for elevator access
+ * @property directions.floor1 - Photo ID for floor 1 destination (elevator interiors only)
+ * @property directions.floor2 - Photo ID for floor 2 destination (elevator interiors only)
+ * @property directions.floor3 - Photo ID for floor 3 destination (elevator interiors only)
+ * @property directions.floor4 - Photo ID for floor 4 destination (elevator interiors only)
  * @property hotspots - Clickable areas for vertical navigation (stairs/elevators)
  * @property nearbyRooms - Rooms visible or accessible from this photo location
  * @property buildingContext - Information about the building and floor context
@@ -43,6 +47,10 @@ export interface Photo {
     up?: string | string[]
     down?: string | string[]
     elevator?: string
+    floor1?: string
+    floor2?: string
+    floor3?: string
+    floor4?: string
   }
 
   hotspots?: NavigationHotspot[]
