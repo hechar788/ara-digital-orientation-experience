@@ -156,7 +156,8 @@ export const xBlockFloor1Area: Area = {
       startingAngle: 320,
       directions: {
         forward: { angle: 325, connection: 'n-f1-x-entry' },
-        back: { angle: 180, connection: 'x-f1-west-11' }
+        back: { angle: 180, connection: 'x-f1-west-11' },
+        up: 'x-f2-north-entry'
       },
       buildingContext: {
         wing: 'west',

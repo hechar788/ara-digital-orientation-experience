@@ -37,7 +37,8 @@ export const xBlockFloor3Area: Area = {
       id: 'x-f3-west-entry',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_entry.webp',
       directions: {
-        forward: { angle: 0, connection: 'x-f3-west-1' }
+        forward: { angle: 0, connection: 'x-f3-west-1' },
+        down: 'x-f2-north-entry'
       },
       buildingContext: {
         wing: 'west',
