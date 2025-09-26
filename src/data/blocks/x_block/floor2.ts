@@ -50,6 +50,7 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-west-1',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_1.webp',
+      startingAngle: 0,
       directions: {
         back: { angle: 0, connection: 'x-f2-west-2' },
         forward: { angle: 90, connection: 'x-f2-north-entry' }
@@ -158,6 +159,7 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-east-12',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_east_12.webp',
+      startingAngle: 180,
       directions: {
         back: { angle: 0, connection: 'x-f2-east-13' },
         forward: { angle: 180, connection: 'x-f2-east-11' }

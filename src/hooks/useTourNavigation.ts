@@ -61,15 +61,11 @@ function analyzeNavigation(
     return { navigationType: 'same-building-corner', preserveOrientation: false }
   }
 
-  // Check corridor orientation consistency
-  const currentForward = currentPhoto.directions.forward?.angle
-  const currentBack = currentPhoto.directions.back?.angle
-  const destinationForward = destinationPhoto.directions.forward?.angle
-  const destinationBack = destinationPhoto.directions.back?.angle
+  // Check corridor geometry by comparing the actual connection angles being used
+  const currentDirectionAngle = currentPhoto.directions[direction]?.angle
+  const destinationReverseAngle = destinationPhoto.directions[reverseDirection]?.angle
 
-  if (currentForward !== undefined && currentBack !== undefined &&
-      destinationForward !== undefined && destinationBack !== undefined) {
-
+  if (currentDirectionAngle !== undefined && destinationReverseAngle !== undefined) {
     // Helper function to calculate angular difference with wraparound
     const angleDiff = (a1: number, a2: number) => {
       let diff = Math.abs(a1 - a2)
@@ -77,12 +73,12 @@ function analyzeNavigation(
       return diff
     }
 
-    // Check if both forward and back directions are similar between photos
-    const forwardDiff = angleDiff(currentForward, destinationForward)
-    const backDiff = angleDiff(currentBack, destinationBack)
+    // For true bidirectional corridors, the angles should be opposite (180° apart)
+    const connectionAngleDiff = angleDiff(currentDirectionAngle, destinationReverseAngle)
 
-    // If corridor geometry differs significantly, it's a corner/direction change
-    if (forwardDiff > 30 || backDiff > 30) {
+
+    // If connection angles are not opposite (within 15° tolerance), it's a corner/geometry change
+    if (Math.abs(connectionAngleDiff - 180) > 15) {
       return { navigationType: 'same-building-corner', preserveOrientation: false }
     }
   }
@@ -113,7 +109,17 @@ function calculateNavigationAngle(
 ): number {
   switch (navigationType) {
     case 'same-corridor':
-      return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      // For bidirectional corridors, preserve directional intent
+      if (direction === 'forward') {
+        // Forward movement: maintain forward-relative orientation
+        return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      } else if (direction === 'back') {
+        // Backward movement: face the back direction to maintain backwards orientation
+        return destinationPhoto.directions.back?.angle ?? calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      } else {
+        // Other directions: use preserved orientation
+        return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      }
 
     case 'cross-building':
       // Use directional intent: forward movement faces forward, backward movement faces backward
@@ -127,8 +133,17 @@ function calculateNavigationAngle(
     case 'same-building-corner':
     case 'turn':
     default:
-      // Use photo's startingAngle for corners, turns, and fallback cases
-      return destinationPhoto.startingAngle ?? 0
+      // For corner navigation, preserve directional intent when possible
+      if (direction === 'forward') {
+        // Forward movement: face the forward direction or use startingAngle
+        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else if (direction === 'back') {
+        // Backward movement: face the back direction or use startingAngle
+        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else {
+        // Other directions: use startingAngle
+        return destinationPhoto.startingAngle ?? 0
+      }
   }
 
   // Fallback
@@ -172,6 +187,7 @@ function calculatePreservedOrientation(
   // Normalize result to 0-360 range
   while (newAngle < 0) newAngle += 360
   while (newAngle >= 360) newAngle -= 360
+
 
   return newAngle
 }
@@ -258,16 +274,15 @@ export function useTourNavigation() {
       // Preload image before navigation
       const targetPhoto = findPhotoById(finalTargetId)
       if (targetPhoto) {
-        // Calculate camera orientation for navigation
-        let calculatedAngle: number | undefined
-
-        if (shouldPreserveOrientation(currentPhoto, targetPhoto, direction)) {
-          // Preserve user's relative orientation within same corridor
-          calculatedAngle = calculatePreservedOrientation(cameraLon, currentPhoto, targetPhoto)
-        } else {
-          // Use photo's startingAngle for different corridors, turns, or vertical navigation
-          calculatedAngle = targetPhoto.startingAngle
-        }
+        // Calculate camera orientation for navigation using comprehensive analysis
+        const navigationAnalysis = analyzeNavigation(currentPhoto, targetPhoto, direction)
+        const calculatedAngle = calculateNavigationAngle(
+          cameraLon,
+          currentPhoto,
+          targetPhoto,
+          direction,
+          navigationAnalysis.navigationType
+        )
 
         const img = new Image()
         img.onload = () => {

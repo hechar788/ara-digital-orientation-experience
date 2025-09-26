@@ -64,7 +64,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3.webp',
-      startingAngle: 180,
+      startingAngle: 0,
       directions: {
         forward: { angle: 180, connection: 'a-f1-mid-4' },
         back: { angle: 0, connection: 'a-f1-north-2' },
@@ -81,7 +81,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3-side',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3_side.webp',
-      startingAngle: 0,
+      startingAngle: 70,
       directions: {
         back: { angle: 270, connection: 'a-f1-north-3' },
         up: 'a-f2-north-stairs-entrance'
@@ -96,7 +96,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-4',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_4.webp',
-      startingAngle: 90,
+      startingAngle: 70,
       directions: {
         forward: { angle: 70, connection: 'a-f1-mid-5' },
         back: { angle: 250, connection: 'a-f1-north-3' }
@@ -105,7 +105,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-5',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_5.webp',
-      startingAngle: 90,
+      startingAngle: 250,
       directions: {
         forward: { angle: 70, connection: 'a-f1-south-6' },
         back: { angle: 250, connection: 'a-f1-mid-4' }
@@ -114,7 +114,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-south-6',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_south_6.webp',
-      startingAngle: 180,
+      startingAngle: 0,
       directions: {
         back: { angle: 180, connection: 'a-f1-mid-5' },
         forward: { angle: 0, connection: 'x-f1-east-1' }
