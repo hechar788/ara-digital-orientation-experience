@@ -35,7 +35,7 @@ interface NavigationAnalysis {
 function analyzeNavigation(
   currentPhoto: Photo,
   destinationPhoto: Photo,
-  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down'
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4'
 ): NavigationAnalysis {
   // Handle turns and vertical navigation
   if (direction !== 'forward' && direction !== 'back') {
@@ -104,7 +104,7 @@ function calculateNavigationAngle(
   currentCameraAngle: number,
   currentPhoto: Photo,
   destinationPhoto: Photo,
-  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down',
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4',
   navigationType: NavigationType
 ): number {
   switch (navigationType) {
@@ -249,9 +249,9 @@ export function useTourNavigation() {
    * Checks if the requested direction is available from the current photo
    * and navigates to the target photo with loading state management.
    *
-   * @param direction - Direction to navigate (forward, back, left, right, up, down)
+   * @param direction - Direction to navigate (forward, back, left, right, up, down, elevator, floor1-4)
    */
-  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
+  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4') => {
     if (!currentPhoto || isLoading) return
 
     let targetPhotoId: string | string[] | undefined
@@ -261,14 +261,15 @@ export function useTourNavigation() {
       const directionDef = currentPhoto.directions[direction]
       targetPhotoId = directionDef?.connection
     } else {
-      // Handle vertical movement (up/down) - still uses simple string/array format
+      // Handle vertical movement (up/down), elevator, and floor selection
       targetPhotoId = currentPhoto.directions[direction]
     }
 
     if (targetPhotoId) {
       setIsLoading(true)
 
-      // Handle array of connections (multi-floor elevators)
+
+      // Handle array of connections if needed
       const finalTargetId = Array.isArray(targetPhotoId) ? targetPhotoId[0] : targetPhotoId
 
       // Preload image before navigation
