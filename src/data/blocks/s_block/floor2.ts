@@ -36,7 +36,7 @@ export const sBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_1.webp',
       directions: {
         forward: { angle: 0, connection: 's-f2-mid-2' },
-        back: { angle: 180, connection: 'n-f2-elevator-entrance' }
+        back: { angle: 190, connection: 'n-f2-elevator-entrance' }
       },
       buildingContext: {
         wing: 'middle',
@@ -54,6 +54,7 @@ export const sBlockFloor2Area: Area = {
     {
       id: 's-f2-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_3.webp',
+      startingAngle: 180, 
       directions: {
         forward: { angle: 0, connection: 's-f2-mid-4' },
         back: { angle: 180, connection: 's-f2-mid-2' }
@@ -64,7 +65,7 @@ export const sBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_4.webp',
       directions: {
         forward: { angle: 0, connection: 's-f2-south-5' },
-        back: { angle: 180, connection: 's-f2-mid-3' }
+        back: { angle: 270, connection: 's-f2-mid-3' }
       }
     },
     {

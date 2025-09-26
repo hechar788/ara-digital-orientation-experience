@@ -17,6 +17,7 @@ function App() {
     currentPhotoId,
     cameraLon,
     cameraLat,
+    calculatedCameraAngle,
     handleCameraChange
   } = useTourNavigation()
 
@@ -92,6 +93,7 @@ function App() {
         imageUrl={currentPhoto?.imageUrl}
         className="w-full h-full"
         startingAngle={currentPhoto?.startingAngle}
+        calculatedCameraAngle={calculatedCameraAngle}
         initialLon={cameraLon}
         initialLat={cameraLat}
         onCameraChange={handleCameraChange}

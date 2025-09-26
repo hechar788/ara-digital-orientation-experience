@@ -36,6 +36,7 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-1',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_1.webp',
+      startingAngle: 180,
       directions: {
         forward: { angle: 90, connection: 'x-f1-east-2' },
         back: { angle: 180, connection: 'a-f1-south-6' }
@@ -48,6 +49,7 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-2',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_2.webp',
+      startingAngle: 15,
       directions: {
         forward: { angle: 0, connection: 'x-f1-east-3' },
         back: { angle: 180, connection: 'x-f1-east-1' },
@@ -63,6 +65,7 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-east-3',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_3.webp',
+      startingAngle: 10,
       directions: {
         forward: { angle: 0, connection: 'x-f1-east-4' },
         back: { angle: 180, connection: 'x-f1-east-2' },
@@ -126,7 +129,7 @@ export const xBlockFloor1Area: Area = {
       id: 'x-f1-west-9',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_9.webp',
       directions: {
-        forward: { angle: 0, connection: 'x-f1-west-10' },
+        forward: { angle: 345, connection: 'x-f1-west-10' },
         back: { angle: 180, connection: 'x-f1-mid-8' }
       }
     },
@@ -141,6 +144,7 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-west-11',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_11.webp',
+      startingAngle: 180,
       directions: {
         forward: { angle: 0, connection: 'x-f1-west-12' },
         back: { angle: 180, connection: 'x-f1-west-10' }
@@ -149,8 +153,9 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-west-12',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_12.webp',
+      startingAngle: 320,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-x-entry' },
+        forward: { angle: 325, connection: 'n-f1-x-entry' },
         back: { angle: 180, connection: 'x-f1-west-11' }
       },
       buildingContext: {

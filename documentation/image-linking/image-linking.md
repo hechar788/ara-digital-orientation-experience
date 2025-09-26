@@ -1,489 +1,770 @@
-# VR Campus Tour Image Linking Implementation
-
-## Overview
-
-This document explains how we transformed a collection of 360° campus photos into a navigable VR tour experience. The system creates Google Street View-style navigation between photos using a structured data approach.
+# VR Campus Tour: How Image Navigation Works
 
 ## What We Built
 
-The tour system connects 360° photos from four building blocks (A, N, S, X) across multiple floors, creating seamless navigation paths between locations. Users can move forward/back through corridors, turn left/right at intersections, go up/down between floors, and use elevators.
+Imagine Google Street View, but for walking through a university campus. We created a system that lets users explore buildings by "jumping" between 360-degree photos. When you're looking at one photo, you can click buttons to move forward, backward, turn left or right, and even go up or down stairs - just like walking through the real building.
 
-## Directory Structure
+## The Big Picture: From Photos to Navigation
+
+Here's how we turned a collection of 360° photos into a navigable virtual tour:
+
+### Step 1: Organizing Photos Into Buildings and Floors
+We have four main buildings (A, N, S, X) with multiple floors each. Every floor is organized as an "Area" containing connected photos.
 
 ```
-src/data/
-├── blocks/
-│   ├── a_block/
-│   │   ├── index.ts         # Exports all A Block areas
-│   │   ├── floor1.ts        # Ground floor navigation
-│   │   └── floor2.ts        # Second floor navigation
-│   ├── x_block/
-│   │   ├── index.ts         # Exports all X Block areas
-│   │   ├── floor1.ts        # Ground floor with elevator access
-│   │   ├── floor2.ts        # Second floor with branch corridors
-│   │   ├── floor3.ts        # Third floor
-│   │   └── elevator.ts      # X Block elevator system
-│   ├── n_block/
-│   │   ├── index.ts         # Exports all N Block areas
-│   │   ├── floor1.ts        # Ground floor with branch corridor
-│   │   └── floor2.ts        # Second floor with elevator access
-│   ├── s_block/
-│   │   ├── index.ts         # Exports all S Block areas
-│   │   ├── floor1.ts        # Ground floor linear progression
-│   │   └── floor2.ts        # Second floor linear progression
-│   └── n_s_shared/
-│       └── elevator.ts      # Shared N/S Block elevator
-└── tourUtilities.ts         # Central export point
+Campus Tour Structure:
+├── A Block (Building A)
+│   ├── Floor 1 (Ground level)
+│   └── Floor 2 (Second level)
+├── N Block (Building N)
+│   ├── Floor 1
+│   └── Floor 2
+├── S Block (Building S)
+│   ├── Floor 1
+│   └── Floor 2
+└── X Block (Building X)
+    ├── Floor 1
+    ├── Floor 2
+    └── Floor 3
 ```
 
-## Core Concepts
+### Step 2: Connecting Photos Together
+Each photo knows where you can go from that location. Think of it like being at an intersection - you can see which directions are available to move.
 
-### 1. Areas and Photos
+## How Navigation Actually Works
 
-Each floor of each building is defined as an **Area** containing multiple **Photos**. Photos represent individual 360° images with navigation connections.
+### The Core Concept: Directional Movement
+When you're standing in a hallway looking at a 360° photo, you have several options:
+- **Forward**: Continue down the hallway in the direction you're facing
+- **Back**: Turn around and go the opposite way
+- **Left**: Turn left and enter a side corridor or room
+- **Right**: Turn right and enter a side corridor or room
+- **Up**: Go upstairs or take an elevator up
+- **Down**: Go downstairs or take an elevator down
 
-```typescript
-// Example: A Block Floor 1 area definition
-export const aBlockFloor1Area: Area = {
-  id: 'a-block-floor-1-main',
-  name: 'A Block',
-  buildingBlock: 'a',
-  floorLevel: 1,
-  photos: [
-    // Array of connected photo definitions
-  ]
-}
-```
-
-## TypeScript Interface Definitions
-
-The tour system uses the following TypeScript interfaces defined in `src/types/tour.ts`:
-
-### Photo Interface
-```typescript
-/**
- * Represents a directional navigation option with angle and destination.
- */
-export interface DirectionDefinition {
-  angle: number
-  connection: string
-}
-
-/**
- * Represents a single 360° photo in the VR tour with navigation connections
- * and contextual information about the location.
- */
-export interface Photo {
-  id: string
-  imageUrl: string
-  startingAngle?: number
-  directions: {
-    forward?: DirectionDefinition
-    back?: DirectionDefinition
-    left?: DirectionDefinition
-    right?: DirectionDefinition
-    up?: string | string[]
-    down?: string | string[]
-    elevator?: string
-  }
-
-  hotspots?: NavigationHotspot[]
-  nearbyRooms?: NearbyRoom[]
-  buildingContext?: BuildingContext
-}
-```
-
-### Supporting Interfaces
-```typescript
-/**
- * Describes a room that is visible from a photo location.
- */
-export interface NearbyRoom {
-  roomNumber: string
-  roomType: 'classroom' | 'lab' | 'office' | 'facility' | 'restroom'
-}
-
-/**
- * Represents a clickable hotspot in a 360° photo for vertical navigation.
- */
-export interface NavigationHotspot {
-  direction: 'up' | 'down' | 'elevator'
-  position: {
-    theta: number  // horizontal (0-360°)
-    phi: number    // vertical (0-180°, 90 = horizon)
-  }
-}
-
-/**
- * Provides location-specific contextual information within a photo location.
- */
-export interface BuildingContext {
-  wing?: string
-  facilities: string[]
-}
-
-/**
- * Represents a logical area containing connected photos that form a navigable space.
- */
-export interface Area {
-  id: string
-  name: string
-  photos: Photo[]
-  buildingBlock: 'a' | 'n' | 's' | 'x'
-  floorLevel: number
-}
-```
-
-### Elevator System Interfaces
-```typescript
-/**
- * Represents an elevator system that connects multiple floors within a building.
- */
-export interface Elevator {
-  id: string
-  name: string
-  buildingBlock: 'a' | 'n' | 's' | 'x'
-  photo: ElevatorPhoto
-}
-
-/**
- * Represents the interior view of an elevator with floor selection capabilities.
- */
-export interface ElevatorPhoto {
-  id: string
-  imageUrl: string
-  floorConnections: {
-    floor1?: string
-    floor2?: string
-    floor3?: string
-    floor4?: string
-  }
-  hotspots?: ElevatorHotspot[]
-}
-
-/**
- * Represents a clickable floor selection button inside an elevator.
- */
-export interface ElevatorHotspot {
-  floor: number
-  position: {
-    theta: number  // horizontal (0-360°)
-    phi: number    // vertical (0-180°, 90 = horizon)
-  }
-}
-```
-
-### 2. Navigation Connections
-
-Each photo defines how users can move to other photos using the unified directions interface:
+### How We Store Navigation Information
+Every photo contains a `directions` object that tells the system where each direction leads:
 
 ```typescript
 {
   id: 'a-f1-north-2',
-  imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_2.webp',
-  startingAngle: 180,                                       // Start facing south (180°)
+  imageUrl: '/path/to/photo.webp',
   directions: {
-    forward: { angle: 0, connection: 'a-f1-north-3' },     // Move forward along corridor
-    back: { angle: 180, connection: 'a-f1-north-1' },      // Move backward along corridor
-    left: { angle: 270, connection: 'a-f1-side-branch' },  // Turn left at intersection
-    up: 'a-f2-stairs'                                       // Go upstairs (simple string)
+    forward: { angle: 0, connection: 'a-f1-north-3' },    // Go to next photo in hallway
+    back: { angle: 180, connection: 'a-f1-north-1' },     // Go to previous photo
+    left: { angle: 270, connection: 'a-f1-classroom' },   // Enter classroom on left
+    up: 'a-f2-stairs'                                      // Go upstairs (simple connection)
   }
 }
 ```
 
-### 3. Navigation Patterns
+**What This Means:**
+- **angle**: Which compass direction to face (0° = North, 90° = East, 180° = South, 270° = West)
+- **connection**: The ID of the photo you'll jump to
+- Vertical directions (up/down) use simple connections since you don't need compass directions for stairs
 
-We established consistent patterns for different corridor types:
+### Understanding Angles and Directions
+Think of angles like a compass overlaid on the photo:
+- **0° (North)**: Straight ahead in the photo
+- **90° (East)**: To the right
+- **180° (South)**: Behind you
+- **270° (West)**: To the left
 
-**Linear Corridors:** Forward/back progression
-```typescript
-photo1 → photo2 → photo3 → photo4
+When you click "Go Forward" and the angle is 0°, you move in the direction you're currently facing. If the angle is 180°, you're essentially walking backward.
+
+## Different Types of Connections
+
+### 1. Corridor Navigation (Bidirectional)
+Most hallways work both ways - you can walk forward or backward through them.
+
+**Example: Walking down a straight hallway**
+```
+Photo A ←→ Photo B ←→ Photo C
 ```
 
-**Branch Corridors:** Left to enter, back to exit
+In the code, this looks like:
 ```typescript
-main-corridor → left → branch-photo → back → main-corridor
+// Photo B can go forward to C or back to A
+{
+  id: 'photo-b',
+  directions: {
+    forward: { angle: 0, connection: 'photo-c' },
+    back: { angle: 180, connection: 'photo-a' }
+  }
+}
 ```
 
-**Cross-Building Connections:** Forward/back between buildings
-```typescript
-building-a-end → forward → building-x-start
+### 2. Branch Corridors (Side Paths)
+Sometimes you can turn left or right to enter a side hallway or room.
+
+**Example: Main hallway with a classroom branch**
+```
+Main Hallway → left → Classroom → back → Main Hallway
 ```
 
-### 4. Contextual Information
+The pattern is always:
+- Enter a branch using `left` or `right`
+- Exit a branch using `back` (you "back out" of the room)
 
-Photos can include information about nearby rooms and facilities:
+### 3. Cross-Building Connections
+Buildings connect to each other at specific points, creating seamless movement between structures.
+
+**Example: X Block connects to N Block**
+```
+X Block End → forward → N Block Start
+N Block Start → back → X Block End
+```
+
+### 4. Vertical Navigation
+Moving between floors happens through stairs or elevators.
+
+**Simple Stairs:**
+```typescript
+directions: {
+  up: 'second-floor-entrance',     // Direct connection upstairs
+  down: 'ground-floor-entrance'    // Direct connection downstairs
+}
+```
+
+**Elevators (Multi-floor):**
+Elevators are special - they connect to multiple floors and show visual buttons you can click.
+
+## How the System Decides Where You Look
+
+This is where things get sophisticated. When you move from one photo to another, the system needs to decide which direction you should be facing in the new photo.
+
+### Smart Orientation Logic
+
+**Scenario 1: Walking Straight Through a Hallway**
+If you're walking forward through a corridor, you should continue facing forward in the new photo. If you turn around and walk backward, you should continue facing backward.
+
+**Scenario 2: Turning Corners**
+When you turn left or right, or move between buildings, you should face the most logical direction for that new location.
+
+**Scenario 3: Using Stairs or Elevators**
+When you go up or down, you should face a sensible direction in the new location (usually toward the main hallway).
+
+### The Navigation Intelligence System
+
+We built a smart system that analyzes each movement and decides how to orient your camera:
+
+1. **Same Corridor Movement**: Preserves your current orientation (forward stays forward, backward stays backward)
+2. **Corner Navigation**: Uses the photo's default starting direction
+3. **Cross-Building Movement**: Faces you toward the logical direction for movement flow
+4. **Vertical Movement**: Uses each photo's preferred starting orientation
+
+## File Organization: How It's All Structured
+
+### Building Block Structure
+```
+src/data/blocks/
+├── a_block/
+│   ├── floor1.ts        # All A Block ground floor photos
+│   ├── floor2.ts        # All A Block second floor photos
+│   └── index.ts         # Exports everything from A Block
+├── x_block/
+│   ├── floor1.ts
+│   ├── floor2.ts
+│   ├── floor3.ts
+│   ├── elevator.ts      # X Block elevator system
+│   └── index.ts
+└── ... (similar structure for N and S blocks)
+```
+
+### Area Definitions
+Each floor file exports an "Area" containing all photos for that floor:
+
+```typescript
+export const aBlockFloor1Area: Area = {
+  id: 'a-block-floor-1',
+  name: 'A Block Ground Floor',
+  buildingBlock: 'a',
+  floorLevel: 1,
+  photos: [
+    // All the connected photos for this floor
+  ]
+}
+```
+
+### Photo Definitions
+Each photo contains all the information needed for navigation:
 
 ```typescript
 {
-  id: 'a-f1-north-entrance',
-  imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
-  startingAngle: 180,                                       // Start facing south
+  id: 'unique-photo-identifier',
+  imageUrl: '/path/to/360-photo.webp',
+  startingAngle: 180,                    // Default direction to face (optional)
   directions: {
-    forward: { angle: 0, connection: 'a-f1-north-1' },
-    left: { angle: 270, connection: 'a-f1-info-desk' }
+    forward: { angle: 0, connection: 'next-photo' },
+    back: { angle: 180, connection: 'previous-photo' },
+    left: { angle: 270, connection: 'side-room' }
   },
-  nearbyRooms: [
-    {
-      roomNumber: 'A101',
-      roomType: 'classroom'
-    },
-    {
-      roomNumber: 'A102',
-      roomType: 'lab'
-    }
+  nearbyRooms: [                         // What rooms are visible from here
+    { roomNumber: 'A101', roomType: 'classroom' }
   ],
-  buildingContext: {
+  buildingContext: {                     // Context about this location
     wing: 'north',
     facilities: ['main entrance', 'information desk']
   }
 }
 ```
 
-The `NearbyRooms` interface helps users understand what's accessible from their current location, while `buildingContext` provides broader area information.
+## Interactive Elements: Hotspots
 
-### 5. Starting Camera Orientation
-
-Each photo can specify an initial camera orientation using the `startingAngle` property:
+Some photos have clickable "hotspots" - visual elements you can click on in the 360° image:
 
 ```typescript
-{
-  id: 'a-f1-north-entrance',
-  imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
-  startingAngle: 180,  // Start facing south (180 degrees)
-  directions: {
-    forward: { angle: 160, connection: 'a-f1-north-1' }
+hotspots: [
+  {
+    direction: 'up',                     // What happens when clicked
+    position: { theta: 270, phi: 60 }   // Where to place the clickable area
   }
+]
+```
+
+**Position Coordinates:**
+- **theta**: Horizontal rotation (0-360°, like a compass)
+- **phi**: Vertical angle (0-180°, where 90° is straight ahead)
+
+These hotspots appear as clickable buttons overlaid on the actual stairs, elevator buttons, or doorways you can see in the photo.
+
+## Navigation Patterns We Follow
+
+### Pattern 1: Linear Progression
+Simple back-and-forth movement through hallways:
+```
+Entrance → Photo 1 → Photo 2 → Photo 3 → End
+```
+
+### Pattern 2: Branch Exploration
+Main path with side branches:
+```
+Main Path → left → Branch Photo → back → Main Path (continue)
+```
+
+### Pattern 3: Floor Connections
+Moving between levels:
+```
+Ground Floor → up (stairs) → Second Floor Landing → forward → Second Floor Hallway
+```
+
+### Pattern 4: Building Transitions
+Moving between different buildings:
+```
+Building A End → forward → Building X Start → continue through Building X
+```
+
+## How Users Experience Navigation
+
+### Visual Feedback
+When users look around in a 360° photo, navigation buttons appear when they're facing the right direction:
+- Look forward → "Go Forward" button appears
+- Look backward → "Go Back" button appears
+- Look left → "Turn Left" button appears
+- Look at stairs → "Go Upstairs" hotspot appears
+
+### Smooth Transitions
+When users click a navigation button:
+1. The new photo loads
+2. The camera automatically rotates to face the appropriate direction
+3. Users can immediately continue navigating or look around
+
+### Contextual Information
+Users can see information about their current location:
+- Room numbers visible from their position
+- Building wing and facilities available
+- Multiple floor options in elevators
+
+## Why This System Works Well
+
+### For Users
+- **Intuitive**: Works like walking through a real building
+- **Consistent**: Same navigation patterns throughout the tour
+- **Visual**: Can see where they're going before they click
+- **Flexible**: Can explore at their own pace and path
+
+### For Developers
+- **Maintainable**: Each photo's connections are clearly defined
+- **Scalable**: Easy to add new photos and buildings
+- **Reliable**: Smart orientation system prevents user confusion
+- **Debuggable**: Clear data structure makes issues easy to trace
+
+### For Content Creators
+- **Logical**: Connection patterns match real-world movement
+- **Flexible**: Can accommodate different building layouts
+- **Rich**: Can include contextual information about locations
+- **Visual**: Hotspots align with actual photo elements
+
+This system transforms a collection of static 360° photos into an immersive, navigable virtual tour that feels natural and intuitive to explore.
+
+## Technical Implementation: How Navigation Actually Works
+
+### The Navigation Stack
+
+The VR tour system consists of several interconnected components that work together to create seamless navigation:
+
+```
+User Interaction Layer
+├── src/components/viewer/DirectionalNavigation.tsx    # UI buttons and directional detection
+├── src/components/viewer/PanoramicViewer.tsx         # Three.js 360° photo rendering
+└── src/components/viewer/NavigationHotspots.tsx      # Interactive click areas
+
+State Management Layer
+├── src/hooks/useTourNavigation.ts        # Core navigation hook
+├── Navigation Analysis System            # Bidirectional movement intelligence
+└── Camera Orientation Logic             # Smart camera positioning
+
+Data Layer
+├── src/data/blocks/                     # Photo definitions with connections
+├── src/data/tourUtilities.ts           # Centralized photo lookup
+└── src/types/tour.ts                    # TypeScript interfaces
+```
+
+### Core Hook: useTourNavigation (src/hooks/useTourNavigation.ts)
+
+The `useTourNavigation` hook is the brain of the navigation system. It manages state and orchestrates photo transitions:
+
+```typescript
+// src/hooks/useTourNavigation.ts
+export function useTourNavigation() {
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  const [isLoading, setIsLoading] = useState(false)
+  const [cameraLon, setCameraLon] = useState(180)      // Horizontal rotation
+  const [cameraLat, setCameraLat] = useState(0)        // Vertical tilt
+  const [calculatedCameraAngle, setCalculatedCameraAngle] = useState<number | undefined>(undefined)
+
+  // Core navigation logic
+  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
+    // Navigation analysis and execution
+  }, [currentPhoto, isLoading, cameraLon])
 }
 ```
 
-**Angle Reference:**
-- `0°` - North (default if not specified)
-- `90°` - East
-- `180°` - South
-- `270°` - West
+**State Variables Explained:**
+- **currentPhotoId**: Which 360° photo is currently displayed
+- **cameraLon/cameraLat**: User's current viewing angle in the photo
+- **calculatedCameraAngle**: Where to position camera after navigation
+- **isLoading**: Prevents multiple simultaneous navigations
 
-**Use Cases:**
-- **Entrance Orientation**: When entering a building, face the interior rather than the entrance
-- **Flow Direction**: Align with the expected movement direction through corridors
-- **Contextual Views**: Show the most relevant view for each location's purpose
+### Navigation Flow: From Click to Photo Transition
 
-**Example: A Block Floor 1**
-All A Block Floor 1 photos use `startingAngle: 180` to face south, creating a consistent orientation as users move through the building from north to south.
+When a user clicks a navigation button, here's the complete flow:
 
-## Implementation Steps
+#### Step 1: Direction Detection (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - navigateDirection function
+const navigateDirection = (direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down') => {
+  if (!currentPhoto || isLoading) return
 
-### Step 1: Building Block Structure
-
-Each building block follows the same organizational pattern:
-
-1. **Floor Files:** Individual `.ts` files for each floor (floor1.ts, floor2.ts, etc.)
-2. **Index File:** Aggregates all floors into a single export
-3. **Elevator Files:** Separate files for elevator systems when applicable
-
-### Step 2: Photo Linking Logic
-
-Photos are linked using logical progression patterns:
-
-**Example: N Block Floor 1 progression**
-```
-n_x_entry → n_east_1 → n_east_2 → n_east_5 → n_east_6 → n_mid_7 → n_west_8 → n_west_9
-                         ↓
-                    (branch corridor)
-                    n_east_south_3 → n_east_south_4
+  // Get target photo ID from current photo's directions
+  const directionDef = currentPhoto.directions[direction]
+  const targetPhotoId = directionDef?.connection || currentPhoto.directions[direction]
+}
 ```
 
-### Step 3: Cross-Building Connections
-
-Buildings connect at strategic points to create campus-wide navigation:
+#### Step 2: Navigation Analysis (src/hooks/useTourNavigation.ts)
+The system analyzes the movement to determine how to orient the camera:
 
 ```typescript
-// X Block to N Block connection
-'x-f1-west-12' → forward → 'n-f1-x-entry'
-'n-f1-x-entry' → back → 'x-f1-west-12'
-
-// N Block to S Block connection
-'n-f1-west-9' → forward → 's-f1-north-4'
-'s-f1-north-4' → back → 'n-f1-west-9'
+// src/hooks/useTourNavigation.ts - within navigateDirection function
+const navigationAnalysis = analyzeNavigation(currentPhoto, targetPhoto, direction)
+const calculatedAngle = calculateNavigationAngle(
+  cameraLon,           // Current user orientation
+  currentPhoto,        // Source location
+  targetPhoto,         // Destination location
+  direction,           // Movement direction
+  navigationAnalysis.navigationType
+)
 ```
 
-### Step 4: Vertical Navigation
-
-#### Stairs
-Stairs provide direct floor-to-floor connections in A and X blocks:
+#### Step 3: Navigation Type Classification (src/hooks/useTourNavigation.ts)
+The `analyzeNavigation` function determines what type of movement this is:
 
 ```typescript
-// A Block stair connection
-{
-  id: 'a-f1-north-3',
-  directions: {
-    forward: { angle: 0, connection: 'a-f1-mid-4' },
-    back: { angle: 180, connection: 'a-f1-north-2' },
-    up: 'a-f2-north-stairs-entrance'  // Direct stair access (simple string)
-  },
-  hotspots: [
-    {
-      direction: 'up',
-      position: { theta: 270, phi: 60 }  // Visual stair location
+// src/hooks/useTourNavigation.ts - analyzeNavigation function
+function analyzeNavigation(
+  currentPhoto: Photo,
+  destinationPhoto: Photo,
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down'
+): NavigationAnalysis {
+
+  // Check if it's cross-building navigation
+  const currentBuilding = currentPhoto.id.split('-')[0]
+  const destBuilding = destinationPhoto.id.split('-')[0]
+  if (currentBuilding !== destBuilding) {
+    return { navigationType: 'cross-building', preserveOrientation: false }
+  }
+
+  // Check for bidirectional connections
+  const currentConnection = currentPhoto.directions[direction]?.connection
+  const reverseDirection = direction === 'forward' ? 'back' : 'forward'
+  const destinationConnection = destinationPhoto.directions[reverseDirection]?.connection
+
+  if (currentConnection !== destinationPhoto.id || destinationConnection !== currentPhoto.id) {
+    return { navigationType: 'same-building-corner', preserveOrientation: false }
+  }
+
+  // Check corridor geometry by comparing actual connection angles
+  const currentDirectionAngle = currentPhoto.directions[direction]?.angle
+  const destinationReverseAngle = destinationPhoto.directions[reverseDirection]?.angle
+
+  if (currentDirectionAngle !== undefined && destinationReverseAngle !== undefined) {
+    const connectionAngleDiff = angleDiff(currentDirectionAngle, destinationReverseAngle)
+
+    // If connection angles are not opposite (within 15° tolerance), it's a corner
+    if (Math.abs(connectionAngleDiff - 180) > 15) {
+      return { navigationType: 'same-building-corner', preserveOrientation: false }
     }
-  ]
-}
+  }
 
-// Corresponding floor 2 connection
-{
-  id: 'a-f2-north-stairs-entrance',
-  directions: {
-    down: 'a-f1-north-3',  // Back down the stairs (simple string)
-    forward: { angle: 0, connection: 'a-f2-mid-3' }
-  },
-  hotspots: [
-    {
-      direction: 'down',
-      position: { theta: 180, phi: 135 }  // Downward stair visual
-    }
-  ]
+  // Same corridor with consistent bidirectional geometry
+  return { navigationType: 'same-corridor', preserveOrientation: true }
 }
 ```
 
-#### Elevators
-Elevators provide multi-floor access with visual floor selection:
+**Navigation Types:**
+- **same-corridor**: Bidirectional hallway connections (preserves user orientation)
+- **same-building-corner**: Corner turns, room entrances (uses photo's starting angle)
+- **cross-building**: Movement between different buildings (directional intent)
+- **turn**: Left/right turns at intersections
+
+#### Step 4: Camera Angle Calculation (src/hooks/useTourNavigation.ts)
+Based on the navigation type, different orientation logic applies:
 
 ```typescript
-// N/S Block elevator connecting multiple floors
-export const nsBlockElevator: Elevator = {
-  id: 'ns-block-elevator',
-  photo: {
-    imageUrl: '/360_photos_compressed/n_s_block/inside_elevator.webp',
-    floorConnections: {
-      floor1: 'n-f1-mid-7',           // Ground floor access
-      floor2: 'n-f2-elevator-entrance', // Second floor lobby
-      floor4: 'ns-f4-placeholder'     // Future expansion
-    },
-    hotspots: [
-      {
-        floor: 1,
-        position: { theta: 270, phi: 100 }  // Floor 1 button location
-      },
-      {
-        floor: 2,
-        position: { theta: 290, phi: 90 }   // Floor 2 button location
+// src/hooks/useTourNavigation.ts - calculateNavigationAngle function
+function calculateNavigationAngle(
+  currentCameraAngle: number,
+  currentPhoto: Photo,
+  destinationPhoto: Photo,
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down',
+  navigationType: NavigationType
+): number {
+  switch (navigationType) {
+    case 'same-corridor':
+      if (direction === 'forward') {
+        // Forward movement: maintain forward-relative orientation
+        return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      } else if (direction === 'back') {
+        // Backward movement: face the back direction to maintain backwards orientation
+        return destinationPhoto.directions.back?.angle ?? calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
       }
-    ]
+      break
+
+    case 'cross-building':
+      // Use directional intent for cross-building movement
+      if (direction === 'forward') {
+        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else if (direction === 'back') {
+        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      }
+      break
+
+    case 'same-building-corner':
+    case 'turn':
+    default:
+      // For corner navigation, preserve directional intent when possible
+      if (direction === 'forward') {
+        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else if (direction === 'back') {
+        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      } else {
+        return destinationPhoto.startingAngle ?? 0
+      }
   }
+
+  return destinationPhoto.startingAngle ?? 0
 }
 ```
 
-#### Hotspot Integration
-Hotspots provide visual cues in the 360° images for interactive navigation. They're positioned using spherical coordinates (theta for horizontal rotation, phi for vertical angle):
+#### Step 5: Preserved Orientation Calculation (src/hooks/useTourNavigation.ts)
+For same-corridor movement, we maintain the user's relative position to the corridor:
 
 ```typescript
-// Elevator access hotspot
-hotspots: [
-  {
-    direction: 'elevator',
-    position: { theta: 180, phi: 85 }  // Centered, slightly above horizon
+// src/hooks/useTourNavigation.ts - calculatePreservedOrientation function
+function calculatePreservedOrientation(
+  currentCameraAngle: number,
+  currentPhoto: Photo,
+  destinationPhoto: Photo
+): number {
+  const currentForward = currentPhoto.directions.forward?.angle
+  const destForward = destinationPhoto.directions.forward?.angle
+
+  if (currentForward === undefined || destForward === undefined) {
+    return currentCameraAngle
   }
-]
 
-// Stair access hotspot
-hotspots: [
-  {
-    direction: 'up',
-    position: { theta: 90, phi: 55 }   // To the right, angled upward
-  }
-]
-```
+  // Calculate user's relative orientation to current corridor
+  let relativeAngle = currentCameraAngle - currentForward
 
-These hotspots render as clickable elements overlaid on the 360° image, allowing users to click directly on stairs, elevators, or floor buttons they can see.
+  // Normalize angle to -180 to 180 range
+  while (relativeAngle > 180) relativeAngle -= 360
+  while (relativeAngle < -180) relativeAngle += 360
 
-### Step 5: Central Export System
+  // Apply same relative orientation to destination corridor
+  let newAngle = destForward + relativeAngle
 
-All areas and elevators are exported through a single utility file:
+  // Normalize result to 0-360 range
+  while (newAngle < 0) newAngle += 360
+  while (newAngle >= 360) newAngle -= 360
 
-```typescript
-// tourUtilities.ts
-export const getAllAreas = (): any[] => {
-  return [
-    ...aBlockAreas,
-    ...xBlockAreas,
-    ...nBlockAreas,
-    ...sBlockAreas,
-    nsBlockElevator
-  ]
+  return newAngle
 }
 ```
 
-## Navigation Flow Examples
+**Example**: User in A Block hallway facing 45° right of forward direction. When moving to next photo, they should still face 45° right of that photo's forward direction.
 
-### Basic Corridor Movement
-User starts at `a-f1-north-entrance` and moves forward through the building:
-```
-a-f1-north-entrance → forward → a-f1-north-1 → forward → a-f1-north-2 → forward → a-f1-north-3
-```
-
-### Branch Corridor Navigation
-User encounters a side corridor and explores it:
-```
-a-f1-north-3 → left → a-f1-north-3-side → back → a-f1-north-3
-```
-
-### Cross-Building Navigation
-User travels from X Block to N Block:
-```
-x-f1-west-12 → forward → n-f1-x-entry → forward → n-f1-east-1
+#### Step 6: Image Preloading and State Update (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - within navigateDirection function
+const img = new Image()
+img.onload = () => {
+  setCurrentPhotoId(finalTargetId)
+  setCalculatedCameraAngle(calculatedAngle)  // Triggers camera reorientation
+  setIsLoading(false)
+}
+img.onerror = () => {
+  setIsLoading(false)
+  console.error('Failed to load image:', targetPhoto.imageUrl)
+}
+img.src = targetPhoto.imageUrl
 ```
 
-### Stair Usage
-User uses stairs to change floors in A Block:
-```
-a-f1-north-3 → up → a-f2-north-stairs-entrance → forward → a-f2-mid-3
-```
+**Why Preload**: Ensures smooth transitions by loading the destination image before switching, preventing loading flickers.
 
-### Elevator Usage
-User uses elevator to change floors:
-```
-n-f1-mid-7 → elevator → ns-elevator-interior → floor2 → n-f2-elevator-entrance
-```
+### The Panoramic Viewer: Three.js Integration (src/components/viewer/PanoramicViewer.tsx)
 
-## Key Design Decisions
-
-### 1. Consistent Navigation Patterns
-- **Forward/back:** Primary corridor movement
-- **Left/right:** Intersection turns and branch access
-- **Up/down:** Stair connections
-- **Elevator:** Dedicated elevator access
-
-### 2. Branch Corridor Logic
-All branch corridors use the same pattern:
-- Enter: `left` from main corridor
-- Exit: `back` to main corridor (not `right`)
-
-This creates intuitive navigation where users "back out" of dead-end areas.
-
-### 3. Building Context
-Photos include contextual information about their location:
+The `PanoramicViewer` component renders 360° photos using Three.js and handles camera orientation:
 
 ```typescript
-buildingContext: {
-  wing: 'north',
-  facilities: ['main entrance', 'information desk']
+// src/components/viewer/PanoramicViewer.tsx
+export function PanoramicViewer({
+  imageUrl,
+  onCameraChange,
+  calculatedCameraAngle,
+  startingAngle
+}: PanoramicViewerProps) {
+
+  // Three.js scene setup
+  const sceneRef = useRef<THREE.Scene>()
+  const cameraRef = useRef<THREE.PerspectiveCamera>()
+  const rendererRef = useRef<THREE.WebGLRenderer>()
+
+  // Camera orientation state
+  const [targetLon, setTargetLon] = useState(startingAngle ?? 0)
+  const [targetLat, setTargetLat] = useState(0)
 }
 ```
 
-## Testing Navigation
+#### Camera Orientation Logic (src/components/viewer/PanoramicViewer.tsx)
+When a new photo loads, the viewer applies the calculated camera angle:
 
-When testing the system:
+```typescript
+// src/components/viewer/PanoramicViewer.tsx - texture loading useEffect
+useEffect(() => {
+  if (!imageUrl) return
 
-1. **Verify connections:** Ensure all forward/back pairs are bidirectional
-2. **Test branch corridors:** Confirm left/back pattern works correctly
-3. **Check cross-building links:** Verify building transitions function
-4. **Test elevators:** Ensure floor connections work properly
-5. **Validate hotspots:** Confirm 3D coordinates align with visual elements
+  const texture = new THREE.TextureLoader().load(imageUrl, () => {
+    // Photo loaded successfully - apply camera orientation
+    if (calculatedCameraAngle !== undefined) {
+      setTargetLon(calculatedCameraAngle)  // Use navigation-calculated angle
+      setTargetLat(0)
+    } else if (startingAngle !== undefined) {
+      setTargetLon(startingAngle)          // Use photo's default starting angle
+      setTargetLat(0)
+    }
+  })
+}, [imageUrl, calculatedCameraAngle, startingAngle])
+```
 
-## Performance Considerations
+**Critical Timing**: Camera orientation is set AFTER texture loading completes to prevent race conditions where orientation is applied before the photo renders.
 
-- **Lazy loading:** Images load only when navigated to
-- **Lean data:** Photos contain only navigation data, not heavy metadata
-- **Efficient lookup:** Connection IDs allow fast photo retrieval
+#### Animation Loop (src/components/viewer/PanoramicViewer.tsx)
+```typescript
+// src/components/viewer/PanoramicViewer.tsx - animate function
+const animate = useCallback(() => {
+  if (!cameraRef.current) return
 
-This structure creates a scalable, maintainable system that can grow with the campus while providing intuitive navigation for users.
+  // Smooth camera interpolation toward target
+  lon += (targetLon - lon) * 0.1
+  lat += (targetLat - lat) * 0.1
+
+  // Apply spherical coordinates to camera
+  const phi = THREE.MathUtils.degToRad(90 - lat)
+  const theta = THREE.MathUtils.degToRad(lon)
+
+  cameraRef.current.lookAt(
+    Math.sin(phi) * Math.cos(theta),
+    Math.cos(phi),
+    Math.sin(phi) * Math.sin(theta)
+  )
+
+  // Update state for navigation component
+  onCameraChange(lon, lat)
+}, [lon, lat, targetLon, targetLat, onCameraChange])
+```
+
+### Directional Navigation UI Component (src/components/viewer/DirectionalNavigation.tsx)
+
+The `DirectionalNavigation` component provides the navigation buttons:
+
+```typescript
+// src/components/viewer/DirectionalNavigation.tsx
+export function DirectionalNavigation({
+  currentPhoto,
+  cameraLon,
+  cameraLat,
+  onNavigate
+}: DirectionalNavigationProps) {
+
+  // Check each direction for availability and visibility
+  const directions = ['forward', 'back', 'left', 'right'] as const
+
+  return directions.map(direction => {
+    const directionDef = currentPhoto.directions[direction]
+    if (!directionDef) return null
+
+    const isVisible = isLookingInDirection(cameraLon, direction, directionDef.angle)
+
+    return isVisible ? (
+      <DirectionButton
+        key={direction}
+        direction={direction}
+        onClick={() => onNavigate(direction)}
+      />
+    ) : null
+  })
+}
+```
+
+#### Direction Detection Algorithm (src/components/viewer/DirectionalNavigation.tsx)
+```typescript
+// src/components/viewer/DirectionalNavigation.tsx - isLookingInDirection function
+function isLookingInDirection(
+  cameraLon: number,
+  direction: string,
+  directionAngle: number,
+  tolerance: number = 45
+): boolean {
+  // Calculate angular difference between camera and direction
+  let angleDiff = Math.abs(cameraLon - directionAngle)
+
+  // Handle wraparound (e.g., 350° vs 10°)
+  if (angleDiff > 180) {
+    angleDiff = 360 - angleDiff
+  }
+
+  // Show button if looking within tolerance of direction
+  return angleDiff <= tolerance
+}
+```
+
+**Example**: Forward direction at 0°, user looking at 30°. Difference = 30°, which is < 45° tolerance, so "Go Forward" button appears.
+
+### Photo Lookup System (src/data/tourUtilities.ts)
+
+The `tourUtilities.ts` provides centralized photo management:
+
+```typescript
+// src/data/tourUtilities.ts - findPhotoById function
+const photoCache = new Map<string, Photo>()
+
+export function findPhotoById(photoId: string): Photo | null {
+  // Check cache first
+  if (photoCache.has(photoId)) {
+    return photoCache.get(photoId)!
+  }
+
+  // Search all areas for the photo
+  const allAreas = getAllAreas()
+  for (const area of allAreas) {
+    if ('photos' in area) {
+      const found = area.photos.find((photo: Photo) => photo.id === photoId)
+      if (found) {
+        photoCache.set(photoId, found)  // Cache for future lookups
+        return found
+      }
+    }
+  }
+
+  return null
+}
+```
+
+**Performance Note**: Caching prevents repeated linear searches through all photos, especially important during rapid navigation.
+
+### Error Handling and Edge Cases
+
+#### Navigation Prevention (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - navigateDirection function
+const navigateDirection = useCallback((direction) => {
+  if (!currentPhoto || isLoading) return  // Prevent navigation during transitions
+
+  const targetPhotoId = currentPhoto.directions[direction]?.connection
+  if (!targetPhotoId) return  // No connection available
+
+  setIsLoading(true)  // Prevent multiple simultaneous navigations
+}, [currentPhoto, isLoading])
+```
+
+#### Image Loading Failures (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - within navigateDirection function
+img.onerror = () => {
+  setIsLoading(false)
+  console.error('Failed to load image:', targetPhoto.imageUrl)
+  // User can try navigation again - loading state is cleared
+}
+```
+
+#### Invalid Photo References (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - within navigateDirection function
+const targetPhoto = findPhotoById(finalTargetId)
+if (!targetPhoto) {
+  setIsLoading(false)
+  console.error('Target photo not found:', finalTargetId)
+  return
+}
+```
+
+### Performance Optimizations
+
+#### Image Preloading Strategy (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - within navigateDirection function
+const img = new Image()
+img.onload = () => {
+  // Immediate state update - no loading delay for user
+  setCurrentPhotoId(finalTargetId)
+  setCalculatedCameraAngle(calculatedAngle)
+  setIsLoading(false)
+}
+img.src = targetPhoto.imageUrl  // Triggers download
+```
+
+**Why This Works**: User sees immediate feedback (loading state), while image loads in background. Once loaded, transition is instant.
+
+#### Texture Cleanup (src/components/viewer/PanoramicViewer.tsx)
+```typescript
+// src/components/viewer/PanoramicViewer.tsx - cleanup useEffect
+useEffect(() => {
+  return () => {
+    // Cleanup Three.js resources to prevent memory leaks
+    if (textureRef.current) {
+      textureRef.current.dispose()
+    }
+  }
+}, [imageUrl])
+```
+
+#### State Update Batching (src/hooks/useTourNavigation.ts)
+```typescript
+// src/hooks/useTourNavigation.ts - React automatically batches these
+setCurrentPhotoId(finalTargetId)
+setCalculatedCameraAngle(calculatedAngle)
+setIsLoading(false)
+```
+
+This technical implementation creates a robust navigation system that handles complex spatial relationships, preserves user orientation context, and provides smooth transitions between 360° photos while maintaining performance and reliability.

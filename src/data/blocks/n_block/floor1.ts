@@ -45,6 +45,8 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-1',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_1.webp',
+      // I want to change the starting angle so it faces like 20 degrees to the right but the following line doesnt seem to work
+      // startingAngle: 10,
       directions: {
         forward: { angle: 0, connection: 'n-f1-east-2' },
         back: { angle: 180, connection: 'n-f1-x-entry' }
@@ -116,6 +118,7 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-west-8',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_8.webp',
+      startingAngle: 180,
       directions: {
         forward: { angle: 0, connection: 'n-f1-west-9' },
         back: { angle: 180, connection: 'n-f1-mid-7' }
@@ -124,9 +127,10 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-west-9',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_9.webp',
+      startingAngle: 30,
       directions: {
-        forward: { angle: 0, connection: 's-f1-north-4' },
-        back: { angle: 180, connection: 'n-f1-west-8' }
+        forward: { angle: 40, connection: 's-f1-north-4' },
+        back: { angle: 230, connection: 'n-f1-west-8' }
       },
       buildingContext: {
         wing: 'west',
