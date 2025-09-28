@@ -133,7 +133,7 @@ export const xBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { x: 0, y: 0.9, z: 9.5 }  // Elevator access point
+          position: { x: 2.25, y: -0.5, z: 5 }  // Elevator access point
         }
       ]
     },
