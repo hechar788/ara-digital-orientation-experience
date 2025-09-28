@@ -12,13 +12,13 @@ import type { Photo } from '../../types/tour'
  *
  * @property currentPhoto - Currently displayed photo with direction data
  * @property cameraLon - Current camera horizontal rotation in degrees
- * @property onNavigate - Callback function for handling navigation actions
+ * @property onNavigate - Callback function for handling HORIZONTAL navigation actions only
  * @property isLoading - Whether navigation is currently in progress
  */
 interface DirectionalNavigationProps {
   currentPhoto: Photo | null
   cameraLon: number
-  onNavigate: (direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4') => void
+  onNavigate: (direction: 'forward' | 'back' | 'left' | 'right') => void
   isLoading: boolean
 }
 
@@ -69,25 +69,14 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
 
   const { directions } = currentPhoto
 
-  // Determine which directions to show based on camera orientation and available directions
+  // Determine which HORIZONTAL directions to show based on camera orientation and available directions
   const showForward = directions.forward && isLookingInDirection(cameraLon, directions.forward.angle)
   const showBack = directions.back && isLookingInDirection(cameraLon, directions.back.angle)
   const showLeft = directions.left && isLookingInDirection(cameraLon, directions.left.angle)
   const showRight = directions.right && isLookingInDirection(cameraLon, directions.right.angle)
 
-  // Always show up/down/elevator if available (not direction dependent)
-  const showUp = !!directions.up
-  const showDown = !!directions.down
-  const showElevator = !!directions.elevator
-
-  // Floor buttons for elevator interior
-  const showFloor1 = !!directions.floor1
-  const showFloor2 = !!directions.floor2
-  const showFloor3 = !!directions.floor3
-  const showFloor4 = !!directions.floor4
-
-  // Don't render if no directions are available
-  if (!showForward && !showBack && !showLeft && !showRight && !showUp && !showDown && !showElevator && !showFloor1 && !showFloor2 && !showFloor3 && !showFloor4) {
+  // Don't render if no horizontal directions are available
+  if (!showForward && !showBack && !showLeft && !showRight) {
     return null
   }
 
@@ -141,92 +130,6 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
             Go Right
           </button>
         )}
-
-        {showUp && (
-          <button
-            onClick={() => onNavigate('up')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Go Up
-          </button>
-        )}
-
-        {showDown && (
-          <button
-            onClick={() => onNavigate('down')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Go Down
-          </button>
-        )}
-
-        {showElevator && (
-          <button
-            onClick={() => onNavigate('elevator')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Enter Elevator
-          </button>
-        )}
-
-        {/* Floor selection buttons for elevator interior */}
-        {showFloor1 && (
-          <button
-            onClick={() => onNavigate('floor1')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Floor 1
-          </button>
-        )}
-
-        {showFloor2 && (
-          <button
-            onClick={() => onNavigate('floor2')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Floor 2
-          </button>
-        )}
-
-        {showFloor3 && (
-          <button
-            onClick={() => onNavigate('floor3')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Floor 3
-          </button>
-        )}
-
-        {showFloor4 && (
-          <button
-            onClick={() => onNavigate('floor4')}
-            onTouchStart={() => {}}
-            disabled={isLoading}
-            className="bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Floor 4
-          </button>
-        )}
-
       </div>
     </div>
   )

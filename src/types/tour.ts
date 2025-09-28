@@ -78,15 +78,17 @@ export interface NearbyRoom {
  * Only used for stairs/elevators where users need to click specific areas in the image.
  *
  * @property direction - Vertical navigation direction (up or down only)
- * @property position - 3D coordinates on the sphere (spherical coordinates)
- * @property position.theta - Horizontal rotation in degrees (0-360)
- * @property position.phi - Vertical rotation in degrees (0-180, where 90 is horizon)
+ * @property position - 3D coordinates on the sphere (Cartesian coordinates)
+ * @property position.x - X coordinate in 3D space
+ * @property position.y - Y coordinate in 3D space
+ * @property position.z - Z coordinate in 3D space
  */
 export interface NavigationHotspot {
   direction: 'up' | 'down' | 'elevator'
   position: {
-    theta: number  // horizontal (0-360°)
-    phi: number    // vertical (0-180°, 90 = horizon)
+    x: number  // X coordinate in 3D space
+    y: number  // Y coordinate in 3D space
+    z: number  // Z coordinate in 3D space
   }
 }
 
@@ -162,17 +164,19 @@ export interface ElevatorPhoto {
 
 /**
  * Represents a clickable floor selection button inside an elevator.
- * Positioned precisely on the elevator panel using spherical coordinates.
+ * Positioned precisely on the elevator panel using 3D coordinates.
  *
  * @property floor - Floor number that this button represents
- * @property position - 3D coordinates on the sphere (spherical coordinates)
- * @property position.theta - Horizontal rotation in degrees (0-360)
- * @property position.phi - Vertical rotation in degrees (0-180, where 90 is horizon)
+ * @property position - 3D coordinates on the sphere (Cartesian coordinates)
+ * @property position.x - X coordinate in 3D space
+ * @property position.y - Y coordinate in 3D space
+ * @property position.z - Z coordinate in 3D space
  */
 export interface ElevatorHotspot {
   floor: number
   position: {
-    theta: number  // horizontal (0-360°)
-    phi: number    // vertical (0-180°, 90 = horizon)
+    x: number  // X coordinate in 3D space
+    y: number  // Y coordinate in 3D space
+    z: number  // Z coordinate in 3D space
   }
 }

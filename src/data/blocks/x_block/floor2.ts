@@ -47,7 +47,17 @@ export const xBlockFloor2Area: Area = {
       buildingContext: {
         wing: 'north',
         facilities: ['entrance', 'information desk']
-      }
+      },
+      hotspots: [
+        {
+          direction: 'up',
+          position: { x: 0.6, y: 0, z: 4.75}  // Stairs
+        },
+        {
+          direction: 'down',
+          position: { x: 2.25, y: -1, z: 4.5 }  // Stairs
+        }
+      ]
     },
     {
       id: 'x-f2-west-1',
@@ -123,7 +133,7 @@ export const xBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { theta: 180, phi: 80 }  // Elevator access point
+          position: { x: 2.25, y: -0.5, z: 5 }  // Elevator access point
         }
       ]
     },
@@ -170,7 +180,7 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-east-13',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_east_13.webp',
-      startingAngle: 270,
+      startingAngle: 245,
       directions: {
         forward: { angle: 270, connection: 'x-f2-east-12' },
         back: { angle: 0, connection: 'a-f2-south-5' },
@@ -179,7 +189,7 @@ export const xBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'down',
-          position: { theta: 270, phi: 120 }  // Stairs going down on the left
+          position: { x: -1.95, y: -0.5, z: -0.55 }  // Stairs going down on the left
         }
       ],
       buildingContext: {

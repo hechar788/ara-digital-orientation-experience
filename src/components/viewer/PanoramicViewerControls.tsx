@@ -1,14 +1,12 @@
 import React from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { ZoomIn, ZoomOut, Eye, Info, Bot } from 'lucide-react'
+import { ZoomIn, ZoomOut, Info, Bot } from 'lucide-react'
 
 interface PanoramicViewerControlsProps {
   className?: string
   currentFov: number
-  isVRMode: boolean
   onZoomIn: () => void
   onZoomOut: () => void
-  onVRToggle: () => void
   onInfo?: () => void
   onAIChat?: () => void
 }
@@ -16,10 +14,8 @@ interface PanoramicViewerControlsProps {
 export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = ({
   className = '',
   currentFov,
-  isVRMode,
   onZoomIn,
   onZoomOut,
-  onVRToggle,
   onInfo,
   onAIChat
 }) => {
@@ -87,24 +83,6 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={onVRToggle}
-                  className={`h-full w-full flex items-center justify-center gap-1 lg:gap-0 border-r border-gray-600/50 text-white hidden sm:flex cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8 ${
-                    isVRMode 
-                      ? 'bg-red-600/90 hover:bg-red-500/90' 
-                      : 'bg-gray-800/90 hover:bg-gray-700/90'
-                  }`}
-                >
-                  <Eye className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
-                  <span className="text-xs lg:hidden whitespace-nowrap">{isVRMode ? 'Exit VR' : 'Enter VR'}</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="lg:block hidden">
-                <p>{isVRMode ? 'Exit VR' : 'Enter VR'}</p>
-              </TooltipContent>
-            </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>

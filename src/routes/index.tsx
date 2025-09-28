@@ -97,13 +97,17 @@ function App() {
         initialLon={cameraLon}
         initialLat={cameraLat}
         onCameraChange={handleCameraChange}
+        currentPhoto={currentPhoto}
+        onNavigate={navigateDirection}
+        cameraLon={cameraLon}
+        cameraLat={cameraLat}
       />
 
-      {/* Directional navigation buttons */}
+      {/* Directional navigation buttons - ONLY horizontal movement */}
       <DirectionalNavigation
         currentPhoto={currentPhoto}
         cameraLon={cameraLon}
-        onNavigate={navigateDirection}
+        onNavigate={(direction: 'forward' | 'back' | 'left' | 'right') => navigateDirection(direction)}
         isLoading={isLoading}
       />
     </div>

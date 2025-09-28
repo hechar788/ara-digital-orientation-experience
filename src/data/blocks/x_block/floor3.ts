@@ -44,7 +44,13 @@ export const xBlockFloor3Area: Area = {
       buildingContext: {
         wing: 'west',
         facilities: ['entrance', 'elevator access']
-      }
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { x: 0.85, y: -0.5, z: -3.5 }  // Stairs
+        }
+      ]
     },
     {
       id: 'x-f3-west-1',
@@ -123,7 +129,7 @@ export const xBlockFloor3Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { theta: 45, phi: 85 }  // Elevator access point
+          position: { x: -1.5, y: 0, z: 0.425 }  // Elevator access point
         }
       ]
     },

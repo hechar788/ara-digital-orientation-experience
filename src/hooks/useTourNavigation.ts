@@ -6,7 +6,7 @@
  */
 import { useState, useCallback, useMemo } from 'react'
 import { findPhotoById, getAreaForPhoto } from '../data/tourUtilities'
-import type { Photo, Area } from '../types/tour'
+import type { Photo } from '../types/tour'
 
 /**
  * Navigation type classification for orientation handling

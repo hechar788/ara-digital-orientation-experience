@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { Plus } from 'lucide-react'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
+import { PanoramicHotspots } from './PanoramicHotspots'
 import { AIChatPopup } from '../AIChatPopup'
 import { InformationPopup } from '../InformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
+import type { Photo } from '../../types/tour'
 
 interface PanoramicViewerProps {
   imageUrl: string
@@ -14,6 +15,10 @@ interface PanoramicViewerProps {
   initialLon?: number
   initialLat?: number
   onCameraChange?: (lon: number, lat: number) => void
+  currentPhoto?: Photo | null
+  onNavigate?: (direction: string) => void
+  cameraLon?: number
+  cameraLat?: number
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -23,11 +28,14 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   calculatedCameraAngle,
   initialLon = 0,
   initialLat = 0,
-  onCameraChange
+  onCameraChange,
+  currentPhoto = null,
+  onNavigate,
+  cameraLon = 0,
+  cameraLat = 0
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
-  const [isVRMode, setIsVRMode] = useState(false)
   const [showAIChat, setShowAIChat] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
@@ -46,12 +54,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     camera: THREE.PerspectiveCamera
     renderer: THREE.WebGLRenderer
     geometry: THREE.SphereGeometry
-    cameraLeft: THREE.PerspectiveCamera
-    cameraRight: THREE.PerspectiveCamera
     sphere: THREE.Mesh
   } | null>(null)
   const fovRef = useRef(75)
-  const stereoModeRef = useRef(false)
   const cameraControlRef = useRef<{ lon: number; lat: number }>({
     lon: calculatedCameraAngle !== undefined
       ? calculatedCameraAngle
@@ -59,32 +64,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     lat: initialLat
   })
 
-  // Orientation change handler to exit VR mode when rotating to portrait
-  useEffect(() => {
-    const handleOrientationChange = () => {
-      // Check if screen is in portrait mode and VR is active
-      const isPortrait = window.innerHeight > window.innerWidth
-      if (isPortrait && isVRMode) {
-        setIsVRMode(false)
-        stereoModeRef.current = false
-      }
-    }
-
-    // Listen for resize events to detect orientation changes
-    window.addEventListener('resize', handleOrientationChange)
-    
-    // Also check on orientation change event if available
-    if (screen.orientation) {
-      screen.orientation.addEventListener('change', handleOrientationChange)
-    }
-
-    return () => {
-      window.removeEventListener('resize', handleOrientationChange)
-      if (screen.orientation) {
-        screen.orientation.removeEventListener('change', handleOrientationChange)
-      }
-    }
-  }, [isVRMode])
 
   // Scene setup - runs once on mount
   useEffect(() => {
@@ -105,21 +84,15 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       renderer.setPixelRatio(window.devicePixelRatio)
       mount.appendChild(renderer.domElement)
 
-      // Stereo cameras for VR mode
-      const cameraLeft = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
-      const cameraRight = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
 
-      // Position cameras at origin inside the sphere
+      // Position camera at origin inside the sphere
       camera.position.set(0, 0, 0)
-      cameraLeft.position.set(-0.032, 0, 0) // ~32mm eye separation
-      cameraRight.position.set(0.032, 0, 0)
+      camera.name = 'panoramic-camera'
 
-      // Set initial camera directions
+      // Set initial camera direction
       camera.lookAt(0, 0, 1)
-      cameraLeft.lookAt(0, 0, 1)
-      cameraRight.lookAt(0, 0, 1)
 
-      // Create sphere geometry - use larger radius to accommodate stereo cameras
+      // Create sphere geometry
       const geometry = new THREE.SphereGeometry(10, 32, 16)
       geometry.scale(-1, 1, 1) // Flip for inside view
 
@@ -129,10 +102,11 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         side: THREE.FrontSide
       })
       const sphere = new THREE.Mesh(geometry, material)
+      sphere.name = 'panoramic-sphere'
       scene.add(sphere)
 
       // Store scene data for cleanup
-      sceneDataRef.current = { scene, camera, renderer, geometry, cameraLeft, cameraRight, sphere }
+      sceneDataRef.current = { scene, camera, renderer, geometry, sphere }
 
       // Mouse control variables - camera orientation is managed by cameraControlRef
       let isMouseDown = false
@@ -203,12 +177,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         camera.fov = fovRef.current
         camera.updateProjectionMatrix()
         
-        // Update stereo cameras for VR mode
-        cameraLeft.fov = fovRef.current
-        cameraLeft.updateProjectionMatrix()
-        cameraRight.fov = fovRef.current
-        cameraRight.updateProjectionMatrix()
-        
         // Update state
         setFov(fovRef.current)
       }
@@ -252,46 +220,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         target.y = 500 * Math.cos(phi)
         target.z = 500 * Math.sin(phi) * Math.sin(theta)
 
-        // Always update main camera rotation first
+        // Update camera rotation and render
         camera.lookAt(target)
-
-        if (stereoModeRef.current) {
-          // Set up stereo cameras with eye separation
-          cameraLeft.position.copy(camera.position)
-          cameraRight.position.copy(camera.position)
-          cameraLeft.rotation.copy(camera.rotation)
-          cameraRight.rotation.copy(camera.rotation)
-
-          // Add stereo offset
-          cameraLeft.position.x -= 0.032
-          cameraRight.position.x += 0.032
-
-          const width = mount.clientWidth
-          const height = mount.clientHeight
-
-          // Clear entire buffer
-          renderer.setViewport(0, 0, width, height)
-          renderer.clear()
-
-          // Left eye - use scissor test
-          renderer.setViewport(0, 0, width / 2, height)
-          renderer.setScissor(0, 0, width / 2, height)
-          renderer.setScissorTest(true)
-          renderer.render(scene, cameraLeft)
-
-          // Right eye
-          renderer.setViewport(width / 2, 0, width / 2, height)
-          renderer.setScissor(width / 2, 0, width / 2, height)
-          renderer.setScissorTest(true)
-          renderer.render(scene, cameraRight)
-
-          // Reset everything
-          renderer.setScissorTest(false)
-          renderer.setViewport(0, 0, width, height)
-        } else {
-          // Normal single camera rendering
-          renderer.render(scene, camera)
-        }
+        renderer.render(scene, camera)
       }
 
       // Start animation loop
@@ -423,10 +354,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     if (sceneDataRef.current) {
       sceneDataRef.current.camera.fov = newFov
       sceneDataRef.current.camera.updateProjectionMatrix()
-      sceneDataRef.current.cameraLeft.fov = newFov
-      sceneDataRef.current.cameraLeft.updateProjectionMatrix()
-      sceneDataRef.current.cameraRight.fov = newFov
-      sceneDataRef.current.cameraRight.updateProjectionMatrix()
     }
   }
 
@@ -437,18 +364,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     if (sceneDataRef.current) {
       sceneDataRef.current.camera.fov = newFov
       sceneDataRef.current.camera.updateProjectionMatrix()
-      sceneDataRef.current.cameraLeft.fov = newFov
-      sceneDataRef.current.cameraLeft.updateProjectionMatrix()
-      sceneDataRef.current.cameraRight.fov = newFov
-      sceneDataRef.current.cameraRight.updateProjectionMatrix()
     }
   }
 
-  const handleVRToggle = () => {
-    const newVRMode = !isVRMode
-    setIsVRMode(newVRMode)
-    stereoModeRef.current = newVRMode
-  }
 
   const handleAIChatToggle = () => {
     setShowAIChat(!showAIChat)
@@ -468,39 +386,33 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         )}
         {status === 'error' && <div className="absolute inset-0 flex items-center justify-center text-red-400 z-10">Error loading image</div>}
       </div>
-      
-      {/* VR Crosshairs - only visible in VR mode */}
-      {isVRMode && (
-        <>
-          {/* Left eye crosshair */}
-          <div className="absolute top-1/2 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-            <Plus className="w-8 h-8 text-gray-400" />
-          </div>
-          
-          {/* Right eye crosshair */}
-          <div className="absolute top-1/2 left-3/4 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-            <Plus className="w-8 h-8 text-gray-400" />
-          </div>
-        </>
+
+      {/* Add hotspot system */}
+      {currentPhoto && onNavigate && sceneDataRef.current && status === 'ready' && (
+        <PanoramicHotspots
+          currentPhoto={currentPhoto}
+          sceneRef={sceneDataRef}
+          fov={fov}
+          onNavigate={onNavigate}
+        />
       )}
-      
-      <PanoramicViewerControls 
+
+
+      <PanoramicViewerControls
         className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20"
         currentFov={fov}
-        isVRMode={isVRMode}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
-        onVRToggle={handleVRToggle}
         onAIChat={handleAIChatToggle}
         onInfo={handleInfoToggle}
-      />      
-      
-      <AIChatPopup 
+      />
+
+      <AIChatPopup
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
       />
-      
-      <InformationPopup 
+
+      <InformationPopup
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
       />

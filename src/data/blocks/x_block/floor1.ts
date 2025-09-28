@@ -58,7 +58,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 270, phi: 60 }  // Stairs
+          position: { x: 1.5, y: 0.2, z: -2.5 }  // Stairs
         }
       ]
     },
@@ -74,7 +74,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 90, phi: 55 }  // Stairs
+          position: { x: -3.25, y: 0.25, z: -3.25 }  // Stairs
         }
       ]
     },
@@ -105,7 +105,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { theta: 270, phi: 75 }  // Elevator
+          position: { x: -9.5, y: 0.65, z: 0 }  // Elevator
         }
       ]
     },
@@ -162,7 +162,13 @@ export const xBlockFloor1Area: Area = {
       buildingContext: {
         wing: 'west',
         facilities: ['classrooms', 'offices', 'restrooms']
-      }
+      },
+      hotspots: [
+        {
+          direction: 'up',
+          position: { x: 1.65, y: 0, z: -4.5 }  // Stairs
+        }
+      ]
     }
   ]
 }

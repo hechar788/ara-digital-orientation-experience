@@ -44,15 +44,15 @@ export const nsBlockElevator: Elevator = {
     hotspots: [
       {
         floor: 1,
-        position: { theta: 270, phi: 100 }  // Floor 1 button
+        position: { x: -9.5, y: 0, z: 0 }  // Floor 1 button
       },
       {
         floor: 2,
-        position: { theta: 290, phi: 90 }   // Floor 2 button
+        position: { x: -8.8, y: -4.1, z: 0 }   // Floor 2 button
       },
       {
         floor: 4,
-        position: { theta: 310, phi: 80 }   // Floor 4 button
+        position: { x: -7.5, y: -6.1, z: 0 }   // Floor 4 button
       }
     ]
   }

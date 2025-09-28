@@ -107,7 +107,11 @@ export const nBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { theta: 90, phi: 80 }  // Elevator access point
+          position: { x: 1, y: -0.5, z: -3 }  // Elevator access point
+        },
+        {
+          direction: 'elevator',
+          position: { x: 4.35, y: -0.5, z: -2.5 }  // Elevator access point
         }
       ],
       buildingContext: {
