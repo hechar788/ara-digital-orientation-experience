@@ -43,7 +43,7 @@ export const aBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'down',
-          position: { theta: 180, phi: 135 }
+          position: { x: 3.75, y: -1.15, z: -0.85 }
         }
       ]
     },
@@ -57,7 +57,13 @@ export const aBlockFloor2Area: Area = {
       buildingContext: {
         wing: 'north',
         facilities: ['classrooms', 'offices']
-      }
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { x: 1.5, y: -1.5, z: -4 }
+        }
+      ]
     },
     {
       id: 'a-f2-north-2',
@@ -89,12 +95,19 @@ export const aBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/a_block/floor_2/a_south_5.webp',
       directions: {
         forward: { angle: 180, connection: 'x-f2-east-13' },
-        back: { angle: 0, connection: 'a-f2-mid-4' }
+        back: { angle: 0, connection: 'a-f2-mid-4' },
+        down: 'x-f1-east-2'
       },
       buildingContext: {
         wing: 'south',
         facilities: ['classrooms', 'faculty offices']
-      }
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { x: -7.5, y: -0.5, z: 0.35 }
+        }
+      ]
     }
   ]
 }

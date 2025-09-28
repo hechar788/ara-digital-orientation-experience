@@ -40,15 +40,15 @@ export const xBlockElevator: Elevator = {
     hotspots: [
       {
         floor: 1,
-        position: { theta: 70, phi: 100 }   // Floor 1 button (lower right on panel)
+        position: { x: 3.193, y: -1.653, z: 8.826 }   // Floor 1 button (lower right on panel)
       },
       {
         floor: 2,
-        position: { theta: 90, phi: 90 }    // Floor 2 button (center of panel)
+        position: { x: 0, y: 0, z: 9.5 }    // Floor 2 button (center of panel)
       },
       {
         floor: 3,
-        position: { theta: 110, phi: 80 }   // Floor 3 button (upper left on panel)
+        position: { x: -3.193, y: 1.653, z: 8.826 }   // Floor 3 button (upper left on panel)
       }
     ]
   }

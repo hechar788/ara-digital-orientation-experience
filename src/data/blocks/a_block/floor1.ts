@@ -59,8 +59,14 @@ export const aBlockFloor1Area: Area = {
       directions: {
         forward: { angle: 180, connection: 'a-f1-north-3' },
         back: { angle: 0, connection: 'a-f1-north-1' },
-        up: 'a-f2-north-stairs-entrance'
-      }
+        up: 'a-f2-north-stairs-entrance',
+      },
+      hotspots: [
+        {
+          direction: 'up',
+          position: { x: -5.5, y: 1, z: 6.35 }
+        }
+      ]
     },
     {
       id: 'a-f1-north-3',
@@ -75,7 +81,7 @@ export const aBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 270, phi: 60 }
+          position: { x: 5, y: 0, z: 6.35 }
         }
       ]
     },
@@ -90,7 +96,7 @@ export const aBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { theta: 90, phi: 55 }
+          position: { x: 3.75, y: -0.5, z: -3.5}
         }
       ]
     },
