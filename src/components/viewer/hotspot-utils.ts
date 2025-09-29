@@ -69,6 +69,38 @@ async function createSVGTexture(svgPath: string): Promise<THREE.Texture> {
   })
 }
 
+/**
+ * Create canvas texture with floor number text
+ *
+ * Generates a texture with a floor number rendered as black text
+ * on transparent background for overlay on white sphere hotspots.
+ *
+ * @param floorNumber - Floor number to render (1, 2, 3, 4)
+ * @returns Promise resolving to Three.js texture with floor number
+ */
+async function createFloorNumberTexture(floorNumber: number): Promise<THREE.Texture> {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')!
+
+  // Clear with transparent background
+  ctx.clearRect(0, 0, 64, 64)
+
+  // Style the text
+  ctx.fillStyle = '#000000' // Black text
+  ctx.font = 'bold 40px Arial'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+
+  // Draw floor number
+  ctx.fillText(floorNumber.toString(), 32, 32)
+
+  // Create and return texture
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
 
 /**
  * Create hotspot geometry and material based on direction type
@@ -174,23 +206,57 @@ export async function createHotspotGeometry(direction: string): Promise<{
     }
   }
 
-  // Keep existing logic for floor and other hotspots
-  const color = direction.startsWith('floor') ? 0x0066ff : 0xff0000
-  const material = new THREE.MeshBasicMaterial({
-    color,
-    transparent: true,
-    opacity: 0.8,
-    side: THREE.DoubleSide
-  })
-
   if (direction.startsWith('floor')) {
-    // Circle for elevator floor buttons - 3x bigger
-    const geometry = new THREE.CircleGeometry(0.36, 16)
-    return { geometry, material }
+    // Extract floor number from direction (e.g., 'floor1' -> 1)
+    const floorNumber = parseInt(direction.replace('floor', ''))
+
+    // White sphere with floor number - same style as stairs/elevator hotspots
+    const sphereGeometry = new THREE.SphereGeometry(0.45, 16, 12)
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff, // White sphere
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.DoubleSide
+    })
+
+    try {
+      const numberTexture = await createFloorNumberTexture(floorNumber)
+      const iconGeometry = new THREE.PlaneGeometry(0.4, 0.4)
+      const iconMaterial = new THREE.MeshBasicMaterial({
+        map: numberTexture,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide
+      })
+
+      // Create meshes
+      const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+      const numberMesh = new THREE.Mesh(iconGeometry, iconMaterial)
+      numberMesh.position.z = 0.46 // Position in front of sphere
+
+      // Create group with sphere + number
+      const group = new THREE.Group()
+      group.add(sphereMesh)
+      group.add(numberMesh)
+
+      return {
+        geometry: group,
+        material: sphereMaterial
+      }
+    } catch (error) {
+      console.warn('Failed to create floor number texture, using fallback:', error)
+      return { geometry: sphereGeometry, material: sphereMaterial }
+    }
   }
 
   // Default sphere for unknown types - 3x bigger
   const geometry = new THREE.SphereGeometry(0.3, 8, 6)
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xff0000, // Red for unknown types
+    transparent: true,
+    opacity: 0.8,
+    side: THREE.DoubleSide
+  })
   return { geometry, material }
 }
 

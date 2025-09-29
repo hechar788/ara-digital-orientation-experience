@@ -83,8 +83,15 @@ export const xBlockFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_east_4.webp',
       directions: {
         forward: { angle: 0, connection: 'x-f1-mid-5' },
-        back: { angle: 180, connection: 'x-f1-east-3' }
-      }
+        back: { angle: 180, connection: 'x-f1-east-3' },
+        up: 'x-f2-east-13'
+      },
+      hotspots: [
+        {
+          direction: 'up',
+          position: { x: -5.25, y: -0.35, z: -7.5 }  // Stairs
+        }
+      ]
     },
     {
       id: 'x-f1-mid-5',
