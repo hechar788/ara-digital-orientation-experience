@@ -73,12 +73,8 @@ function analyzeNavigation(
       return diff
     }
 
-    // For true bidirectional corridors, the angles should be opposite (180° apart)
-    const connectionAngleDiff = angleDiff(currentDirectionAngle, destinationReverseAngle)
-
-
-    // If connection angles are not opposite (within 15° tolerance), it's a corner/geometry change
-    if (Math.abs(connectionAngleDiff - 180) > 15) {
+    // Check if connection angles are opposite (180° apart within 15° tolerance)
+    if (Math.abs(angleDiff(currentDirectionAngle, destinationReverseAngle) - 180) > 15) {
       return { navigationType: 'same-building-corner', preserveOrientation: false }
     }
   }
@@ -335,28 +331,6 @@ export function useTourNavigation() {
     }
   }, [currentPhotoId, isLoading])
 
-  /**
-   * Get available navigation directions from current photo
-   *
-   * Returns an object indicating which directions are available
-   * for navigation from the current location.
-   *
-   * @returns Object with boolean flags for each direction
-   */
-  const getAvailableDirections = useCallback(() => {
-    if (!currentPhoto) return {}
-
-    const { directions } = currentPhoto
-    return {
-      forward: !!directions.forward,
-      back: !!directions.back,
-      left: !!directions.left,
-      right: !!directions.right,
-      up: !!directions.up,
-      down: !!directions.down,
-      elevator: !!directions.elevator
-    }
-  }, [currentPhoto])
 
   return {
     // State
@@ -371,7 +345,6 @@ export function useTourNavigation() {
     // Navigation functions
     navigateDirection,
     jumpToPhoto,
-    getAvailableDirections,
     handleCameraChange
   }
 }

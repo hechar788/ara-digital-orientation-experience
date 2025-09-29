@@ -99,8 +99,6 @@ function App() {
         onCameraChange={handleCameraChange}
         currentPhoto={currentPhoto}
         onNavigate={navigateDirection}
-        cameraLon={cameraLon}
-        cameraLat={cameraLat}
       />
 
       {/* Directional navigation buttons - ONLY horizontal movement */}
