@@ -87,8 +87,15 @@ export const aBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/a_block/floor_2/a_mid_4.webp',
       directions: {
         forward: { angle: 180, connection: 'a-f2-south-5' },
-        back: { angle: 0, connection: 'a-f2-mid-3' }
-      }
+        back: { angle: 0, connection: 'a-f2-mid-3' },
+        down: 'x-f1-east-2'
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { x: -9.5, y: -0.35, z: -0.25 }
+        }
+      ]
     },
     {
       id: 'a-f2-south-5',
@@ -105,7 +112,7 @@ export const aBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'down',
-          position: { x: -7.5, y: -0.5, z: 0.35 }
+          position: { x: -7.5, y: -0.45, z: 0.35 }
         }
       ]
     }

@@ -174,8 +174,15 @@ export const xBlockFloor2Area: Area = {
       startingAngle: 180,
       directions: {
         back: { angle: 0, connection: 'x-f2-east-13' },
-        forward: { angle: 180, connection: 'x-f2-east-11' }
-      }
+        forward: { angle: 180, connection: 'x-f2-east-11' },
+        down: 'x-f1-east-2'
+      },
+      hotspots: [
+        {
+          direction: 'down',
+          position: { x: 5, y: -0.5, z: 1.65 }  // Stairs going down on the left
+        }
+      ]
     },
     {
       id: 'x-f2-east-13',
@@ -189,7 +196,7 @@ export const xBlockFloor2Area: Area = {
       hotspots: [
         {
           direction: 'down',
-          position: { x: -1.95, y: -0.5, z: -0.55 }  // Stairs going down on the left
+          position: { x: -3.25, y: -0.75, z: -1 }  // Stairs going down on the left
         }
       ],
       buildingContext: {

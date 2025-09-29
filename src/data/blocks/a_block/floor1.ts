@@ -64,7 +64,7 @@ export const aBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: -5.5, y: 1, z: 6.35 }
+          position: { x: -3, y: 0.55, z: 3.35 }
         }
       ]
     },
@@ -81,7 +81,7 @@ export const aBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: 5, y: 0, z: 6.35 }
+          position: { x: 2.5, y: 0, z: 3.5 }
         }
       ]
     },
@@ -96,7 +96,7 @@ export const aBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: 3.75, y: -0.5, z: -3.5}
+          position: { x: 2.75, y: -0.5, z: -2.5}
         }
       ]
     },

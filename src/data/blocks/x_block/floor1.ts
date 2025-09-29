@@ -58,7 +58,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: 1.5, y: 0.2, z: -2.5 }  // Stairs
+          position: { x: 2, y: 0, z: -3.5 }  // Stairs
         }
       ]
     },
@@ -74,7 +74,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: -3.25, y: 0.25, z: -3.25 }  // Stairs
+          position: { x: -4, y: -0.15, z: -4.25 }  // Stairs
         }
       ]
     },
@@ -105,7 +105,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { x: -9.5, y: 0.65, z: 0 }  // Elevator
+          position: { x: -0.5, y: -0.25, z: -7 }  // Elevator
         }
       ]
     },
@@ -166,7 +166,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'up',
-          position: { x: 1.65, y: 0, z: -4.5 }  // Stairs
+          position: { x: 1.65, y: -0.15, z: -4.5 }  // Stairs
         }
       ]
     }
