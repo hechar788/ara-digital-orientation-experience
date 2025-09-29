@@ -24,17 +24,6 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
     return Math.round(((120 - currentFov) / (120 - 10)) * 100)
   }
 
-  const handleInfoClick = () => {
-    if (onInfo) {
-      onInfo()
-    }
-  }
-
-  const handleAIChatClick = () => {
-    if (onAIChat) {
-      onAIChat()
-    }
-  }
 
   return (
     <TooltipProvider>
@@ -87,7 +76,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={handleAIChatClick}
+                  onClick={onAIChat}
                   className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
                 >
                   <Bot className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />
@@ -102,7 +91,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={handleInfoClick}
+                  onClick={onInfo}
                   className="h-full w-full flex items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
                 >
                   <Info className="flex-shrink-0 lg:w-7 lg:h-7 w-[18px] h-[18px]" />

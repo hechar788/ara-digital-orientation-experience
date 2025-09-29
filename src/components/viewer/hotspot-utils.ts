@@ -9,7 +9,6 @@
  */
 
 import * as THREE from 'three'
-import type { NavigationHotspot } from '../../types/tour'
 
 /**
  * Cache for loaded SVG textures to avoid reloading
@@ -70,22 +69,6 @@ async function createSVGTexture(svgPath: string): Promise<THREE.Texture> {
   })
 }
 
-/**
- * Get appropriate color for hotspot based on direction type
- *
- * Provides consistent visual styling for different types of navigation hotspots
- * to help users quickly identify the type of navigation available.
- *
- * @param direction - Hotspot direction (up, down, elevator, floor1, floor2, etc.)
- * @returns Hex color value for hotspot material
- */
-export function getHotspotColor(direction: string): number {
-  if (direction.startsWith('floor')) return 0x0066ff // Blue for elevator floors
-  if (direction === 'up') return 0x00ff00 // Green for up stairs
-  if (direction === 'down') return 0xff6600 // Orange for down stairs
-  if (direction === 'elevator') return 0x0066ff // Blue for elevator access
-  return 0xff0000 // Red for other/unknown
-}
 
 /**
  * Create hotspot geometry and material based on direction type
@@ -192,7 +175,7 @@ export async function createHotspotGeometry(direction: string): Promise<{
   }
 
   // Keep existing logic for floor and other hotspots
-  const color = getHotspotColor(direction)
+  const color = direction.startsWith('floor') ? 0x0066ff : 0xff0000
   const material = new THREE.MeshBasicMaterial({
     color,
     transparent: true,
