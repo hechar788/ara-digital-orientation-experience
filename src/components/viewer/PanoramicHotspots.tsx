@@ -86,28 +86,52 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         if (child.material instanceof THREE.Material) {
           child.material.dispose()
         }
+      } else if (child instanceof THREE.Group) {
+        // Dispose of group contents (sphere + icon meshes)
+        child.children.forEach(groupChild => {
+          if (groupChild instanceof THREE.Mesh) {
+            groupChild.geometry.dispose()
+            if (groupChild.material instanceof THREE.Material) {
+              groupChild.material.dispose()
+            }
+          }
+        })
       }
     })
     hotspotsGroup.clear()
 
-    // Create new hotspots
-    hotspots.forEach((hotspot, index) => {
+    // Create new hotspots asynchronously
+    hotspots.forEach(async (hotspot, index) => {
       const position = new THREE.Vector3(hotspot.position.x, hotspot.position.y, hotspot.position.z)
-      const { geometry, material } = createHotspotGeometry(hotspot.direction)
 
-      const mesh = new THREE.Mesh(geometry, material)
-      mesh.position.copy(position)
-      mesh.userData = {
-        direction: hotspot.direction,
-        index,
-        originalPosition: position.clone()
+      try {
+        const { geometry, material } = await createHotspotGeometry(hotspot.direction)
+
+        let hotspotObject: THREE.Object3D
+
+        if (geometry instanceof THREE.Group) {
+          // For stairs hotspots that return a group (sphere + icon)
+          hotspotObject = geometry
+        } else {
+          // For regular hotspots that return geometry
+          hotspotObject = new THREE.Mesh(geometry, material)
+        }
+
+        hotspotObject.position.copy(position)
+        hotspotObject.userData = {
+          direction: hotspot.direction,
+          index,
+          originalPosition: position.clone()
+        }
+        hotspotObject.name = `hotspot-${index}`
+
+        // Orient hotspot to face camera
+        orientHotspotToCamera(hotspotObject, position)
+
+        hotspotsGroup.add(hotspotObject)
+      } catch (error) {
+        console.error(`Failed to create hotspot ${index}:`, error)
       }
-      mesh.name = `hotspot-${index}`
-
-      // Orient hotspot to face camera
-      orientHotspotToCamera(mesh, position)
-
-      hotspotsGroup.add(mesh)
     })
   }, [hotspots, sceneRef])
 
@@ -119,13 +143,13 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
 
     const scale = calculateHotspotScale(fov)
 
-    hotspotsGroupRef.current.children.forEach((mesh, index) => {
-      if (mesh instanceof THREE.Mesh && hotspots[index]) {
+    hotspotsGroupRef.current.children.forEach((object, index) => {
+      if (hotspots[index]) {
         // Hotspots are always visible
-        mesh.visible = true
+        object.visible = true
 
         // Update scale based on zoom level
-        mesh.scale.setScalar(scale)
+        object.scale.setScalar(scale)
       }
     })
   }, [hotspots, fov])
@@ -136,6 +160,38 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   useEffect(() => {
     updateHotspotDisplay()
   }, [updateHotspotDisplay])
+
+  /**
+   * Handle mouse move events to change cursor on hotspot hover
+   */
+  const handleCanvasMouseMove = useCallback((event: MouseEvent) => {
+    if (!sceneRef.current || !hotspotsGroupRef.current) return
+
+    const { camera, renderer } = sceneRef.current
+    const canvas = renderer.domElement
+
+    // Get mouse coordinates
+    const rect = canvas.getBoundingClientRect()
+    const mouse = new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    )
+
+    // Perform raycasting
+    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(mouse, camera)
+
+    // Check for intersections with visible hotspots
+    const visibleHotspots = hotspotsGroupRef.current.children.filter(child => child.visible)
+    const intersects = raycaster.intersectObjects(visibleHotspots, true)
+
+    // Change cursor based on hover
+    if (intersects.length > 0) {
+      canvas.style.cursor = 'pointer'
+    } else {
+      canvas.style.cursor = 'grab'
+    }
+  }, [sceneRef])
 
   /**
    * Handle click events on the canvas to detect hotspot interactions
@@ -172,16 +228,23 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     const raycaster = new THREE.Raycaster()
     raycaster.setFromCamera(mouse, camera)
 
-    // Check for intersections with visible hotspots
+    // Check for intersections with visible hotspots (including children of groups)
     const visibleHotspots = hotspotsGroupRef.current.children.filter(child => child.visible)
-    const intersects = raycaster.intersectObjects(visibleHotspots, false)
+    const intersects = raycaster.intersectObjects(visibleHotspots, true) // recursive = true to check group children
 
     if (intersects.length > 0) {
-      const clickedHotspot = intersects[0].object
-      const direction = clickedHotspot.userData.direction
+      const clickedObject = intersects[0].object
 
-      // Trigger navigation
-      onNavigate(direction)
+      // Find the parent hotspot object that contains the direction data
+      let hotspotObject = clickedObject
+      while (hotspotObject && !hotspotObject.userData.direction && hotspotObject.parent) {
+        hotspotObject = hotspotObject.parent
+      }
+
+      if (hotspotObject && hotspotObject.userData.direction) {
+        // Trigger navigation
+        onNavigate(hotspotObject.userData.direction)
+      }
     }
   }, [sceneRef, onNavigate])
 
@@ -196,12 +259,14 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     // Add event listeners for both mouse and touch
     canvas.addEventListener('click', handleCanvasClick)
     canvas.addEventListener('touchend', handleCanvasClick)
+    canvas.addEventListener('mousemove', handleCanvasMouseMove)
 
     return () => {
       canvas.removeEventListener('click', handleCanvasClick)
       canvas.removeEventListener('touchend', handleCanvasClick)
+      canvas.removeEventListener('mousemove', handleCanvasMouseMove)
     }
-  }, [handleCanvasClick, sceneRef])
+  }, [handleCanvasClick, handleCanvasMouseMove, sceneRef])
 
   /**
    * Cleanup hotspots when component unmounts
@@ -216,6 +281,16 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
             if (child.material instanceof THREE.Material) {
               child.material.dispose()
             }
+          } else if (child instanceof THREE.Group) {
+            // Dispose of group contents (sphere + icon meshes)
+            child.children.forEach(groupChild => {
+              if (groupChild instanceof THREE.Mesh) {
+                groupChild.geometry.dispose()
+                if (groupChild.material instanceof THREE.Material) {
+                  groupChild.material.dispose()
+                }
+              }
+            })
           }
         })
 
