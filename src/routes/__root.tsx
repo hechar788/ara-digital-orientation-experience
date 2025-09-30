@@ -1,7 +1,9 @@
 import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { useEffect } from 'react'
 
 import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
+import { initializeCacheDebugging } from '../lib/cacheDebug'
 
 import '../styles.css'
 
@@ -22,20 +24,27 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Software Development Project - Starter',
+        title: 'Digital Orientation Experience | ARA Institute of Canterbury',
       },
     ],
     links: [],
   }),
 
-  component: () => (
-    <RootDocument>
-      <Outlet />
-      {/* <TanStackRouterDevtools /> */}
+  component: () => {
+    // Initialize cache debugging in development
+    useEffect(() => {
+      initializeCacheDebugging()
+    }, [])
 
-      {/* <TanStackQueryLayout /> */}
-    </RootDocument>
-  ),
+    return (
+      <RootDocument>
+        <Outlet />
+        {/* <TanStackRouterDevtools /> */}
+
+        {/* <TanStackQueryLayout /> */}
+      </RootDocument>
+    )
+  },
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
