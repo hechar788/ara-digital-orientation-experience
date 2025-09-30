@@ -1,12 +1,5 @@
 import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { useEffect } from 'react'
-
-import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
-import { initializeCacheDebugging } from '../lib/cacheDebug'
-
 import '../styles.css'
-
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
@@ -31,11 +24,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
 
   component: () => {
-    // Initialize cache debugging in development
-    useEffect(() => {
-      initializeCacheDebugging()
-    }, [])
-
     return (
       <RootDocument>
         <Outlet />
