@@ -112,7 +112,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { x: -0.5, y: -0.25, z: -7 }  // Elevator
+          position: { x: -0.75, y: -0.5, z: -9 }  // Elevator
         }
       ]
     },
@@ -121,8 +121,15 @@ export const xBlockFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_7.webp',
       directions: {
         forward: { angle: 0, connection: 'x-f1-mid-8' },
-        back: { angle: 180, connection: 'x-f1-mid-6' }
-      }
+        back: { angle: 180, connection: 'x-f1-mid-6' },
+        elevator: 'x-elevator-interior'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { x: -5.75, y: -0.35, z: -7.5 }  // Elevator
+        }
+      ]
     },
     {
       id: 'x-f1-mid-8',
