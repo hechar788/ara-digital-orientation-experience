@@ -52,9 +52,15 @@ export const libraryFloor1Area: Area = {
       directions: {
         forward: { angle: 180, connection: 'library-f1-2' },
         back: { angle: 0, connection: 'library-f1-entrance' },
+        door: 'x-f1-mid-6-library',
         up: 'library-f2-entrance'
       },
       hotspots: [
+        {
+          direction: 'door',
+          position: { x: 3.75, y: -0.35, z: 2.5 },
+          destination: 'x-f1-mid-6-library'
+        },
         {
           direction: 'up',
           position: { x: -2, y: 0, z: 4 }  // Stairs

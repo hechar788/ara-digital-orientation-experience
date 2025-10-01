@@ -61,8 +61,16 @@ export const libraryFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor2_aside_1.webp',
       directions: {
         forward: { angle: 320, connection: 'library-f2-aside-3' },
-        back: { angle: 230, connection: 'library-f2-aside' }
-      }
+        back: { angle: 230, connection: 'library-f2-aside' },
+        door: 'x-f2-north-9'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 2, y: -0.15, z: 3 },
+          destination: 'x-f2-north-9'
+        }
+      ]
     },
     {
       id: 'library-f2-aside-3',
