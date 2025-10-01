@@ -31,6 +31,7 @@ interface PanoramicHotspotsProps {
   }>
   fov: number
   onNavigate: (direction: string) => void
+  onNavigateToPhoto?: (photoId: string) => void
 }
 
 /**
@@ -49,7 +50,8 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   currentPhoto,
   sceneRef,
   fov,
-  onNavigate
+  onNavigate,
+  onNavigateToPhoto
 }) => {
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const hotspots = currentPhoto?.hotspots || []
@@ -120,6 +122,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         hotspotObject.position.copy(position)
         hotspotObject.userData = {
           direction: hotspot.direction,
+          destination: hotspot.destination,
           index,
           originalPosition: position.clone()
         }
@@ -242,11 +245,17 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
       }
 
       if (hotspotObject && hotspotObject.userData.direction) {
-        // Trigger navigation
-        onNavigate(hotspotObject.userData.direction)
+        // Check if hotspot has a specific destination
+        if (hotspotObject.userData.destination && onNavigateToPhoto) {
+          // Navigate directly to the destination photo
+          onNavigateToPhoto(hotspotObject.userData.destination)
+        } else {
+          // Navigate using direction lookup
+          onNavigate(hotspotObject.userData.direction)
+        }
       }
     }
-  }, [sceneRef, onNavigate])
+  }, [sceneRef, onNavigate, onNavigateToPhoto])
 
   /**
    * Set up canvas event listeners for click detection

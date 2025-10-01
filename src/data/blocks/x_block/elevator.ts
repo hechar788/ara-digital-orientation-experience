@@ -33,7 +33,7 @@ export const xBlockElevator: Elevator = {
     id: 'x-elevator-interior',
     imageUrl: '/360_photos_compressed/x_block/x_elevator.webp',
     floorConnections: {
-      floor1: 'x-f1-mid-6',
+      floor1: 'x-f1-mid-6-aside',
       floor2: 'x-f2-mid-7',
       floor3: 'x-f3-east-7'
     },

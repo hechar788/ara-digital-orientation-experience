@@ -9,6 +9,9 @@
  */
 
 import * as THREE from 'three'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createElement } from 'react'
+import { DoorOpen } from 'lucide-react'
 
 /**
  * Cache for loaded SVG textures to avoid reloading
@@ -201,6 +204,51 @@ export async function createHotspotGeometry(direction: string): Promise<{
       }
     } catch (error) {
       console.warn('Failed to load elevator texture, using fallback:', error)
+      // Fallback to just the white sphere
+      return { geometry: sphereGeometry, material: sphereMaterial }
+    }
+  }
+
+  if (direction === 'door') {
+    // White sphere with door icon - 3x bigger
+    const sphereGeometry = new THREE.SphereGeometry(0.45, 16, 12)
+
+    // Create solid white sphere material
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff, // Solid white sphere
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.DoubleSide
+    })
+
+    // Create a plane for the door icon that sits on top
+    try {
+      const doorTexture = await createSVGTexture('/svg/door-open.svg')
+      const iconGeometry = new THREE.PlaneGeometry(0.4, 0.4)
+      const iconMaterial = new THREE.MeshBasicMaterial({
+        map: doorTexture,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        alphaTest: 0.1 // Only render non-transparent parts
+      })
+
+      // Create meshes
+      const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+      const iconMesh = new THREE.Mesh(iconGeometry, iconMaterial)
+      iconMesh.position.z = 0.46 // Position slightly in front of sphere
+
+      // Create a group containing both the sphere and icon
+      const group = new THREE.Group()
+      group.add(sphereMesh)
+      group.add(iconMesh)
+
+      return {
+        geometry: group, // Return the group containing sphere + icon
+        material: sphereMaterial // Return sphere material as main material
+      }
+    } catch (error) {
+      console.warn('Failed to load door texture, using fallback:', error)
       // Fallback to just the white sphere
       return { geometry: sphereGeometry, material: sphereMaterial }
     }

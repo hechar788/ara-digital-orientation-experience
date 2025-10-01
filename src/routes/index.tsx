@@ -14,6 +14,7 @@ function App() {
     currentArea,
     isLoading,
     navigateDirection,
+    jumpToPhoto,
     currentPhotoId,
     cameraLon,
     cameraLat,
@@ -99,6 +100,7 @@ function App() {
         onCameraChange={handleCameraChange}
         currentPhoto={currentPhoto}
         onNavigate={navigateDirection}
+        onNavigateToPhoto={jumpToPhoto}
       />
 
       {/* Directional navigation buttons - ONLY horizontal movement */}
