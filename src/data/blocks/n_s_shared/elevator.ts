@@ -39,7 +39,7 @@ export const nsBlockElevator: Elevator = {
     floorConnections: {
       floor1: 'n-f1-mid-7',           // N Block Floor 1 middle section
       floor2: 'n-f2-elevator-entrance', // Shared Floor 2 elevator entrance
-      floor4: 'ns-f4-placeholder'     // Future Floor 4 connection
+      floor4: 's-f4-elevator-1'       // S Block Floor 4 elevator entrance
     },
     hotspots: [
       {

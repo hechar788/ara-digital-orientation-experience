@@ -104,15 +104,55 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-mid-6',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_6.webp',
+      startingAngle: 180,
       directions: {
-        forward: { angle: 0, connection: 'x-f1-mid-7' },
-        back: { angle: 180, connection: 'x-f1-mid-5' },
-        elevator: 'x-elevator-interior'
+        forward: { angle: 15, connection: 'x-f1-mid-7' },
+        back: { angle: 195, connection: 'x-f1-mid-5' },
+        left: { angle: 285, connection: 'x-f1-mid-6-aside' },
+        right: { angle: 100, connection: 'x-f1-mid-6-library' },
+        elevator: 'x-elevator-interior',
+        door: 'library-f1-entrance'
       },
       hotspots: [
         {
           direction: 'elevator',
           position: { x: -0.75, y: -0.5, z: -9 }  // Elevator
+        },
+        {
+          direction: 'door',
+          position: { x: -4.5, y: -0.15, z: 6.5 },
+          destination: 'library-f1-entrance'
+        }
+      ]
+    },
+    {
+      id: 'x-f1-mid-6-library',
+      imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_6_aside.webp',
+      startingAngle: 180,
+      directions: {
+        back: { angle: 270, connection: 'x-f1-mid-6' },
+        door: 'library-f1-entrance'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -2, y: -0.15, z: 1.35 },
+          destination: 'library-f1-entrance'
+        }
+      ]
+    },
+    {
+      id: 'x-f1-mid-6-aside',
+      imageUrl: '/360_photos_compressed/x_block/floor_1/x_mid_6_aside_1.webp',
+      startingAngle: 180,
+      directions: {
+        back: { angle: 100, connection: 'x-f1-mid-6' },
+        elevator: 'x-elevator-interior'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { x: -4, y: -1, z: 0 }  // Elevator
         }
       ]
     },
@@ -127,7 +167,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'elevator',
-          position: { x: -5.75, y: -0.35, z: -7.5 }  // Elevator
+          position: { x: -6, y: -0.35, z: -8 }  // Elevator
         }
       ]
     },

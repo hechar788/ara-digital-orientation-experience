@@ -79,9 +79,19 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-west-3',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_3.webp',
+      startingAngle: 180,
       directions: {
         back: { angle: 0, connection: 'x-f2-west-4' },
-        forward: { angle: 180, connection: 'x-f2-west-2' }
+        forward: { angle: 180, connection: 'x-f2-west-2' },
+        left: { angle: 90, connection: 'x-f2-west-3-aside' }
+      }
+    },
+    {
+      id: 'x-f2-west-3-aside',
+      imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_3_aside.webp',
+      startingAngle: 180,
+      directions: {
+        back: { angle: 0, connection: 'x-f2-west-3' }
       }
     },
     {
@@ -105,8 +115,9 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-west-5-aside',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_west_5_aside.webp',
+      startingAngle: 180,
       directions: {
-        back: { angle: 180, connection: 'x-f2-west-5' }
+        back: { angle: 0, connection: 'x-f2-west-5' }
       }
     },
     {
@@ -124,18 +135,43 @@ export const xBlockFloor2Area: Area = {
     {
       id: 'x-f2-mid-7',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_mid_7.webp',
+      startingAngle: 180,
       directions: {
         back: { angle: 0, connection: 'x-f2-mid-10' },
         forward: { angle: 180, connection: 'x-f2-west-6' },
-        left: { angle: 270, connection: 'x-f2-mid-8' },
+        left: { angle: 90, connection: 'x-f2-mid-7-aside' },
+        right: { angle: 270, connection: 'x-f2-mid-8' },
         elevator: 'x-elevator-interior'
       },
       hotspots: [
         {
           direction: 'elevator',
-          position: { x: 2.25, y: -0.5, z: 5 }  // Elevator access point
+          position: { x: 3, y: -0.75, z: 7 }  // Elevator access point
         }
       ]
+    },
+    {
+      id: 'x-f2-mid-7-aside',
+      imageUrl: '/360_photos_compressed/x_block/floor_2/x_mid_7_aside.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { angle: 270, connection: 'x-f2-mid-7-aside-1' },
+        back: { angle: 100, connection: 'x-f2-mid-7' },
+        elevator: 'x-elevator-interior'
+      },
+      hotspots: [
+        {
+          direction: 'elevator',
+          position: { x: -3.5, y: -0.85, z: 0.5}  // Elevator
+        }
+      ]
+    },
+    {
+      id: 'x-f2-mid-7-aside-1',
+      imageUrl: '/360_photos_compressed/x_block/floor_2/x_mid_7_aside_1.webp',
+      directions: {
+        back: { angle: 0, connection: 'x-f2-mid-7-aside' },
+      }
     },
     {
       id: 'x-f2-mid-8',
@@ -149,7 +185,16 @@ export const xBlockFloor2Area: Area = {
       id: 'x-f2-north-9',
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_north_9.webp',
       directions: {
-        back: { angle: 250, connection: 'x-f2-mid-8' }
+        back: { angle: 250, connection: 'x-f2-mid-8' },
+        forward: { angle: 0, connection: 'x-f2-north-9-aside' }
+      }
+    },
+    {
+      id: 'x-f2-north-9-aside',
+      imageUrl: '/360_photos_compressed/x_block/floor_2/x_north_9_aside.webp',
+      startingAngle: 160,
+      directions: {
+        back: { angle: 0, connection: 'x-f2-north-9' }
       }
     },
     {

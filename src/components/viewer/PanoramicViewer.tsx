@@ -17,6 +17,7 @@ interface PanoramicViewerProps {
   onCameraChange?: (lon: number, lat: number) => void
   currentPhoto?: Photo | null
   onNavigate?: (direction: string) => void
+  onNavigateToPhoto?: (photoId: string) => void
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -28,7 +29,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   initialLat = 0,
   onCameraChange,
   currentPhoto = null,
-  onNavigate
+  onNavigate,
+  onNavigateToPhoto
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
@@ -390,6 +392,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           sceneRef={sceneDataRef}
           fov={fov}
           onNavigate={onNavigate}
+          onNavigateToPhoto={onNavigateToPhoto}
         />
       )}
 

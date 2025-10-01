@@ -35,7 +35,7 @@ interface NavigationAnalysis {
 function analyzeNavigation(
   currentPhoto: Photo,
   destinationPhoto: Photo,
-  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4'
+  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'door' | 'floor1' | 'floor2' | 'floor3' | 'floor4'
 ): NavigationAnalysis {
   // Handle turns and vertical navigation
   if (direction !== 'forward' && direction !== 'back') {
@@ -209,7 +209,8 @@ function calculatePreservedOrientation(
  * ```
  */
 export function useTourNavigation() {
-  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  // const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>('library-f1-entrance')
   const [isLoading, setIsLoading] = useState(false)
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)
@@ -245,9 +246,9 @@ export function useTourNavigation() {
    * Checks if the requested direction is available from the current photo
    * and navigates to the target photo with loading state management.
    *
-   * @param direction - Direction to navigate (forward, back, left, right, up, down, elevator, floor1-4)
+   * @param direction - Direction to navigate (forward, back, left, right, up, down, elevator, door, floor1-4)
    */
-  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4') => {
+  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'door' | 'floor1' | 'floor2' | 'floor3' | 'floor4') => {
     if (!currentPhoto || isLoading) return
 
     let targetPhotoId: string | string[] | undefined

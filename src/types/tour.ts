@@ -26,7 +26,8 @@ export interface DirectionDefinition {
  * @property directions.right - Right navigation with angle and destination
  * @property directions.up - Photo ID(s) when going up (stairs/elevator) - array for multi-floor elevators
  * @property directions.down - Photo ID(s) when going down (stairs/elevator) - array for multi-floor elevators
- * @property directions.elevator - Photo ID for elevator access
+ * @property directions.elevator - Photo ID(s) for elevator access - array for multiple elevators
+ * @property directions.door - Photo ID(s) for door access - array for multiple doors
  * @property directions.floor1 - Photo ID for floor 1 destination (elevator interiors only)
  * @property directions.floor2 - Photo ID for floor 2 destination (elevator interiors only)
  * @property directions.floor3 - Photo ID for floor 3 destination (elevator interiors only)
@@ -46,7 +47,8 @@ export interface Photo {
     right?: DirectionDefinition
     up?: string | string[]
     down?: string | string[]
-    elevator?: string
+    elevator?: string | string[]
+    door?: string | string[]
     floor1?: string
     floor2?: string
     floor3?: string
@@ -75,21 +77,23 @@ export interface NearbyRoom {
 
 /**
  * Represents a clickable hotspot in a 360° photo for vertical navigation.
- * Only used for stairs/elevators where users need to click specific areas in the image.
+ * Only used for stairs/elevators/doors where users need to click specific areas in the image.
  *
- * @property direction - Vertical navigation direction (up or down only)
+ * @property direction - Navigation direction type
  * @property position - 3D coordinates on the sphere (Cartesian coordinates)
  * @property position.x - X coordinate in 3D space
  * @property position.y - Y coordinate in 3D space
  * @property position.z - Z coordinate in 3D space
+ * @property destination - Optional specific photo ID for this hotspot (overrides direction-based lookup)
  */
 export interface NavigationHotspot {
-  direction: 'up' | 'down' | 'elevator'
+  direction: 'up' | 'down' | 'elevator' | 'door'
   position: {
     x: number  // X coordinate in 3D space
     y: number  // Y coordinate in 3D space
     z: number  // Z coordinate in 3D space
   }
+  destination?: string  // Specific photo ID this hotspot leads to
 }
 
 /**
