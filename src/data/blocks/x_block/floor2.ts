@@ -186,8 +186,16 @@ export const xBlockFloor2Area: Area = {
       imageUrl: '/360_photos_compressed/x_block/floor_2/x_north_9.webp',
       directions: {
         back: { angle: 250, connection: 'x-f2-mid-8' },
-        forward: { angle: 0, connection: 'x-f2-north-9-aside' }
-      }
+        forward: { angle: 0, connection: 'x-f2-north-9-aside' },
+        door: 'library-f2-aside-1'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -3, y: -0.15, z: 0.5 },
+          destination: 'library-f2-aside-1'
+        }
+      ]
     },
     {
       id: 'x-f2-north-9-aside',

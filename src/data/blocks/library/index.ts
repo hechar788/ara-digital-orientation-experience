@@ -9,6 +9,7 @@
 
 import type { Area } from '../../../types/tour'
 import { libraryFloor1Area } from './floor1'
+import { libraryFloor2Area } from './floor2'
 
 /**
  * Collection of all Library areas
@@ -16,9 +17,11 @@ import { libraryFloor1Area } from './floor1'
  * Contains all floor areas with complete photo sequences and navigation
  * connections. Used as the primary export for Library navigation.
  */
-export const libraryAreas: [Area] = [
-  libraryFloor1Area
+export const libraryAreas: Area[] = [
+  libraryFloor1Area,
+  libraryFloor2Area
 ]
 
 // Re-export individual areas for direct access
 export { libraryFloor1Area } from './floor1'
+export { libraryFloor2Area } from './floor2'
