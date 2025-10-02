@@ -6,7 +6,21 @@
  */
 import { useState, useCallback, useMemo } from 'react'
 import { findPhotoById, getAreaForPhoto } from '../data/tourUtilities'
-import type { Photo } from '../types/tour'
+import type { Photo, DirectionType } from '../types/tour'
+import { DIRECTION_ANGLES } from '../types/tour'
+
+/**
+ * Calculates the absolute angle for a direction based on photo's startingAngle
+ *
+ * @param photo - Photo containing the direction and startingAngle
+ * @param direction - Direction name to calculate angle for
+ * @returns Absolute angle in degrees (0-360)
+ */
+function getDirectionAngle(photo: Photo, direction: DirectionType): number {
+  const startingAngle = photo.startingAngle ?? 0
+  const offset = DIRECTION_ANGLES[direction] ?? 0
+  return (startingAngle + offset) % 360
+}
 
 /**
  * Navigation type classification for orientation handling
@@ -35,10 +49,14 @@ interface NavigationAnalysis {
 function analyzeNavigation(
   currentPhoto: Photo,
   destinationPhoto: Photo,
-  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'door' | 'floor1' | 'floor2' | 'floor3' | 'floor4'
+  direction: DirectionType
 ): NavigationAnalysis {
-  // Handle turns and vertical navigation
-  if (direction !== 'forward' && direction !== 'back') {
+  // Classify direction as forward-based, back-based, or turning
+  const isForwardMovement = direction === 'forward' || direction === 'forwardLeft' || direction === 'forwardRight'
+  const isBackMovement = direction === 'back' || direction === 'backLeft' || direction === 'backRight'
+
+  // Handle pure turns (left/right) and vertical navigation
+  if (!isForwardMovement && !isBackMovement) {
     return { navigationType: 'turn', preserveOrientation: false }
   }
 
@@ -53,7 +71,9 @@ function analyzeNavigation(
 
   // Check for bidirectional forward/back connections
   const currentConnection = currentPhoto.directions[direction]?.connection
-  const reverseDirection = direction === 'forward' ? 'back' : 'forward'
+
+  // Determine primary reverse direction (forward-based ↔ back-based)
+  const reverseDirection: DirectionType = isForwardMovement ? 'back' : 'forward'
   const destinationConnection = destinationPhoto.directions[reverseDirection]?.connection
 
   // Not bidirectional connections
@@ -62,8 +82,8 @@ function analyzeNavigation(
   }
 
   // Check corridor geometry by comparing the actual connection angles being used
-  const currentDirectionAngle = currentPhoto.directions[direction]?.angle
-  const destinationReverseAngle = destinationPhoto.directions[reverseDirection]?.angle
+  const currentDirectionAngle = getDirectionAngle(currentPhoto, direction)
+  const destinationReverseAngle = getDirectionAngle(destinationPhoto, reverseDirection)
 
   if (currentDirectionAngle !== undefined && destinationReverseAngle !== undefined) {
     // Helper function to calculate angular difference with wraparound
@@ -100,18 +120,22 @@ function calculateNavigationAngle(
   currentCameraAngle: number,
   currentPhoto: Photo,
   destinationPhoto: Photo,
-  direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'floor1' | 'floor2' | 'floor3' | 'floor4',
+  direction: DirectionType,
   navigationType: NavigationType
 ): number {
+  // Classify movement type
+  const isForwardMovement = direction === 'forward' || direction === 'forwardLeft' || direction === 'forwardRight'
+  const isBackMovement = direction === 'back' || direction === 'backLeft' || direction === 'backRight'
+
   switch (navigationType) {
     case 'same-corridor':
       // For bidirectional corridors, preserve directional intent
-      if (direction === 'forward') {
-        // Forward movement: maintain forward-relative orientation
+      if (isForwardMovement) {
+        // Forward-based movement: maintain forward-relative orientation
         return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
-      } else if (direction === 'back') {
-        // Backward movement: face the back direction to maintain backwards orientation
-        return destinationPhoto.directions.back?.angle ?? calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
+      } else if (isBackMovement) {
+        // Back-based movement: face the back direction to maintain backwards orientation
+        return destinationPhoto.directions.back ? getDirectionAngle(destinationPhoto, 'back') : calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
       } else {
         // Other directions: use preserved orientation
         return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
@@ -119,25 +143,26 @@ function calculateNavigationAngle(
 
     case 'cross-building':
       // Use directional intent: forward movement faces forward, backward movement faces backward
-      if (direction === 'forward') {
-        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
-      } else if (direction === 'back') {
-        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      if (isForwardMovement) {
+        return destinationPhoto.directions.forward ? getDirectionAngle(destinationPhoto, 'forward') : destinationPhoto.startingAngle ?? 0
+      } else if (isBackMovement) {
+        // If destination has back direction, face it. Otherwise face opposite of startingAngle (backward).
+        return destinationPhoto.directions.back ? getDirectionAngle(destinationPhoto, 'back') : ((destinationPhoto.startingAngle ?? 0) + 180) % 360
       }
       break
 
     case 'same-building-corner':
     case 'turn':
     default:
-      // For corner navigation, preserve directional intent when possible
-      if (direction === 'forward') {
-        // Forward movement: face the forward direction or use startingAngle
-        return destinationPhoto.directions.forward?.angle ?? destinationPhoto.startingAngle ?? 0
-      } else if (direction === 'back') {
-        // Backward movement: face the back direction or use startingAngle
-        return destinationPhoto.directions.back?.angle ?? destinationPhoto.startingAngle ?? 0
+      // For corner navigation, preserve directional intent based on primary direction
+      if (isForwardMovement) {
+        // Forward-based movement: face the forward direction or use startingAngle
+        return destinationPhoto.directions.forward ? getDirectionAngle(destinationPhoto, 'forward') : destinationPhoto.startingAngle ?? 0
+      } else if (isBackMovement) {
+        // Back-based movement: face the back direction if it exists, otherwise face opposite of startingAngle
+        return destinationPhoto.directions.back ? getDirectionAngle(destinationPhoto, 'back') : ((destinationPhoto.startingAngle ?? 0) + 180) % 360
       } else {
-        // Other directions: use startingAngle
+        // Pure turns (left/right): use startingAngle
         return destinationPhoto.startingAngle ?? 0
       }
   }
@@ -162,8 +187,8 @@ function calculatePreservedOrientation(
   currentPhoto: Photo,
   destinationPhoto: Photo
 ): number {
-  const currentForward = currentPhoto.directions.forward?.angle
-  const destForward = destinationPhoto.directions.forward?.angle
+  const currentForward = currentPhoto.directions.forward ? getDirectionAngle(currentPhoto, 'forward') : undefined
+  const destForward = destinationPhoto.directions.forward ? getDirectionAngle(destinationPhoto, 'forward') : undefined
 
   // Fallback to simple preservation if direction data is missing
   if (currentForward === undefined || destForward === undefined) {
@@ -209,7 +234,8 @@ function calculatePreservedOrientation(
  * ```
  */
 export function useTourNavigation() {
-  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  // const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>('outside-n-north-entrance')
   const [isLoading, setIsLoading] = useState(false)
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)
@@ -247,13 +273,14 @@ export function useTourNavigation() {
    *
    * @param direction - Direction to navigate (forward, back, left, right, up, down, elevator, door, floor1-4)
    */
-  const navigateDirection = useCallback((direction: 'forward' | 'back' | 'left' | 'right' | 'up' | 'down' | 'elevator' | 'door' | 'floor1' | 'floor2' | 'floor3' | 'floor4') => {
+  const navigateDirection = useCallback((direction: DirectionType) => {
     if (!currentPhoto || isLoading) return
 
     let targetPhotoId: string | string[] | undefined
 
-    // Handle new directions interface for horizontal movement
-    if (direction === 'forward' || direction === 'back' || direction === 'left' || direction === 'right') {
+    // Handle new directions interface for horizontal movement (8 directions)
+    if (direction === 'forward' || direction === 'forwardRight' || direction === 'right' || direction === 'backRight' ||
+        direction === 'back' || direction === 'backLeft' || direction === 'left' || direction === 'forwardLeft') {
       const directionDef = currentPhoto.directions[direction]
       targetPhotoId = directionDef?.connection
     } else {

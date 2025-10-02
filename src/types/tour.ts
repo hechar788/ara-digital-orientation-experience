@@ -2,14 +2,41 @@
 // Shared TypeScript interfaces for tour navigation system
 
 /**
- * Represents a directional navigation option with angle and destination.
+ * Unified direction type for VR tour navigation
  *
- * @property angle - Camera angle where button appears (0-360 degrees)
+ * Represents all possible navigation directions in the VR campus tour system.
+ * Supports 8-directional movement (cardinal + diagonal) for precise navigation.
+ * Used consistently across navigation functions to ensure type safety.
+ *
+ * @type DirectionType
+ */
+export type DirectionType = 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft' | 'up' | 'down' | 'elevator' | 'door' | 'floor1' | 'floor2' | 'floor3' | 'floor4'
+
+/**
+ * Represents a directional navigation option with just the connection.
+ * The angle is automatically calculated based on the direction name and startingAngle.
+ *
  * @property connection - Photo ID to navigate to when button is clicked
  */
 export interface DirectionDefinition {
-  angle: number
   connection: string
+}
+
+/**
+ * Direction angle offsets relative to startingAngle (in degrees)
+ * Used to automatically calculate button placement angles
+ *
+ * @constant
+ */
+export const DIRECTION_ANGLES: Record<string, number> = {
+  forward: 0,
+  forwardRight: 45,
+  right: 90,
+  backRight: 135,
+  back: 180,
+  backLeft: 225,
+  left: 270,
+  forwardLeft: 315
 }
 
 /**
@@ -42,9 +69,13 @@ export interface Photo {
   startingAngle?: number
   directions: {
     forward?: DirectionDefinition
-    back?: DirectionDefinition
-    left?: DirectionDefinition
+    forwardRight?: DirectionDefinition
     right?: DirectionDefinition
+    backRight?: DirectionDefinition
+    back?: DirectionDefinition
+    backLeft?: DirectionDefinition
+    left?: DirectionDefinition
+    forwardLeft?: DirectionDefinition
     up?: string | string[]
     down?: string | string[]
     elevator?: string | string[]
@@ -122,7 +153,7 @@ export interface Area {
   id: string
   name: string
   photos: Photo[]
-  buildingBlock: 'a' | 'n' | 's' | 'x'
+  buildingBlock: 'a' | 'n' | 's' | 'x' | 'w' | 'outside' | 'library'
   floorLevel: number
 }
 
@@ -138,7 +169,7 @@ export interface Area {
 export interface Elevator {
   id: string
   name: string
-  buildingBlock: 'a' | 'n' | 's' | 'x'
+  buildingBlock: 'a' | 'n' | 's' | 'x' | 'outside' | 'library'
   photo: ElevatorPhoto
 }
 
