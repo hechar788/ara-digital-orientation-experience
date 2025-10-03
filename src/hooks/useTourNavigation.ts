@@ -559,7 +559,7 @@ function calculatePreservedOrientation(
  */
 export function useTourNavigation() {
   // const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
-  const [currentPhotoId, setCurrentPhotoId] = useState<string>('x-f3-east-7')
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-1')
   const [isLoading, setIsLoading] = useState(false)
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)

@@ -36,8 +36,16 @@ export const aBlockFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
       startingAngle: 160,
       directions: {
-        forward: { connection: 'a-f1-north-1' }
+        forward: { connection: 'a-f1-north-1' },
+        door: 'outside-a-north-1'
       },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 2, y: -0.25, z: -0.25 },
+          destination: 'outside-a-north-1'
+        }
+      ],
       buildingContext: {
         wing: 'north',
         facilities: ['main entrance', 'information desk']
@@ -49,8 +57,16 @@ export const aBlockFloor1Area: Area = {
       startingAngle: 185,
       directions: {
         forward: { connection: 'a-f1-north-2' },
-        back: { connection: 'a-f1-north-entrance' }
-      }
+        back: { connection: 'a-f1-north-entrance' },
+        door: 'outside-a-north-1'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 6, y: -0.35, z: -0.075 },
+          destination: 'outside-a-north-1'
+        }
+      ]
     },
     {
       id: 'a-f1-north-2',
@@ -124,8 +140,16 @@ export const aBlockFloor1Area: Area = {
       startingAngle: 5,
       directions: {
         back: { connection: 'a-f1-mid-5' },
-        forward: { connection: 'x-f1-east-1' }
+        forward: { connection: 'x-f1-east-1' },
+        door: 'outside-x-south-entrance'
       },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 7.5, y: -0.45, z: -0.4 },
+          destination: 'outside-x-south-entrance'
+        }
+      ],
       buildingContext: {
         wing: 'south',
         facilities: ['restrooms', 'water fountain']

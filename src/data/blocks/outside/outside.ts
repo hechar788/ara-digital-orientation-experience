@@ -154,7 +154,8 @@ export const outsideArea: Area = {
       imageUrl: '/360_photos_compressed/outside/outside_s_north_1_aside_2.webp',
       startingAngle: 180,
       directions: {
-        // forward: { connection: '' },
+        forwardLeft: { connection: 'outside-u-mid-3' },
+        forwardRight: { connection: 'outside-u-mid-4' },
         back: { connection: 'outside-s-north-1-aside-1' },
       }
     },
@@ -183,6 +184,7 @@ export const outsideArea: Area = {
       imageUrl: '/360_photos_compressed/outside/outside_n_north_1_aside_2.webp',
       startingAngle: 0,
       directions: {
+        forward: { connection: 'outside-g-mid-1' },
         back: { connection: 'outside-n-north-1-aside-1' }
       }
     },
@@ -201,7 +203,433 @@ export const outsideArea: Area = {
       startingAngle: 180,
       directions: {
         forward: { connection: 'outside-s-north-4' },
+        forwardRight: { connection: 'outside-u-mid-1' },
         backLeft: { connection: 'outside-s-north-2' }
+      }
+    },
+    {
+      id: 'outside-u-mid-1',
+      imageUrl: '/360_photos_compressed/outside/outside_u_mid_1.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-u-mid-2' },
+        back: { connection: 'outside-s-north-3' }
+      }
+    },
+    {
+      id: 'outside-u-mid-2',
+      imageUrl: '/360_photos_compressed/outside/outside_u_mid_2.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-u-mid-3' },
+        back: { connection: 'outside-u-mid-1' }
+      }
+    },
+    {
+      id: 'outside-u-mid-3',
+      imageUrl: '/360_photos_compressed/outside/outside_u_mid_3.webp',
+      startingAngle: 200,
+      directions: {
+        forward: { connection: 'outside-u-mid-4' },
+        forwardRight: { connection: 'outside-s-north-1-aside-2' },
+        back: { connection: 'outside-u-mid-2' }
+      }
+    },
+    {
+      id: 'outside-u-mid-4',
+      imageUrl: '/360_photos_compressed/outside/outside_u_mid_4.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-u-mid-5' },
+        back: { connection: 'outside-u-mid-3' },
+        backRight: { connection: 'outside-s-north-1-aside-2' }
+      }
+    },
+    {
+      id: 'outside-u-mid-5',
+      imageUrl: '/360_photos_compressed/outside/outside_u_mid_5.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-t-mid-1' },
+        back: { connection: 'outside-u-mid-4' }
+      }
+    },
+    {
+      id: 'outside-t-mid-1',
+      imageUrl: '/360_photos_compressed/outside/outside_t_mid_1.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-t-mid-2' },
+        back: { connection: 'outside-u-mid-5' }
+      }
+    },
+    {
+      id: 'outside-t-mid-2',
+      imageUrl: '/360_photos_compressed/outside/outside_t_mid_2.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-t-mid-3' },
+        back: { connection: 'outside-t-mid-1' }
+      }
+    },
+    {
+      id: 'outside-t-mid-3',
+      imageUrl: '/360_photos_compressed/outside/outside_t_mid_3.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-g-mid-1' },
+        backLeft: { connection: 'outside-t-mid-2' }
+      }
+    },
+    {
+      id: 'outside-g-mid-1',
+      imageUrl: '/360_photos_compressed/outside/outside_g_mid_1.webp',
+      startingAngle: 185,
+      directions: {
+        forward: { connection: 'outside-g-mid-2' },
+        right: { connection: 'outside-n-north-1-aside-2' },
+        back: { connection: 'outside-t-mid-3' }
+      }
+    },
+    {
+      id: 'outside-g-mid-2',
+      imageUrl: '/360_photos_compressed/outside/outside_g_mid_2.webp',
+      startingAngle: 187.5,
+      directions: {
+        forward: { connection: 'outside-g-mid-3' },
+        back: { connection: 'outside-g-mid-1' }
+      }
+    },
+    {
+      id: 'outside-g-mid-3',
+      imageUrl: '/360_photos_compressed/outside/outside_g_mid_3.webp',
+      startingAngle: 195,
+      directions: {
+        forward: { connection: 'outside-g-mid-4' },
+        back: { connection: 'outside-g-mid-2' }
+      }
+    },
+    {
+      id: 'outside-g-mid-4',
+      imageUrl: '/360_photos_compressed/outside/outside_g_mid_4.webp',
+      startingAngle: 180,
+      directions: {
+        forwardLeft: { connection: 'outside-g-mid-5' },
+        back: { connection: 'outside-g-mid-3' }
+      }
+    },
+    {
+      id: 'outside-g-mid-5',
+      imageUrl: '/360_photos_compressed/outside/outside_g_mid_5.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-tm-1' },
+        backRight: { connection: 'outside-g-mid-4' }
+      }
+    },
+    {
+      id: 'outside-tm-1',
+      imageUrl: '/360_photos_compressed/outside/outside_tm_1.webp',
+      startingAngle: 200,
+      directions: {
+        forward: { connection: 'outside-tm-2' },
+        back: { connection: 'outside-g-mid-5' }
+      }
+    },
+    {
+      id: 'outside-tm-2',
+      imageUrl: '/360_photos_compressed/outside/outside_tm_2.webp',
+      startingAngle: 185,
+      directions: {
+        forward: { connection: 'outside-tm-3' },
+        back: { connection: 'outside-tm-1' }
+      }
+    },
+    {
+      id: 'outside-tm-3',
+      imageUrl: '/360_photos_compressed/outside/outside_tm_3.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-a-north-1' },
+        back: { connection: 'outside-tm-2' }
+      }
+    },
+    {
+      id: 'outside-a-north-1',
+      imageUrl: '/360_photos_compressed/outside/outside_a_north_1.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-a-north-2' },
+        back: { connection: 'outside-tm-3' },
+        door: 'a-f1-north-entrance'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 0.3, y: -0.2, z: -5.5 },
+          destination: 'a-f1-north-entrance'
+        }
+      ]
+    },
+    {
+      id: 'outside-a-north-2',
+      imageUrl: '/360_photos_compressed/outside/outside_a_north_2.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-a-north-3' },
+        back: { connection: 'outside-a-north-1' },
+        door: 'a-f1-north-entrance'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 7.85, y: -0.2, z: -4.5 },
+          destination: 'a-f1-north-entrance'
+        }
+      ]
+    },
+    {
+      id: 'outside-a-north-3',
+      imageUrl: '/360_photos_compressed/outside/outside_a_north_3.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-a-north-4' },
+        back: { connection: 'outside-a-north-2' }
+      }
+    },
+    {
+      id: 'outside-a-north-4',
+      imageUrl: '/360_photos_compressed/outside/outside_a_north_4.webp',
+      startingAngle: 180,
+      directions: {
+        right: { connection: 'outside-a-east-1' },
+        left: { connection: 'outside-w-west-1' },
+        back: { connection: 'outside-a-north-3' }
+      }
+    },
+    {
+      id: 'outside-a-east-1',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_1.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-a-east-2' },
+        back: { connection: 'outside-a-north-4' }
+      }
+    },
+    {
+      id: 'outside-a-east-2',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_2.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-a-east-3' },
+        back: { connection: 'outside-a-east-1' }
+      }
+    },
+    {
+      id: 'outside-a-east-3',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_3.webp',
+      startingAngle: 180,
+      directions: {
+        forwardRight: { connection: 'outside-a-east-4' },
+        back: { connection: 'outside-a-east-2' }
+      }
+    },
+    {
+      id: 'outside-a-east-4',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_4.webp',
+      startingAngle: 185,
+      directions: {
+        forward: { connection: 'outside-a-east-5' },
+        backLeft: { connection: 'outside-a-east-3' }
+      }
+    },
+    {
+      id: 'outside-a-east-5',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_5.webp',
+      startingAngle: 190,
+      directions: {
+        forward: { connection: 'outside-a-east-6' },
+        back: { connection: 'outside-a-east-4' }
+      }
+    },
+    {
+      id: 'outside-a-east-6',
+      imageUrl: '/360_photos_compressed/outside/outside_a_east_6.webp',
+      startingAngle: 140,
+      directions: {
+        forwardLeft: { connection: 'outside-cafeteria-1' },
+        forward: { connection: 'outside-cafeteria-7' },
+        back: { connection: 'outside-a-east-5' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-1',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_1.webp',
+      startingAngle: 0,
+      directions: {
+        forward: { connection: 'outside-cafeteria-2' },
+        forwardRight: { connection: 'outside-cafeteria-6' },
+        back: { connection: 'outside-a-east-6' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-2',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_2.webp',
+      startingAngle: 0,
+      directions: {
+        forward: { connection: 'outside-cafeteria-3' },
+        backRight: { connection: 'outside-cafeteria-6' },
+        back: { connection: 'outside-cafeteria-1' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-6',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_6.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-cafeteria-6-aside' },
+        backRight: { connection: 'outside-cafeteria-1' },
+        backLeft: { connection: 'outside-cafeteria-2' },
+        left: { connection: 'outside-cafeteria-8' },
+        right: { connection: 'outside-cafeteria-7' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-6-aside',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_6_aside.webp',
+      startingAngle: 160,
+      directions: {
+        back: { connection: 'outside-cafeteria-6' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-8',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_8.webp',
+      startingAngle: 185,
+      directions: {
+        forward: { connection: 'outside-x-south-entrance' },
+        right: { connection: 'outside-cafeteria-6' }
+      }
+    },
+    {
+      id: 'outside-x-south-entrance',
+      imageUrl: '/360_photos_compressed/outside/outside_x_south_entrance.webp',
+      startingAngle: 90,
+      directions: {
+        back: { connection: 'outside-cafeteria-8' },
+        door: 'x-f1-east-1'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -7, y: -0.2, z: -1.175 },
+          destination: 'x-f1-east-1'
+        }
+      ]
+    },
+    {
+      id: 'outside-cafeteria-7',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_7.webp',
+      startingAngle: 195,
+      directions: {
+        forward: { connection: 'outside-cafeteria-6' },
+        backLeft: { connection: 'outside-a-east-6' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-3',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_3.webp',
+      startingAngle: 350,
+      directions: {
+        forward: { connection: 'outside-cafeteria-4' },
+        back: { connection: 'outside-cafeteria-2' },
+        door: 'inside-student-lounge'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 0.5, y: -0.25, z: -3 },
+          destination: 'inside-student-lounge'
+        }
+      ]
+    },
+    {
+      id: 'outside-cafeteria-4',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_4.webp',
+      startingAngle: 0,
+      directions: {
+        forward: { connection: 'outside-cafeteria-5' },
+        back: { connection: 'outside-cafeteria-3' }
+      }
+    },
+    {
+      id: 'outside-cafeteria-5',
+      imageUrl: '/360_photos_compressed/outside/outside_cafeteria_5.webp',
+      startingAngle: 0,
+      directions: {
+        forward: { connection: 'student-lounge-madras-street-entrance' },
+        back: { connection: 'outside-cafeteria-4' }
+      }
+    },
+    {
+      id: 'student-lounge-madras-street-entrance',
+      imageUrl: '/360_photos_compressed/student_lounge/madras_street_entrance.webp',
+      startingAngle: 260,
+      directions: {
+        back: { connection: 'outside-cafeteria-5' }
+      }
+    },
+    {
+      id: 'outside-w-west-1',
+      imageUrl: '/360_photos_compressed/outside/outside_w_west_1.webp',
+      startingAngle: 195,
+      directions: {
+        forward: { connection: 'outside-w-west-2' },
+        back: { connection: 'outside-a-north-4' }
+      }
+    },
+    {
+      id: 'outside-w-west-2',
+      imageUrl: '/360_photos_compressed/outside/outside_w_west_2.webp',
+      startingAngle: 185,
+      directions: {
+        forward: { connection: 'outside-w-west-3' },
+        right: { connection: 'outside-w-entrance' },
+        back: { connection: 'outside-w-west-1' }
+      }
+    },
+    {
+      id: 'outside-w-entrance',
+      imageUrl: '/360_photos_compressed/outside/outside_w_entrance.webp',
+      startingAngle: 180,
+      directions: {
+        back: { connection: 'outside-w-west-2' }
+      }
+    },
+    {
+      id: 'outside-w-west-3',
+      imageUrl: '/360_photos_compressed/outside/outside_w_west_3.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-w-west-4' },
+        back: { connection: 'outside-w-west-2' }
+      }
+    },
+    {
+      id: 'outside-w-west-4',
+      imageUrl: '/360_photos_compressed/outside/outside_w_west_4.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-w-west-5' },
+        back: { connection: 'outside-w-west-3' }
+      }
+    },
+    {
+      id: 'outside-w-west-5',
+      imageUrl: '/360_photos_compressed/outside/outside_w_west_5.webp',
+      startingAngle: 180,
+      directions: {
+        back: { connection: 'outside-w-west-4' }
       }
     },
     {

@@ -153,7 +153,7 @@ export interface Area {
   id: string
   name: string
   photos: Photo[]
-  buildingBlock: 'a' | 'n' | 's' | 'x' | 'w' | 'outside' | 'library'
+  buildingBlock: 'a' | 'n' | 's' | 'x' | 'w' | 'outside' | 'library' | 'lounge'
   floorLevel: number
 }
 

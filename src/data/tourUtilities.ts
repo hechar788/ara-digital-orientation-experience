@@ -13,6 +13,7 @@ import { nBlockAreas } from './blocks/n_block'
 import { sBlockAreas } from './blocks/s_block'
 import { libraryAreas } from './blocks/library'
 import { outsideAreas } from './blocks/outside'
+import { studentLoungeAreas } from './blocks/student_lounge'
 import { nsBlockElevator } from './blocks/n_s_shared/elevator'
 import { xBlockElevator } from './blocks/x_block/elevator'
 import type { Photo, Area, Elevator } from '../types/tour'
@@ -34,6 +35,7 @@ const getAllAreas = (): any[] => {
     ...sBlockAreas,
     ...libraryAreas,
     ...outsideAreas,
+    ...studentLoungeAreas,
     nsBlockElevator,
     xBlockElevator
   ]
