@@ -70,14 +70,14 @@ export const sBlockFloor4Area: Area = {
         },
         {
           direction: 'elevator',
-          position: { x: 8.75, y: -0.5, z: 4.8 }  // Elevator access point
+          position: { x: 8.75, y: -0.5, z: 4.85 }  // Elevator access point
         }
       ]
     },
     {
       id: 's-f4-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_3.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forward: { connection: 's-f4-mid-4' },
         back: { connection: 's-f4-mid-2' }
@@ -86,7 +86,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-mid-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_4.webp',
-      startingAngle: 180,
+      startingAngle: 165,
       directions: {
         forward: { connection: 's-f4-corner-5' },
         back: { connection: 's-f4-mid-3' }
@@ -108,7 +108,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-north-6',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_6.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forward: { connection: 's-f4-north-7' },
         back: { connection: 's-f4-corner-5' }
@@ -121,7 +121,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-north-7',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_7.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forward: { connection: 's-f4-north-8' },
         back: { connection: 's-f4-north-6' },

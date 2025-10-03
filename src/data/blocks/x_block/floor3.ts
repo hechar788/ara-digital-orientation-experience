@@ -36,7 +36,6 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-west-entry',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_entry.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-west-1' },
         down: 'x-f2-north-entry'
@@ -55,7 +54,6 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-west-1',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_1.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-west-2' },
         forward: { connection: 'x-f3-west-entry' },
@@ -66,44 +64,62 @@ export const xBlockFloor3Area: Area = {
       id: 'x-f3-west-1-aside',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_1_aside.webp',
       directions: {
-        back: { connection: 'x-f3-west-1' }
-      }
+        back: { connection: 'x-f3-west-1' },
+        door: 'x-302-classroom'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 5, y: -0.5, z: 0.4 },
+          destination: 'x-302-classroom'
+        }
+      ]
     },
+    {
+      id: 'x-302-classroom',
+      imageUrl: '/360_photos_compressed/x_block/floor_3/x302.webp',
+      directions: {
+        door: 'x-f3-west-1-aside'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -4.5, y: -0.35, z: -4.9 },
+          destination: 'x-f3-west-1-aside'
+        }
+      ]
+    },
+    // {
+    //   id: 'x-f3-west-2',
+    //   imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_2.webp',
+    //   directions: {
+    //     back: { connection: 'x-f3-mid-3' },
+    //     forward: { connection: 'x-f3-west-1' }
+    //   },
+    //   buildingContext: {
+    //     wing: 'west',
+    //     facilities: ['classrooms', 'offices']
+    //   }
+    // },
     {
       id: 'x-f3-west-2',
-      imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_2.webp',
-      startingAngle: 180,
-      directions: {
-        back: { connection: 'x-f3-mid-3' },
-        forward: { connection: 'x-f3-west-1' }
-      },
-      buildingContext: {
-        wing: 'west',
-        facilities: ['classrooms', 'offices']
-      }
-    },
-    {
-      id: 'x-f3-mid-3',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_3.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-mid-4' },
-        forward: { connection: 'x-f3-west-2' }
+        forward: { connection: 'x-f3-west-1' }
       }
     },
     {
       id: 'x-f3-mid-4',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_4.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-mid-5' },
-        forward: { connection: 'x-f3-mid-3' }
+        forward: { connection: 'x-f3-west-2' }
       }
     },
     {
       id: 'x-f3-mid-5',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_5.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-east-6' },
         forward: { connection: 'x-f3-mid-4' }
@@ -112,7 +128,6 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-east-6',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_6.webp',
-      startingAngle: 180,
       directions: {
         back: { connection: 'x-f3-east-7' },
         forward: { connection: 'x-f3-mid-5' }
@@ -121,9 +136,10 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-east-7',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_7.webp',
+      startingAngle: 80,
       directions: {
-        left: { connection: 'x-f3-east-8' },
-        right: { connection: 'x-f3-east-6' },
+        back: { connection: 'x-f3-east-8' },
+        forward: { connection: 'x-f3-east-6' },
         elevator: 'x-elevator-interior'
       },
       hotspots: [
@@ -136,8 +152,9 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-east-8',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_east_8.webp',
+      startingAngle: 90,
       directions: {
-        left: { connection: 'x-f3-east-7' }
+        back: { connection: 'x-f3-east-7' }
       },
       buildingContext: {
         wing: 'east',

@@ -33,10 +33,10 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-x-entry',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_x_entry.webp',
-      startingAngle: 0,
+      startingAngle: 350,
       directions: {
         forward: { connection: 'n-f1-east-1' },
-        backRight: { connection: 'x-f1-west-12' }
+        back: { connection: 'x-f1-west-12' }
       },
       buildingContext: {
         wing: 'entrance',
@@ -46,7 +46,7 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-1',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_1.webp',
-      startingAngle: 10,
+      startingAngle: 17.5,
       directions: {
         forward: { connection: 'n-f1-east-2' },
         back: { connection: 'n-f1-x-entry' }
@@ -83,7 +83,7 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-5',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_5.webp',
-      startingAngle: 5,
+      startingAngle: 0,
       directions: {
         forward: { connection: 'n-f1-east-6' },
         back: { connection: 'n-f1-east-2' }
@@ -92,7 +92,7 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-6',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_6.webp',
-      startingAngle: 5,
+      startingAngle: 10,
       directions: {
         forward: { connection: 'n-f1-mid-7' },
         back: { connection: 'n-f1-east-5' }
@@ -101,7 +101,7 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-mid-7',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_mid_7.webp',
-      startingAngle: 7.5,
+      startingAngle: 10,
       directions: {
         forward: { connection: 'n-f1-west-8' },
         back: { connection: 'n-f1-east-6' },
@@ -131,19 +131,19 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-west-8',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_8.webp',
-      startingAngle: 180,
+      startingAngle: 0,
       directions: {
-        back: { connection: 'n-f1-west-9' },
-        forward: { connection: 'n-f1-mid-7' }
+        back: { connection: 'n-f1-mid-7' },
+        forward: { connection: 'n-f1-west-9' }
       }
     },
     {
       id: 'n-f1-west-9',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_9.webp',
-      startingAngle: 30,
+      startingAngle: 35,
       directions: {
-        forwardRight: { connection: 's-f1-north-4' },
-        left: { connection: 'n-f1-west-8' }
+        forward: { connection: 's-f1-north-4' },
+        back: { connection: 'n-f1-west-8' }
       },
       buildingContext: {
         wing: 'west',

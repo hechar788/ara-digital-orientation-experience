@@ -34,9 +34,9 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-entrance',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_entrance.webp',
-      startingAngle: 170,
+      startingAngle: 160,
       directions: {
-        forwardLeft: { connection: 'a-f1-north-1' }
+        forward: { connection: 'a-f1-north-1' }
       },
       buildingContext: {
         wing: 'north',
@@ -46,7 +46,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-1',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_1.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         forward: { connection: 'a-f1-north-2' },
         back: { connection: 'a-f1-north-entrance' }
@@ -55,7 +55,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-2',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_2.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forward: { connection: 'a-f1-north-3' },
         back: { connection: 'a-f1-north-1' },
@@ -71,11 +71,11 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3.webp',
-      startingAngle: 0,
+      startingAngle: 180,
       directions: {
-        back: { connection: 'a-f1-mid-4' },
-        forward: { connection: 'a-f1-north-2' },
-        right: { connection: 'a-f1-north-3-side' },
+        back: { connection: 'a-f1-north-2' },
+        forward: { connection: 'a-f1-mid-4' },
+        left: { connection: 'a-f1-north-3-side' },
         up: 'a-f2-north-stairs-entrance'
       },
       hotspots: [
@@ -88,9 +88,9 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3-side',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3_side.webp',
-      startingAngle: 70,
+      startingAngle: 80,
       directions: {
-        left: { connection: 'a-f1-north-3' },
+        back: { connection: 'a-f1-north-3' },
         up: 'a-f2-north-stairs-entrance'
       },
       hotspots: [
@@ -112,16 +112,16 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-mid-5',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_mid_5.webp',
-      startingAngle: 250,
+      startingAngle: 70,
       directions: {
-        back: { connection: 'a-f1-south-6' },
-        forward: { connection: 'a-f1-mid-4' }
+        back: { connection: 'a-f1-mid-4' },
+        forward: { connection: 'a-f1-south-6' }
       }
     },
     {
       id: 'a-f1-south-6',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_south_6.webp',
-      startingAngle: 0,
+      startingAngle: 5,
       directions: {
         back: { connection: 'a-f1-mid-5' },
         forward: { connection: 'x-f1-east-1' }

@@ -29,7 +29,7 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_entrance.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'library-f1-1' },
+        forward: { connection: 'library-f1-1' },
         door: 'x-f1-mid-6-library',
         up: 'library-f2-entrance'
       },
@@ -50,8 +50,8 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_1.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'library-f1-2' },
-        forward: { connection: 'library-f1-entrance' },
+        back: { connection: 'library-f1-entrance' },
+        forward: { connection: 'library-f1-2' },
         door: 'x-f1-mid-6-library',
         up: 'library-f2-entrance'
       },
@@ -70,10 +70,10 @@ export const libraryFloor1Area: Area = {
     {
       id: 'library-f1-2',
       imageUrl: '/360_photos_compressed/library/library_floor1_2.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
-        back: { connection: 'library-f1-3' },
-        forward: { connection: 'library-f1-1' }
+        back: { connection: 'library-f1-1' },
+        forward: { connection: 'library-f1-3' }
       }
     },
     {
@@ -81,8 +81,8 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_3.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'library-f1-4' },
-        forward: { connection: 'library-f1-2' }
+        back: { connection: 'library-f1-2' },
+        forward: { connection: 'library-f1-4' }
       }
     },
     {
@@ -90,9 +90,9 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_4.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'library-f1-5' },
+        back: { connection: 'library-f1-3' },
         left: { connection: 'library-f1-7' },
-        forward: { connection: 'library-f1-3' }
+        forward: { connection: 'library-f1-5' }
       }
     },
     {
@@ -100,8 +100,8 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_5.webp',
       startingAngle: 180,
       directions: {
-        left: { connection: 'library-f1-6' },
-        forward: { connection: 'library-f1-4' }
+        right: { connection: 'library-f1-6' },
+        back: { connection: 'library-f1-4' }
       }
     },
     {
@@ -109,8 +109,8 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_6.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'library-f1-7' },
-        left: { connection: 'library-f1-5' }
+        forward: { connection: 'library-f1-7' },
+        right: { connection: 'library-f1-5' }
       }
     },
     {
@@ -118,8 +118,8 @@ export const libraryFloor1Area: Area = {
       imageUrl: '/360_photos_compressed/library/library_floor1_7.webp',
       startingAngle: 180,
       directions: {
-        left: { connection: 'library-f1-4' },
-        forward: { connection: 'library-f1-6' }
+        right: { connection: 'library-f1-4' },
+        back: { connection: 'library-f1-6' }
       }
     }
   ]

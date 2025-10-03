@@ -61,7 +61,7 @@ export const outsideArea: Area = {
     {
       id: 'outside-x-north-2',
       imageUrl: '/360_photos_compressed/outside/outside_x_north_2.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         forward: { connection: 'outside-n-north-1' },
         back: { connection: 'outside-x-north-1' }
@@ -90,7 +90,7 @@ export const outsideArea: Area = {
     {
       id: 'outside-n-north-entrance',
       imageUrl: '/360_photos_compressed/outside/outside_n_north_entrance.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forwardRight: { connection: 'outside-s-north-entrance' },
         back: { connection: 'outside-n-north-1' },

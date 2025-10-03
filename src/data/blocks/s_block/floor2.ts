@@ -54,10 +54,9 @@ export const sBlockFloor2Area: Area = {
     {
       id: 's-f2-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_mid_3.webp',
-      startingAngle: 180,
       directions: {
-        back: { connection: 's-f2-mid-4' },
-        forward: { connection: 's-f2-mid-2' }
+        forward: { connection: 's-f2-mid-4' },
+        back: { connection: 's-f2-mid-2' }
       }
     },
     {
@@ -79,6 +78,7 @@ export const sBlockFloor2Area: Area = {
     {
       id: 's-f2-south-6',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_2/s_south_6.webp',
+      startingAngle: 350,
       directions: {
         forward: { connection: 's-f2-south-7' },
         back: { connection: 's-f2-south-5' }
