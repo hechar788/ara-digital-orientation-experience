@@ -127,9 +127,39 @@ export const outsideArea: Area = {
       directions: {
         forward: { connection: 'outside-s-north-2' },
         back: { connection: 'outside-n-north-2' },
-        backLeft: { connection: 'outside-s-north-entrance' }
+        backLeft: { connection: 'outside-s-north-entrance' },
+        forwardRight: { connection: 'outside-s-north-1-aside' }
       }
     },
+    {
+      id: 'outside-s-north-1-aside',
+      imageUrl: '/360_photos_compressed/outside/outside_s_north_1_aside.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-s-north-1-aside-1' },
+        back: { connection: 'outside-s-north-1' },
+      }
+    },
+    {
+      id: 'outside-s-north-1-aside-1',
+      imageUrl: '/360_photos_compressed/outside/outside_s_north_1_aside_1.webp',
+      startingAngle: 180,
+      directions: {
+        forward: { connection: 'outside-s-north-1-aside-2' },
+        back: { connection: 'outside-s-north-1-aside' },
+      }
+    },
+    {
+      id: 'outside-s-north-1-aside-2',
+      imageUrl: '/360_photos_compressed/outside/outside_s_north_1_aside_2.webp',
+      startingAngle: 180,
+      directions: {
+        // forward: { connection: '' },
+        back: { connection: 'outside-s-north-1-aside-1' },
+      }
+    },
+
+
     {
       id: 'outside-n-north-1-aside',
       imageUrl: '/360_photos_compressed/outside/outside_n_north_1_aside.webp',
