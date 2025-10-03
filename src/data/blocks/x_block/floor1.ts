@@ -39,8 +39,16 @@ export const xBlockFloor1Area: Area = {
       startingAngle: 0,
       directions: {
         right: { connection: 'x-f1-east-2' },
-        back: { connection: 'a-f1-south-6' }
+        back: { connection: 'a-f1-south-6' },
+        door: 'outside-x-south-entrance'
       },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 4.5, y: -0.25, z: 0 },
+          destination: 'outside-x-south-entrance'
+        }
+      ],
       buildingContext: {
         wing: 'east',
         facilities: ['classrooms', 'offices']
