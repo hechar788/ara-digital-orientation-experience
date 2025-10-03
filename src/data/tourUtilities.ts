@@ -11,6 +11,7 @@ import { aBlockAreas } from './blocks/a_block'
 import { xBlockAreas } from './blocks/x_block'
 import { nBlockAreas } from './blocks/n_block'
 import { sBlockAreas } from './blocks/s_block'
+import { wBlockAreas } from './blocks/w_block'
 import { libraryAreas } from './blocks/library'
 import { outsideAreas } from './blocks/outside'
 import { studentLoungeAreas } from './blocks/student_lounge'
@@ -33,6 +34,7 @@ const getAllAreas = (): any[] => {
     ...xBlockAreas,
     ...nBlockAreas,
     ...sBlockAreas,
+    ...wBlockAreas,
     ...libraryAreas,
     ...outsideAreas,
     ...studentLoungeAreas,

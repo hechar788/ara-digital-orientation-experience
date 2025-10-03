@@ -603,8 +603,16 @@ export const outsideArea: Area = {
       imageUrl: '/360_photos_compressed/outside/outside_w_entrance.webp',
       startingAngle: 180,
       directions: {
-        back: { connection: 'outside-w-west-2' }
-      }
+        back: { connection: 'outside-w-west-2' },
+        door: 'w-f1-main-entrance'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -6.5, y: -0.2, z: -0.65 },
+          destination: 'w-f1-main-entrance'
+        }
+      ]
     },
     {
       id: 'outside-w-west-3',
