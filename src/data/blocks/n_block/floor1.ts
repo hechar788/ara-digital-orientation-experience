@@ -33,9 +33,10 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-x-entry',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_x_entry.webp',
+      startingAngle: 350,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-east-1' },
-        back: { angle: 180, connection: 'x-f1-west-12' }
+        forward: { connection: 'n-f1-east-1' },
+        back: { connection: 'x-f1-west-12' }
       },
       buildingContext: {
         wing: 'entrance',
@@ -45,35 +46,34 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-1',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_1.webp',
-      // I want to change the starting angle so it faces like 20 degrees to the right but the following line doesnt seem to work
-      // startingAngle: 10,
+      startingAngle: 17.5,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-east-2' },
-        back: { angle: 180, connection: 'n-f1-x-entry' }
+        forward: { connection: 'n-f1-east-2' },
+        back: { connection: 'n-f1-x-entry' }
       }
     },
     {
       id: 'n-f1-east-2',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_2.webp',
       directions: {
-        forward: { angle: 0, connection: 'n-f1-east-5' },
-        back: { angle: 180, connection: 'n-f1-east-1' },
-        left: { angle: 270, connection: 'n-f1-east-south-3' }
+        forward: { connection: 'n-f1-east-5' },
+        back: { connection: 'n-f1-east-1' },
+        left: { connection: 'n-f1-east-south-3' }
       }
     },
     {
       id: 'n-f1-east-south-3',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_south_3.webp',
       directions: {
-        forward: { angle: 0, connection: 'n-f1-east-south-4' },
-        back: { angle: 180, connection: 'n-f1-east-2' }
+        forward: { connection: 'n-f1-east-south-4' },
+        back: { connection: 'n-f1-east-2' }
       }
     },
     {
       id: 'n-f1-east-south-4',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_south_4.webp',
       directions: {
-        back: { angle: 180, connection: 'n-f1-east-south-3' }
+        back: { connection: 'n-f1-east-south-3' }
       },
       buildingContext: {
         wing: 'east',
@@ -83,26 +83,30 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-east-5',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_5.webp',
+      startingAngle: 0,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-east-6' },
-        back: { angle: 180, connection: 'n-f1-east-2' }
+        forward: { connection: 'n-f1-east-6' },
+        back: { connection: 'n-f1-east-2' }
       }
     },
     {
       id: 'n-f1-east-6',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_east_6.webp',
+      startingAngle: 10,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-mid-7' },
-        back: { angle: 180, connection: 'n-f1-east-5' }
+        forward: { connection: 'n-f1-mid-7' },
+        back: { connection: 'n-f1-east-5' }
       }
     },
     {
       id: 'n-f1-mid-7',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_mid_7.webp',
+      startingAngle: 10,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-west-8' },
-        back: { angle: 180, connection: 'n-f1-east-6' },
-        elevator: 'ns-elevator-interior'
+        forward: { connection: 'n-f1-west-8' },
+        back: { connection: 'n-f1-east-6' },
+        elevator: 'ns-elevator-interior',
+        door: ['outside-n-north-entrance', 'outside-s-north-entrance']
       },
       hotspots: [
         {
@@ -112,6 +116,11 @@ export const nBlockFloor1Area: Area = {
         {
           direction: 'elevator',
           position: { x: 4.35, y: -0.5, z: -2.5 }  // Elevator access point
+        },
+        {
+          direction: 'door',
+          position: { x: 2.25, y: -0.5, z: 4 },
+          destination: 'outside-s-north-entrance'
         }
       ],
       buildingContext: {
@@ -122,19 +131,19 @@ export const nBlockFloor1Area: Area = {
     {
       id: 'n-f1-west-8',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_8.webp',
-      startingAngle: 180,
+      startingAngle: 0,
       directions: {
-        forward: { angle: 0, connection: 'n-f1-west-9' },
-        back: { angle: 180, connection: 'n-f1-mid-7' }
+        back: { connection: 'n-f1-mid-7' },
+        forward: { connection: 'n-f1-west-9' }
       }
     },
     {
       id: 'n-f1-west-9',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_1/n_west_9.webp',
-      startingAngle: 30,
+      startingAngle: 35,
       directions: {
-        forward: { angle: 40, connection: 's-f1-north-4' },
-        back: { angle: 230, connection: 'n-f1-west-8' }
+        forward: { connection: 's-f1-north-4' },
+        back: { connection: 'n-f1-west-8' }
       },
       buildingContext: {
         wing: 'west',

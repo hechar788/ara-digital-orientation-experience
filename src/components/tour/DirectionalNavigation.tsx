@@ -6,19 +6,20 @@
  */
 import React from 'react'
 import type { Photo } from '../../types/tour'
+import { DIRECTION_ANGLES } from '../../types/tour'
 
 /**
  * Props for DirectionalNavigation component
  *
  * @property currentPhoto - Currently displayed photo with direction data
  * @property cameraLon - Current camera horizontal rotation in degrees
- * @property onNavigate - Callback function for handling HORIZONTAL navigation actions only
+ * @property onNavigate - Callback function for handling HORIZONTAL navigation actions (8 directions)
  * @property isLoading - Whether navigation is currently in progress
  */
 interface DirectionalNavigationProps {
   currentPhoto: Photo | null
   cameraLon: number
-  onNavigate: (direction: 'forward' | 'back' | 'left' | 'right') => void
+  onNavigate: (direction: 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft') => void
   isLoading: boolean
 }
 
@@ -27,7 +28,7 @@ interface DirectionalNavigationProps {
  *
  * @param cameraLon - Current camera horizontal rotation in degrees
  * @param targetAngle - The angle where the direction button should appear
- * @returns Whether user is looking in that direction (within 45° threshold)
+ * @returns Whether user is looking in that direction (within 20° threshold for 8-directional navigation)
  */
 function isLookingInDirection(
   cameraLon: number,
@@ -43,8 +44,8 @@ function isLookingInDirection(
     angleDiff = 360 - angleDiff
   }
 
-  // Show button if within 45° of target direction
-  return angleDiff <= 45
+  // Show button if within 20° of target direction (8-directional with 5° gaps)
+  return angleDiff <= 20
 }
 
 /**
@@ -68,54 +69,54 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
   if (!currentPhoto) return null
 
   const { directions } = currentPhoto
+  const startingAngle = currentPhoto.startingAngle ?? 0
 
-  // Determine which HORIZONTAL directions to show based on camera orientation and available directions
-  const showForward = directions.forward && isLookingInDirection(cameraLon, directions.forward.angle)
-  const showBack = directions.back && isLookingInDirection(cameraLon, directions.back.angle)
-  const showLeft = directions.left && isLookingInDirection(cameraLon, directions.left.angle)
-  const showRight = directions.right && isLookingInDirection(cameraLon, directions.right.angle)
+  // Calculate actual angles for each direction based on startingAngle + offset
+  const getAngle = (direction: string) => {
+    const offset = DIRECTION_ANGLES[direction] ?? 0
+    return (startingAngle + offset) % 360
+  }
+
+  // Determine which HORIZONTAL directions to show based on camera orientation and available directions (8-directional)
+  const showForward = directions.forward && isLookingInDirection(cameraLon, getAngle('forward'))
+  const showForwardRight = directions.forwardRight && isLookingInDirection(cameraLon, getAngle('forwardRight'))
+  const showRight = directions.right && isLookingInDirection(cameraLon, getAngle('right'))
+  const showBackRight = directions.backRight && isLookingInDirection(cameraLon, getAngle('backRight'))
+  const showBack = directions.back && isLookingInDirection(cameraLon, getAngle('back'))
+  const showBackLeft = directions.backLeft && isLookingInDirection(cameraLon, getAngle('backLeft'))
+  const showLeft = directions.left && isLookingInDirection(cameraLon, getAngle('left'))
+  const showForwardLeft = directions.forwardLeft && isLookingInDirection(cameraLon, getAngle('forwardLeft'))
 
   // Don't render if no horizontal directions are available
-  if (!showForward && !showBack && !showLeft && !showRight) {
+  if (!showForward && !showForwardRight && !showRight && !showBackRight &&
+      !showBack && !showBackLeft && !showLeft && !showForwardLeft) {
     return null
   }
 
   return (
     <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-2 justify-center flex-wrap max-w-md">
         {showForward && (
           <button
             onClick={() => onNavigate('forward')}
-            onTouchStart={() => {}} // Ensure touch events are handled
-            disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            Go Forward
-          </button>
-        )}
-
-        {showBack && (
-          <button
-            onClick={() => onNavigate('back')}
             onTouchStart={() => {}}
             disabled={isLoading}
             className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            Go Back
+            Forward
           </button>
         )}
 
-        {showLeft && (
+        {showForwardRight && (
           <button
-            onClick={() => onNavigate('left')}
+            onClick={() => onNavigate('forwardRight')}
             onTouchStart={() => {}}
             disabled={isLoading}
             className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            Go Left
+            Forward ↗
           </button>
         )}
 
@@ -127,7 +128,67 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
             className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            Go Right
+            Right
+          </button>
+        )}
+
+        {showBackRight && (
+          <button
+            onClick={() => onNavigate('backRight')}
+            onTouchStart={() => {}}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Back ↘
+          </button>
+        )}
+
+        {showBack && (
+          <button
+            onClick={() => onNavigate('back')}
+            onTouchStart={() => {}}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Back
+          </button>
+        )}
+
+        {showBackLeft && (
+          <button
+            onClick={() => onNavigate('backLeft')}
+            onTouchStart={() => {}}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Back ↙
+          </button>
+        )}
+
+        {showLeft && (
+          <button
+            onClick={() => onNavigate('left')}
+            onTouchStart={() => {}}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Left
+          </button>
+        )}
+
+        {showForwardLeft && (
+          <button
+            onClick={() => onNavigate('forwardLeft')}
+            onTouchStart={() => {}}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-lg font-medium shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] min-h-[44px] touch-manipulation select-none text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Forward ↖
           </button>
         )}
       </div>

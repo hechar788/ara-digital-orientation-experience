@@ -36,7 +36,7 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_elevator_1.webp',
       startingAngle: 240,
       directions: {
-        forward: { angle: 290, connection: 's-f4-mid-2' },
+        forwardRight: { connection: 's-f4-mid-2' },
         elevator: 'ns-elevator-interior'
       },
       buildingContext: {
@@ -59,8 +59,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_2.webp',
       startingAngle: 180,
       directions: {
-        forward: { angle: 180, connection: 's-f4-mid-3' },
-        back: { angle: 0, connection: 's-f4-elevator-1' },
+        forward: { connection: 's-f4-mid-3' },
+        back: { connection: 's-f4-elevator-1' },
         elevator: 'ns-elevator-interior'
       },
       hotspots: [
@@ -70,26 +70,26 @@ export const sBlockFloor4Area: Area = {
         },
         {
           direction: 'elevator',
-          position: { x: 8.75, y: -0.5, z: 4.8 }  // Elevator access point
+          position: { x: 8.75, y: -0.5, z: 4.85 }  // Elevator access point
         }
       ]
     },
     {
       id: 's-f4-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_3.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
-        forward: { angle: 180, connection: 's-f4-mid-4' },
-        back: { angle: 0, connection: 's-f4-mid-2' }
+        forward: { connection: 's-f4-mid-4' },
+        back: { connection: 's-f4-mid-2' }
       }
     },
     {
       id: 's-f4-mid-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_4.webp',
-      startingAngle: 180,
+      startingAngle: 165,
       directions: {
-        forward: { angle: 180, connection: 's-f4-corner-5' },
-        back: { angle: 0, connection: 's-f4-mid-3' }
+        forward: { connection: 's-f4-corner-5' },
+        back: { connection: 's-f4-mid-3' }
       }
     },
     {
@@ -97,8 +97,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_corner_5.webp',
       startingAngle: 180,
       directions: {
-        forward: { angle: 180, connection: 's-f4-north-6' },
-        back: { angle: 90, connection: 's-f4-mid-4' }
+        forward: { connection: 's-f4-north-6' },
+        left: { connection: 's-f4-mid-4' }
       },
       buildingContext: {
         wing: 'corner',
@@ -108,10 +108,10 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-north-6',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_6.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
-        forward: { angle: 180, connection: 's-f4-north-7' },
-        back: { angle: 0, connection: 's-f4-corner-5' }
+        forward: { connection: 's-f4-north-7' },
+        back: { connection: 's-f4-corner-5' }
       },
       buildingContext: {
         wing: 'north',
@@ -121,10 +121,10 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-north-7',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_7.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
-        forward: { angle: 180, connection: 's-f4-north-8' },
-        back: { angle: 0, connection: 's-f4-north-6' },
+        forward: { connection: 's-f4-north-8' },
+        back: { connection: 's-f4-north-6' },
         door: 's-f4-inside-453'
       },
       hotspots: [
@@ -160,8 +160,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_1.webp',
       startingAngle: 190,
       directions: {
-        forward: { angle: 191, connection: 's-f4-switch-2' },
-        left: { angle: 100, connection: 's-f4-switch-6' },
+        forward: { connection: 's-f4-switch-2' },
+        left: { connection: 's-f4-switch-6' },
         door: 's-f4-inside-453'
       },
       hotspots: [
@@ -177,8 +177,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_2.webp',
       startingAngle: 180,
       directions: {
-        forward: { angle: 180, connection: 's-f4-switch-3' },
-        back: { angle: 0, connection: 's-f4-switch-1' },
+        forward: { connection: 's-f4-switch-3' },
+        back: { connection: 's-f4-switch-1' },
         door: 's-f4-inside-453'
       },
       hotspots: [
@@ -194,8 +194,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_3.webp',
       startingAngle: 90,
       directions: {
-        forward: { angle: 90, connection: 's-f4-switch-4' },
-        back: { angle: 0, connection: 's-f4-switch-2' },
+        forward: { connection: 's-f4-switch-4' },
+        left: { connection: 's-f4-switch-2' },
         door: 's-f4-north-8'
       },
       hotspots: [
@@ -211,8 +211,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_4.webp',
       startingAngle: 180,
       directions: {
-        forward: { angle: 180, connection: 's-f4-switch-5' },
-        back: { angle: 90, connection: 's-f4-switch-3' },
+        forward: { connection: 's-f4-switch-5' },
+        left: { connection: 's-f4-switch-3' },
         door: 's-f4-north-8'
       },
       hotspots: [
@@ -228,8 +228,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_5.webp',
       startingAngle: 180,
       directions: {
-        forward: { angle: 180, connection: 's-f4-switch-6' },
-        back: { angle: 0, connection: 's-f4-switch-4' },
+        forward: { connection: 's-f4-switch-6' },
+        back: { connection: 's-f4-switch-4' },
         door: 's-f4-north-8'
       },
       hotspots: [
@@ -245,8 +245,8 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_6.webp',
       startingAngle: 100,
       directions: {
-        back: { angle: 0, connection: 's-f4-switch-5' },
-        forward: { angle: 100, connection: 's-f4-switch-1' },
+        left: { connection: 's-f4-switch-5' },
+        forward: { connection: 's-f4-switch-1' },
         door: ['s-f4-inside-453', 's-f4-north-8']
       },
       hotspots: [
@@ -267,7 +267,7 @@ export const sBlockFloor4Area: Area = {
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_8.webp',
       startingAngle: 180,
       directions: {
-        back: { angle: 0, connection: 's-f4-north-7' },
+        back: { connection: 's-f4-north-7' },
         door: 's-f4-switch-4'
       },
       hotspots: [
