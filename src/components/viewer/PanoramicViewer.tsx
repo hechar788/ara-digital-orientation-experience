@@ -398,7 +398,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
 
       <PanoramicViewerControls
-        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20"
+        className="fixed left-1/2 transform -translate-x-1/2 z-20"
+        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
         currentFov={fov}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}

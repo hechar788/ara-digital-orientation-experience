@@ -135,4 +135,19 @@ code {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Mobile viewport and safe area handling */
+  html {
+    /* Support for safe area insets on devices with notches */
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
+      env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+
+  /* Prevent mobile browser UI from affecting fixed positioning */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS Safari specific fixes */
+    body {
+      min-height: -webkit-fill-available;
+    }
+  }
 }
