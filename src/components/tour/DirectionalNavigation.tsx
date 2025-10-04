@@ -94,7 +94,10 @@ export const DirectionalNavigation: React.FC<DirectionalNavigationProps> = ({
   }
 
   return (
-    <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
+    <div
+      className="fixed left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto"
+      style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom, 0px))' }}
+    >
       <div className="flex gap-2 justify-center flex-wrap max-w-md">
         {showForward && (
           <button
