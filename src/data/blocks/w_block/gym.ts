@@ -25,7 +25,7 @@ import type { Area } from '../../../types/tour'
  */
 export const wBlockGymFloor1Area: Area = {
   id: 'w-block-gym-floor-1',
-  name: 'W Block Gym',
+  name: 'The Recreation Centre',
   buildingBlock: 'w',
   floorLevel: 1,
   photos: [
@@ -94,7 +94,7 @@ export const wBlockGymFloor1Area: Area = {
  */
 export const wBlockGymFloor2Area: Area = {
   id: 'w-block-gym-floor-2',
-  name: 'W Block Gym',
+  name: 'The Recreation Centre',
   buildingBlock: 'w',
   floorLevel: 2,
   photos: [

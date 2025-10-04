@@ -8,14 +8,20 @@
  * @fileoverview Component for rendering and managing 3D hotspots in panoramic viewer
  */
 
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useEffect, useCallback, useRef, useState } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '../../types/tour'
 import {
   createHotspotGeometry,
   calculateHotspotScale,
-  orientHotspotToCamera
+  orientHotspotToCamera,
+  getScreenPosition,
+  getDialogPosition,
+  type ScreenPosition,
+  type DialogPosition
 } from './hotspot-utils'
+import { HotspotConfirmationDialog } from './HotspotConfirmationDialog'
+import { getAreaForPhoto } from '../../data/tourUtilities'
 
 /**
  * Props for PanoramicHotspots component
@@ -46,6 +52,29 @@ interface PanoramicHotspotsProps {
  * @param fov - Current field of view for scaling calculations
  * @param onNavigate - Callback to trigger navigation when hotspot is clicked
  */
+/**
+ * Pending navigation state for confirmation dialog
+ *
+ * @property destination - Destination photo ID if using direct navigation
+ * @property direction - Navigation direction if using direction-based navigation
+ * @property worldPosition - 3D world position of the clicked hotspot
+ * @property screenPosition - Current 2D screen position of the hotspot
+ * @property dialogPosition - Calculated position for the confirmation dialog
+ * @property areaName - Resolved name of the destination area
+ * @property floorLevel - Floor level of destination (for stairs/elevator)
+ * @property navigationType - Navigation type: 'elevator', 'stairs', or 'door'
+ */
+interface PendingNavigation {
+  destination?: string
+  direction: string
+  worldPosition: THREE.Vector3
+  screenPosition: ScreenPosition
+  dialogPosition: DialogPosition
+  areaName: string
+  floorLevel?: number
+  navigationType: 'elevator' | 'stairs' | 'door'
+}
+
 export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   currentPhoto,
   sceneRef,
@@ -55,6 +84,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
 }) => {
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const hotspots = currentPhoto?.hotspots || []
+  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
 
   /**
    * Create and position hotspot meshes in the scene
@@ -120,9 +150,20 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         }
 
         hotspotObject.position.copy(position)
+
+        let destination = hotspot.destination
+        if (!destination && currentPhoto) {
+          const directionConnection = currentPhoto.directions[hotspot.direction as keyof typeof currentPhoto.directions]
+          if (typeof directionConnection === 'string') {
+            destination = directionConnection
+          } else if (Array.isArray(directionConnection)) {
+            destination = directionConnection[0]
+          }
+        }
+
         hotspotObject.userData = {
           direction: hotspot.direction,
-          destination: hotspot.destination,
+          destination: destination,
           index,
           originalPosition: position.clone()
         }
@@ -245,17 +286,52 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
       }
 
       if (hotspotObject && hotspotObject.userData.direction) {
-        // Check if hotspot has a specific destination
-        if (hotspotObject.userData.destination && onNavigateToPhoto) {
-          // Navigate directly to the destination photo
-          onNavigateToPhoto(hotspotObject.userData.destination)
-        } else {
-          // Navigate using direction lookup
-          onNavigate(hotspotObject.userData.direction)
+        const worldPosition = hotspotObject.userData.originalPosition as THREE.Vector3
+
+        if (!worldPosition || !sceneRef.current) return
+
+        const { camera, renderer } = sceneRef.current
+
+        const screenPos = getScreenPosition(worldPosition, camera, renderer)
+
+        if (!screenPos.isVisible) return
+
+        const dialogPos = getDialogPosition(screenPos)
+
+        const destinationId = hotspotObject.userData.destination
+        const direction = hotspotObject.userData.direction
+        const area = destinationId ? getAreaForPhoto(destinationId) : null
+
+        let navigationType: 'elevator' | 'stairs' | 'door' = 'door'
+        if (direction === 'elevator') {
+          navigationType = 'elevator'
+        } else if (direction === 'up' || direction === 'down' || direction.startsWith('floor')) {
+          navigationType = 'stairs'
         }
+
+        let areaName = 'this location'
+        let floorLevel: number | undefined
+
+        if (area) {
+          areaName = area.name
+          if (navigationType === 'stairs' && area.floorLevel !== 0) {
+            floorLevel = area.floorLevel
+          }
+        }
+
+        setPendingNavigation({
+          destination: destinationId,
+          direction,
+          worldPosition,
+          screenPosition: screenPos,
+          dialogPosition: dialogPos,
+          areaName,
+          floorLevel,
+          navigationType
+        })
       }
     }
-  }, [sceneRef, onNavigate, onNavigateToPhoto])
+  }, [sceneRef])
 
   /**
    * Set up canvas event listeners for click detection
@@ -276,6 +352,62 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
       canvas.removeEventListener('mousemove', handleCanvasMouseMove)
     }
   }, [handleCanvasClick, handleCanvasMouseMove, sceneRef])
+
+  /**
+   * Handle confirmation of navigation
+   */
+  const handleConfirmNavigation = useCallback(() => {
+    if (!pendingNavigation) return
+
+    if (pendingNavigation.destination && onNavigateToPhoto) {
+      onNavigateToPhoto(pendingNavigation.destination)
+    } else {
+      onNavigate(pendingNavigation.direction)
+    }
+
+    setPendingNavigation(null)
+  }, [pendingNavigation, onNavigate, onNavigateToPhoto])
+
+  /**
+   * Handle cancellation of navigation
+   */
+  const handleCancelNavigation = useCallback(() => {
+    setPendingNavigation(null)
+  }, [])
+
+  /**
+   * Update dialog position when camera moves
+   */
+  useEffect(() => {
+    if (!pendingNavigation || !sceneRef.current) return
+
+    const updateDialogPosition = () => {
+      if (!sceneRef.current || !pendingNavigation) return
+
+      const { camera, renderer } = sceneRef.current
+      const screenPos = getScreenPosition(pendingNavigation.worldPosition, camera, renderer)
+
+      if (!screenPos.isVisible) {
+        setPendingNavigation(null)
+        return
+      }
+
+      const dialogPos = getDialogPosition(screenPos)
+
+      setPendingNavigation(prev => {
+        if (!prev) return null
+        return {
+          ...prev,
+          screenPosition: screenPos,
+          dialogPosition: dialogPos
+        }
+      })
+    }
+
+    const intervalId = setInterval(updateDialogPosition, 100)
+
+    return () => clearInterval(intervalId)
+  }, [pendingNavigation, sceneRef])
 
   /**
    * Cleanup hotspots when component unmounts
@@ -310,6 +442,15 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     }
   }, [sceneRef])
 
-  // This component doesn't render any JSX - it manages 3D objects directly
-  return null
+  return (
+    <HotspotConfirmationDialog
+      isOpen={!!pendingNavigation}
+      areaName={pendingNavigation?.areaName || ''}
+      floorLevel={pendingNavigation?.floorLevel}
+      isStairs={pendingNavigation?.navigationType || 'door'}
+      position={pendingNavigation?.dialogPosition || { x: 0, y: 0, flippedHorizontal: false }}
+      onConfirm={handleConfirmNavigation}
+      onCancel={handleCancelNavigation}
+    />
+  )
 }

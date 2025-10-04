@@ -45,7 +45,7 @@ export const xBlockFloor1Area: Area = {
       hotspots: [
         {
           direction: 'door',
-          position: { x: 4.5, y: -0.25, z: 0 },
+          position: { x: 4.5, y: -0.35, z: 0 },
           destination: 'outside-x-south-entrance'
         }
       ],

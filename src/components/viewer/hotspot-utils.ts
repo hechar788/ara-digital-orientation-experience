@@ -338,3 +338,130 @@ export function orientHotspotToCamera(object: THREE.Object3D, position: THREE.Ve
   // No special rotations needed for spherical stairs hotspots
   // All hotspots now maintain consistent orientation
 }
+
+/**
+ * Screen position coordinates with visibility flag
+ *
+ * Represents a 2D screen position converted from 3D world coordinates,
+ * including whether the position is visible on screen.
+ *
+ * @property x - Horizontal screen coordinate in pixels
+ * @property y - Vertical screen coordinate in pixels
+ * @property isVisible - Whether the 3D position is in front of camera and visible
+ */
+export interface ScreenPosition {
+  x: number
+  y: number
+  isVisible: boolean
+}
+
+/**
+ * Convert 3D world position to 2D screen coordinates
+ *
+ * Projects a 3D position in world space to 2D screen pixel coordinates
+ * using camera projection. Useful for positioning UI elements relative
+ * to 3D objects in the scene.
+ *
+ * @param worldPosition - 3D position in world space to convert
+ * @param camera - Camera used for projection
+ * @param renderer - WebGL renderer containing canvas dimensions
+ * @returns Screen coordinates with visibility flag
+ *
+ * @example
+ * ```typescript
+ * const hotspotPos = new THREE.Vector3(5, 0, 5)
+ * const screenPos = getScreenPosition(hotspotPos, camera, renderer)
+ * if (screenPos.isVisible) {
+ *   console.log(`Hotspot at screen position: ${screenPos.x}, ${screenPos.y}`)
+ * }
+ * ```
+ */
+export function getScreenPosition(
+  worldPosition: THREE.Vector3,
+  camera: THREE.PerspectiveCamera,
+  renderer: THREE.WebGLRenderer
+): ScreenPosition {
+  const vector = worldPosition.clone()
+  vector.project(camera)
+
+  const canvas = renderer.domElement
+  const widthHalf = canvas.clientWidth / 2
+  const heightHalf = canvas.clientHeight / 2
+
+  return {
+    x: (vector.x * widthHalf) + widthHalf,
+    y: -(vector.y * heightHalf) + heightHalf,
+    isVisible: vector.z < 1 // Position is behind camera if z >= 1
+  }
+}
+
+/**
+ * Dialog position with adjustment flags
+ *
+ * Represents calculated position for confirmation dialog with edge detection flags.
+ *
+ * @property x - Horizontal position in pixels from left edge
+ * @property y - Vertical position in pixels from top edge
+ * @property flippedHorizontal - Whether dialog was flipped to left due to right edge overflow
+ */
+export interface DialogPosition {
+  x: number
+  y: number
+  flippedHorizontal: boolean
+}
+
+/**
+ * Calculate smart dialog position relative to screen coordinates
+ *
+ * Determines optimal position for confirmation dialog near a hotspot,
+ * with intelligent edge detection to prevent overflow. Prefers positioning
+ * to the right of the hotspot, but flips to left if near right screen edge.
+ *
+ * @param screenPos - Screen coordinates of the hotspot
+ * @param dialogWidth - Width of dialog in pixels (default: 280)
+ * @param dialogHeight - Height of dialog in pixels (default: 120)
+ * @returns Calculated dialog position with adjustment flags
+ *
+ * @example
+ * ```typescript
+ * const hotspotScreen = { x: 800, y: 400, isVisible: true }
+ * const dialogPos = getDialogPosition(hotspotScreen, 280, 120)
+ * // Returns { x: 840, y: 350, flippedHorizontal: false }
+ * ```
+ */
+export function getDialogPosition(
+  screenPos: ScreenPosition,
+  dialogWidth: number = 280,
+  dialogHeight: number = 120
+): DialogPosition {
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const margin = 20
+  const hotspotOffset = 80 // Distance from hotspot
+
+  // Default: position to the right of hotspot
+  let x = screenPos.x + hotspotOffset
+  let y = screenPos.y - (dialogHeight / 2) // Vertically centered on hotspot
+  let flippedHorizontal = false
+
+  // Edge detection - flip to left if overflows right edge
+  if (x + dialogWidth + margin > viewportWidth) {
+    x = screenPos.x - dialogWidth - hotspotOffset
+    flippedHorizontal = true
+  }
+
+  // Prevent left edge overflow
+  if (x < margin) {
+    x = margin
+  }
+
+  // Prevent vertical overflow
+  if (y < margin) {
+    y = margin
+  }
+  if (y + dialogHeight + margin > viewportHeight) {
+    y = viewportHeight - dialogHeight - margin
+  }
+
+  return { x, y, flippedHorizontal }
+}
