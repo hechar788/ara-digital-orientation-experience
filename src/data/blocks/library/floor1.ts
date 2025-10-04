@@ -20,7 +20,7 @@ import type { Area } from '../../../types/tour'
  */
 export const libraryFloor1Area: Area = {
   id: 'library-floor-1-main',
-  name: 'Library',
+  name: 'The Library',
   buildingBlock: 'x',
   floorLevel: 1,
   photos: [

@@ -128,8 +128,16 @@ export const outsideArea: Area = {
         forward: { connection: 'outside-s-north-2' },
         back: { connection: 'outside-n-north-2' },
         backLeft: { connection: 'outside-s-north-entrance' },
-        forwardRight: { connection: 'outside-s-north-1-aside' }
-      }
+        forwardRight: { connection: 'outside-s-north-1-aside' },
+        door: 'n-f1-mid-7'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 4.15, y: 0.25, z: 8 },
+          destination: 'n-f1-mid-7'
+        }
+      ]
     },
     {
       id: 'outside-s-north-1-aside',
@@ -595,8 +603,16 @@ export const outsideArea: Area = {
       directions: {
         forward: { connection: 'outside-w-west-3' },
         right: { connection: 'outside-w-entrance' },
-        back: { connection: 'outside-w-west-1' }
-      }
+        back: { connection: 'outside-w-west-1' },
+        door: 'w-f1-main-entrance'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 1.5, y: -0.2, z: -9.5 },
+          destination: 'w-f1-main-entrance'
+        }
+      ]
     },
     {
       id: 'outside-w-entrance',
@@ -688,7 +704,7 @@ export const outsideArea: Area = {
     {
       id: 'outside-s-east-9',
       imageUrl: '/360_photos_compressed/outside/outside_s_east_9.webp',
-      startingAngle: 90,
+      startingAngle: 95,
       directions: {
         back: { connection: 'outside-s-east-8' }
       }
