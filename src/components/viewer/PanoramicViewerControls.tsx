@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut, Info, Bot } from 'lucide-react'
 
 interface PanoramicViewerControlsProps {
   className?: string
+  style?: React.CSSProperties
   currentFov: number
   onZoomIn: () => void
   onZoomOut: () => void
@@ -13,6 +14,7 @@ interface PanoramicViewerControlsProps {
 
 export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = ({
   className = '',
+  style,
   currentFov,
   onZoomIn,
   onZoomOut,
@@ -33,10 +35,11 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
       </div>
 
       {/* Control Pane - Responsive */}
-      <div 
+      <div
         className={`h-12 lg:h-12 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center`}
         style={{
-          clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)'
+          clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
+          ...style
         }}
       >
         <div className="flex items-center h-full w-full">
