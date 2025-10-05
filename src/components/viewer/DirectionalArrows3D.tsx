@@ -8,7 +8,7 @@
  * @fileoverview Component for rendering 3D directional navigation arrows
  */
 
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '../../types/tour'
 import { DIRECTION_ANGLES } from '../../types/tour'
@@ -79,6 +79,12 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
   const [hoveredArrow, setHoveredArrow] = useState<THREE.Mesh | null>(null)
   const [arrowsReady, setArrowsReady] = useState(false)
 
+  // Detect mobile and calculate appropriate arrow distance (memoized to prevent dependency array issues)
+  const arrowDistance = useMemo(() => {
+    const isMobile = window.innerWidth <= 768
+    return isMobile ? 5 : 4.25 // 15% further on mobile (5.25 * 1.15 ≈ 6.04)
+  }, [])
+
   /**
    * Create and position directional arrows in the scene
    */
@@ -131,7 +137,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
 
       try {
         const arrow = await createDirectionalArrow(direction, angle)
-        const position = calculateArrowPosition(angle)
+        const position = calculateArrowPosition(angle, arrowDistance)
 
         arrow.position.copy(position)
         orientDirectionalArrow(arrow, angle)
@@ -170,7 +176,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
         arrowsGroupRef.current = null
       }
     }
-  }, [currentPhoto, sceneRef])
+  }, [currentPhoto, sceneRef, arrowDistance])
 
   /**
    * Update arrow visibility based on camera orientation
