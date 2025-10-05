@@ -564,6 +564,7 @@ export function useTourNavigation() {
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)
   const [calculatedCameraAngle, setCalculatedCameraAngle] = useState<number | undefined>(undefined)
+  const [currentPhotoImage, setCurrentPhotoImage] = useState<HTMLImageElement | null>(null)
 
   // Get current photo using centralized lookup
   const currentPhoto = useMemo(() => {
@@ -634,11 +635,13 @@ export function useTourNavigation() {
 
         const img = new Image()
         img.onload = () => {
+          setCurrentPhotoImage(img)
           setCurrentPhotoId(finalTargetId)
           setCalculatedCameraAngle(calculatedAngle)
           setIsLoading(false)
         }
         img.onerror = () => {
+          setCurrentPhotoImage(null)
           setIsLoading(false)
           console.error('Failed to load image:', targetPhoto.imageUrl)
         }
@@ -667,12 +670,14 @@ export function useTourNavigation() {
 
       const img = new Image()
       img.onload = () => {
+        setCurrentPhotoImage(img)
         setCurrentPhotoId(photoId)
         // For direct jumps, always use startingAngle if available
         setCalculatedCameraAngle(targetPhoto.startingAngle)
         setIsLoading(false)
       }
       img.onerror = () => {
+        setCurrentPhotoImage(null)
         setIsLoading(false)
         console.error('Failed to load image:', targetPhoto.imageUrl)
       }
@@ -687,6 +692,7 @@ export function useTourNavigation() {
     // State
     currentPhotoId,
     currentPhoto,
+    currentPhotoImage,
     currentArea,
     isLoading,
     cameraLon,

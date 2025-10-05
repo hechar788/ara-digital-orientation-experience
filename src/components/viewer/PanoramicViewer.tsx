@@ -9,6 +9,7 @@ import type { Photo } from '../../types/tour'
 
 interface PanoramicViewerProps {
   imageUrl: string
+  photoImage?: HTMLImageElement | null
   className?: string
   startingAngle?: number
   calculatedCameraAngle?: number
@@ -22,6 +23,7 @@ interface PanoramicViewerProps {
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   imageUrl,
+  photoImage,
   className = '',
   startingAngle = 0,
   calculatedCameraAngle,
@@ -291,58 +293,106 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
   useEffect(() => {
     // Skip if this is the initial load (handled in scene setup) or scene not ready
-    if (!initialLoadComplete || !imageUrl || !sceneDataRef.current) return
+    if (!initialLoadComplete || !sceneDataRef.current) return
 
-    setStatus('loading')
+    // Primary path: Use photoImage if available (navigation with preloaded Image)
+    if (photoImage) {
+      setStatus('loading')
 
-    const loader = new THREE.TextureLoader()
+      if (sceneDataRef.current) {
+        const { sphere } = sceneDataRef.current
 
-    loader.load(
-      imageUrl,
-      (texture) => {
-        if (sceneDataRef.current) {
-          const { sphere } = sceneDataRef.current
-          // Dispose of old material to prevent memory leaks
-          if (sphere.material && sphere.material.map) {
-            sphere.material.map.dispose()
-            sphere.material.dispose()
-          }
-          // Update existing sphere's material with new texture
-          sphere.material = new THREE.MeshBasicMaterial({
-            map: texture,
-            side: THREE.FrontSide
-          })
-
-          // Reset camera orientation AFTER texture is loaded to prevent flash
-          // Priority: calculatedCameraAngle > startingAngle > initialLon
-          let targetLon: number
-          let targetLat: number
-
-          if (calculatedCameraAngle !== undefined) {
-            targetLon = calculatedCameraAngle
-            targetLat = 0
-          } else if (startingAngle !== undefined) {
-            targetLon = startingAngle
-            targetLat = 0
-          } else {
-            targetLon = initialLon
-            targetLat = initialLat
-          }
-
-          cameraControlRef.current.lon = targetLon
-          cameraControlRef.current.lat = targetLat
-          onCameraChange?.(targetLon, targetLat)
-
-          setStatus('ready')
+        // Dispose of old material to prevent memory leaks
+        if (sphere.material && sphere.material.map) {
+          sphere.material.map.dispose()
+          sphere.material.dispose()
         }
-      },
-      undefined,
-      (error) => {
-        console.error('Failed to load texture:', error)
-        setStatus('error')
+
+        // Create texture directly from Image element (no download!)
+        const texture = new THREE.Texture(photoImage)
+        texture.needsUpdate = true
+
+        // Update existing sphere's material with new texture
+        sphere.material = new THREE.MeshBasicMaterial({
+          map: texture,
+          side: THREE.FrontSide
+        })
+
+        // Reset camera orientation AFTER texture is loaded to prevent flash
+        // Priority: calculatedCameraAngle > startingAngle > initialLon
+        let targetLon: number
+        let targetLat: number
+
+        if (calculatedCameraAngle !== undefined) {
+          targetLon = calculatedCameraAngle
+          targetLat = 0
+        } else if (startingAngle !== undefined) {
+          targetLon = startingAngle
+          targetLat = 0
+        } else {
+          targetLon = initialLon
+          targetLat = initialLat
+        }
+
+        cameraControlRef.current.lon = targetLon
+        cameraControlRef.current.lat = targetLat
+        onCameraChange?.(targetLon, targetLat)
+
+        setStatus('ready')
       }
-    )
-  }, [imageUrl, initialLoadComplete])
+    }
+    // Fallback: Use TextureLoader if no photoImage (backward compatibility)
+    else if (imageUrl) {
+      setStatus('loading')
+
+      const loader = new THREE.TextureLoader()
+
+      loader.load(
+        imageUrl,
+        (texture) => {
+          if (sceneDataRef.current) {
+            const { sphere } = sceneDataRef.current
+
+            if (sphere.material && sphere.material.map) {
+              sphere.material.map.dispose()
+              sphere.material.dispose()
+            }
+
+            sphere.material = new THREE.MeshBasicMaterial({
+              map: texture,
+              side: THREE.FrontSide
+            })
+
+            // Camera angle logic
+            let targetLon: number
+            let targetLat: number
+
+            if (calculatedCameraAngle !== undefined) {
+              targetLon = calculatedCameraAngle
+              targetLat = 0
+            } else if (startingAngle !== undefined) {
+              targetLon = startingAngle
+              targetLat = 0
+            } else {
+              targetLon = initialLon
+              targetLat = initialLat
+            }
+
+            cameraControlRef.current.lon = targetLon
+            cameraControlRef.current.lat = targetLat
+            onCameraChange?.(targetLon, targetLat)
+
+            setStatus('ready')
+          }
+        },
+        undefined,
+        (error) => {
+          console.error('Failed to load texture:', error)
+          setStatus('error')
+        }
+      )
+    }
+  }, [photoImage, imageUrl, initialLoadComplete])
 
   // Handler functions for controls
   const handleZoomIn = () => {

@@ -19,57 +19,97 @@ import { DoorOpen } from 'lucide-react'
 const textureCache = new Map<string, THREE.Texture>()
 
 /**
+ * Cache for in-flight SVG loading promises to prevent duplicate fetches
+ *
+ * When multiple hotspots request the same SVG simultaneously (race condition),
+ * this cache ensures they all wait for the same fetch instead of making
+ * duplicate network requests.
+ */
+const loadingCache = new Map<string, Promise<THREE.Texture>>()
+
+/**
  * Create texture from SVG file for hotspot icons
  *
  * Loads an SVG file and converts it to a Three.js texture that can be
  * applied to hotspot materials for consistent iconography.
  *
+ * Uses two-tier caching:
+ * 1. Completed texture cache - instant return for already-loaded SVGs
+ * 2. Loading promise cache - prevents duplicate fetches during concurrent loads
+ *
  * @param svgPath - Path to SVG file relative to public directory
  * @returns Promise resolving to Three.js texture
  */
 async function createSVGTexture(svgPath: string): Promise<THREE.Texture> {
-  // Check cache first
+  // Tier 1: Check completed texture cache (instant return)
   if (textureCache.has(svgPath)) {
     return textureCache.get(svgPath)!
   }
 
-  // Load SVG as text
-  const response = await fetch(svgPath)
-  const svgText = await response.text()
+  // Tier 2: Check loading cache for in-flight requests
+  if (loadingCache.has(svgPath)) {
+    return loadingCache.get(svgPath)!
+  }
 
-  // Create canvas and draw SVG
-  const canvas = document.createElement('canvas')
-  canvas.width = 64
-  canvas.height = 64
-  const ctx = canvas.getContext('2d')!
+  // Tier 3: Start new load and cache the promise
+  const loadPromise = (async () => {
+    try {
+      // Load SVG as text
+      const response = await fetch(svgPath)
+      const svgText = await response.text()
 
-  // Create image from SVG
-  const img = new Image()
-  const svgBlob = new Blob([svgText], { type: 'image/svg+xml' })
-  const url = URL.createObjectURL(svgBlob)
+      // Create canvas and draw SVG
+      const canvas = document.createElement('canvas')
+      canvas.width = 64
+      canvas.height = 64
+      const ctx = canvas.getContext('2d')!
 
-  return new Promise<THREE.Texture>((resolve) => {
-    img.onload = () => {
-      // Clear canvas with transparent background
-      ctx.clearRect(0, 0, 64, 64)
+      // Create image from SVG
+      const img = new Image()
+      const svgBlob = new Blob([svgText], { type: 'image/svg+xml' })
+      const url = URL.createObjectURL(svgBlob)
 
-      // Draw SVG centered
-      ctx.drawImage(img, 0, 0, 64, 64)
+      return new Promise<THREE.Texture>((resolve, reject) => {
+        img.onload = () => {
+          // Clear canvas with transparent background
+          ctx.clearRect(0, 0, 64, 64)
 
-      // Create texture
-      const texture = new THREE.CanvasTexture(canvas)
-      texture.needsUpdate = true
+          // Draw SVG centered
+          ctx.drawImage(img, 0, 0, 64, 64)
 
-      // Cache texture
-      textureCache.set(svgPath, texture)
+          // Create texture
+          const texture = new THREE.CanvasTexture(canvas)
+          texture.needsUpdate = true
 
-      // Clean up blob URL
-      URL.revokeObjectURL(url)
+          // Cache completed texture
+          textureCache.set(svgPath, texture)
 
-      resolve(texture)
+          // Clean up blob URL
+          URL.revokeObjectURL(url)
+
+          resolve(texture)
+        }
+
+        img.onerror = () => {
+          URL.revokeObjectURL(url)
+          reject(new Error(`Failed to load SVG image: ${svgPath}`))
+        }
+
+        img.src = url
+      })
+    } catch (error) {
+      console.error(`Error loading SVG texture: ${svgPath}`, error)
+      throw error
+    } finally {
+      // Always remove from loading cache when done (success or failure)
+      loadingCache.delete(svgPath)
     }
-    img.src = url
-  })
+  })()
+
+  // Cache the loading promise
+  loadingCache.set(svgPath, loadPromise)
+
+  return loadPromise
 }
 
 /**

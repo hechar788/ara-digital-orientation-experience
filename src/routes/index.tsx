@@ -11,6 +11,7 @@ export const Route = createFileRoute('/')({
 function App() {
   const {
     currentPhoto,
+    currentPhotoImage,
     currentArea,
     isLoading,
     navigateDirection,
@@ -92,6 +93,7 @@ function App() {
 
       <PanoramicViewer
         imageUrl={currentPhoto?.imageUrl}
+        photoImage={currentPhotoImage}
         className="w-full h-full"
         startingAngle={currentPhoto?.startingAngle}
         calculatedCameraAngle={calculatedCameraAngle}
