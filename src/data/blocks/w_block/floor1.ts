@@ -30,7 +30,7 @@ export const wBlockFloor1Area: Area = {
     {
       id: 'w-f1-main-entrance',
       imageUrl: '/360_photos_compressed/w_block/floor_1/w_main_entrance.webp',
-      startingAngle: 180,
+      startingAngle: 200,
       directions: {
         forwardLeft: { connection: 'w-f1-main-1' },
         door: 'outside-w-entrance'
@@ -126,7 +126,7 @@ export const wBlockFloor1Area: Area = {
     {
       id: 'w-f1-main-3-aside-1',
       imageUrl: '/360_photos_compressed/w_block/floor_1/w_main_3_aside_1.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         forward: { connection: 'w-f1-main-3-aside-2' },
         back: { connection: 'w-f1-main-3-aside' }
@@ -135,7 +135,7 @@ export const wBlockFloor1Area: Area = {
     {
       id: 'w-f1-main-3-aside-2',
       imageUrl: '/360_photos_compressed/w_block/floor_1/w_main_3_aside_2.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         back: { connection: 'w-f1-main-3-aside-1' }
       }

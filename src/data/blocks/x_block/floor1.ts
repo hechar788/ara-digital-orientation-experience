@@ -218,10 +218,10 @@ export const xBlockFloor1Area: Area = {
     {
       id: 'x-f1-west-12',
       imageUrl: '/360_photos_compressed/x_block/floor_1/x_west_12.webp',
-      startingAngle: 0,
+      startingAngle: 310,
       directions: {
-        forwardLeft: { connection: 'n-f1-x-entry' },
-        back: { connection: 'x-f1-west-11' },
+        forward: { connection: 'n-f1-x-entry' },
+        backLeft: { connection: 'x-f1-west-11' },
         up: 'x-f2-north-entry',
         door: 'outside-x-north-entrance'
       },

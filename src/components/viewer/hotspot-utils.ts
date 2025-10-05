@@ -505,3 +505,122 @@ export function getDialogPosition(
 
   return { x, y, flippedHorizontal }
 }
+
+/**
+ * Create 3D directional arrow sprite for in-scene navigation
+ *
+ * Creates a flat sprite arrow that appears "on the ground" in the panoramic scene,
+ * similar to Google Maps Street View navigation arrows.
+ *
+ * @param direction - Navigation direction ('forward', 'right', etc.)
+ * @param angle - Rotation angle in degrees to point arrow in correct direction
+ * @returns Promise resolving to Three.js mesh with arrow sprite
+ *
+ * @example
+ * ```typescript
+ * const forwardArrow = await createDirectionalArrow('forward', 0)
+ * scene.add(forwardArrow)
+ * ```
+ */
+export async function createDirectionalArrow(
+  direction: string,
+  angle: number
+): Promise<THREE.Mesh> {
+  // Load arrow texture
+  const arrowTexture = await createSVGTexture('/svg/arrow-navigation.svg')
+
+  // Create sprite plane - made thicker/wider
+  const geometry = new THREE.PlaneGeometry(1.8, 2.0)
+
+  // Blue solid material
+  const material = new THREE.MeshBasicMaterial({
+    map: arrowTexture,
+    transparent: true,
+    opacity: 1.0,
+    side: THREE.DoubleSide,
+    alphaTest: 0.1
+  })
+
+  const arrow = new THREE.Mesh(geometry, material)
+
+  // Store original material for hover effects
+  arrow.userData.originalMaterial = material
+  arrow.userData.direction = direction
+  arrow.userData.isDirectionalArrow = true
+
+  return arrow
+}
+
+/**
+ * Calculate 3D position for directional arrow at floor level
+ *
+ * Uses spherical coordinates matching the camera system to position arrows.
+ * This ensures arrows appear correctly in the inverted panoramic sphere.
+ *
+ * @param angle - Direction angle in degrees (longitude/theta)
+ * @param distance - Distance from camera center (default: 7 units)
+ * @returns 3D position vector for arrow placement
+ *
+ * @example
+ * ```typescript
+ * const position = calculateArrowPosition(0) // Forward arrow position
+ * arrow.position.copy(position)
+ * ```
+ */
+export function calculateArrowPosition(
+  angle: number,
+  distance: number = 3.25  // Reduced from 7 to bring 25% closer
+): THREE.Vector3 {
+  // Convert angle to radians (theta in spherical coordinates)
+  const theta = angle * (Math.PI / 180)
+
+  // Use phi = 90° for floor-level items (horizontal plane)
+  const phi = Math.PI / 2
+
+  // Spherical coordinate conversion (same as camera target calculation)
+  return new THREE.Vector3(
+    distance * Math.sin(phi) * Math.cos(theta),  // X
+    -2.0,  // Y: slightly above floor level (raised from -2.5)
+    distance * Math.sin(phi) * Math.sin(theta)   // Z
+  )
+}
+
+/**
+ * Orient directional arrow to face outward from camera
+ *
+ * Rotates arrow to lay flat on ground and point in the direction of travel.
+ * Uses Y-axis rotation to align with spherical coordinate theta angle.
+ *
+ * @param arrow - Arrow mesh to orient
+ * @param angle - Direction angle in degrees (theta)
+ */
+export function orientDirectionalArrow(arrow: THREE.Mesh, angle: number): void {
+  // First, lay arrow flat on horizontal plane
+  arrow.rotation.x = Math.PI / 2 // 90° to lay flat
+
+  // Then rotate around Z axis to point in direction (theta angle)
+  // When arrow is rotated to lay flat (x=90°), Z rotation controls horizontal direction
+  arrow.rotation.z = (angle - 90) * (Math.PI / 180)
+}
+
+/**
+ * Apply hover brightness effect to directional arrow
+ *
+ * Brightens arrow when hovering to provide visual feedback.
+ *
+ * @param arrow - Arrow mesh to brighten
+ * @param isHovering - Whether arrow is being hovered
+ */
+export function setArrowHoverState(arrow: THREE.Mesh, isHovering: boolean): void {
+  if (!arrow.userData.isDirectionalArrow) return
+
+  const material = arrow.material as THREE.MeshBasicMaterial
+
+  if (isHovering) {
+    // Brighten: add lighter blue tint
+    material.color.setHex(0x88CCFF) // Lighter blue tint
+  } else {
+    // Normal state: no tint (white = use texture color as-is)
+    material.color.setHex(0xFFFFFF) // White = no color modification
+  }
+}

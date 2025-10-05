@@ -67,6 +67,7 @@ export const sBlockFloor1Area: Area = {
     {
       id: 's-f1-south-entrance',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_1/s_south_entrance.webp',
+      startingAngle: 5,
       directions: {
         back: { connection: 's-f1-south-2' }
       },

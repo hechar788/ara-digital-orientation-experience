@@ -63,7 +63,7 @@ export const wBlockFloor2Area: Area = {
     {
       id: 'w-f2-2',
       imageUrl: '/360_photos_compressed/w_block/floor_2/w_floor_2_2.webp',
-      startingAngle: 180,
+      startingAngle: 182.5,
       directions: {
         forward: { connection: 'w-f2-3' },
         back: { connection: 'w-f2-1' }
@@ -72,7 +72,7 @@ export const wBlockFloor2Area: Area = {
     {
       id: 'w-f2-3',
       imageUrl: '/360_photos_compressed/w_block/floor_2/w_floor_2_3.webp',
-      startingAngle: 270,
+      startingAngle: 275,
       directions: {
         back: { connection: 'w-f2-2' },
         left: { connection: 'w-f2-4' },
@@ -91,7 +91,7 @@ export const wBlockFloor2Area: Area = {
     {
       id: 'w-f2-5',
       imageUrl: '/360_photos_compressed/w_block/floor_2/w_floor_2_5.webp',
-      startingAngle: 180,
+      startingAngle: 182.5,
       directions: {
         back: { connection: 'w-f2-4' },
         forward: { connection: 'w-f2-6' }

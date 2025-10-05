@@ -36,6 +36,7 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-west-entry',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_entry.webp',
+      startingAngle: 347.5,
       directions: {
         back: { connection: 'x-f3-west-1' },
         down: 'x-f2-north-entry'
@@ -54,6 +55,7 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-west-1',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_west_1.webp',
+      startingAngle: 11.5,
       directions: {
         back: { connection: 'x-f3-west-2' },
         forward: { connection: 'x-f3-west-entry' },
@@ -112,6 +114,7 @@ export const xBlockFloor3Area: Area = {
     {
       id: 'x-f3-mid-4',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x_mid_4.webp',
+      startingAngle: 7.5,
       directions: {
         back: { connection: 'x-f3-mid-5' },
         forward: { connection: 'x-f3-west-2' }
@@ -139,7 +142,7 @@ export const xBlockFloor3Area: Area = {
       startingAngle: 80,
       directions: {
         back: { connection: 'x-f3-east-8' },
-        forward: { connection: 'x-f3-east-6' },
+        forwardLeft: { connection: 'x-f3-east-6' },
         elevator: 'x-elevator-interior'
       },
       hotspots: [

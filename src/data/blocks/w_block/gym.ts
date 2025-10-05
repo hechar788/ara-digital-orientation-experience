@@ -101,7 +101,7 @@ export const wBlockGymFloor2Area: Area = {
     {
       id: 'w-gym-overlook',
       imageUrl: '/360_photos_compressed/w_block/gym/floor_2/w_gym_overlook.webp',
-      startingAngle: 350,
+      startingAngle: 345,
       directions: {
         forward: { connection: 'w-gym-overlook-1' },
         back: { connection: 'w-f2-3'},

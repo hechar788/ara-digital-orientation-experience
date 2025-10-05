@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { PanoramicViewerControls } from './PanoramicViewerControls'
 import { PanoramicHotspots } from './PanoramicHotspots'
+import { DirectionalArrows3D } from './DirectionalArrows3D'
 import { AIChatPopup } from '../AIChatPopup'
 import { InformationPopup } from '../InformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
@@ -19,6 +20,7 @@ interface PanoramicViewerProps {
   currentPhoto?: Photo | null
   onNavigate?: (direction: string) => void
   onNavigateToPhoto?: (photoId: string) => void
+  cameraLon?: number
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -32,7 +34,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onCameraChange,
   currentPhoto = null,
   onNavigate,
-  onNavigateToPhoto
+  onNavigateToPhoto,
+  cameraLon = 0
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
@@ -441,6 +444,16 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           fov={fov}
           onNavigate={onNavigate}
           onNavigateToPhoto={onNavigateToPhoto}
+        />
+      )}
+
+      {/* Add 3D directional arrows */}
+      {currentPhoto && onNavigate && sceneDataRef.current && status === 'ready' && (
+        <DirectionalArrows3D
+          currentPhoto={currentPhoto}
+          sceneRef={sceneDataRef}
+          cameraControlRef={cameraControlRef}
+          onNavigate={onNavigate as (direction: 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft') => void}
         />
       )}
 
