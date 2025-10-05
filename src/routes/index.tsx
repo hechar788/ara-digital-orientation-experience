@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
 import { DirectionalNavigation } from '../components/tour/DirectionalNavigation'
+import { Spinner } from '../components/ui/shadcn-io/spinner'
 import { useTourNavigation } from '../hooks/useTourNavigation'
 
 export const Route = createFileRoute('/')({
@@ -112,6 +113,13 @@ function App() {
         onNavigate={(direction: 'forward' | 'back' | 'left' | 'right') => navigateDirection(direction)}
         isLoading={isLoading}
       />
+
+      {/* Navigation loading spinner */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+          <Spinner className="text-gray-500" size={48} />
+        </div>
+      )}
     </div>
   )
 }
