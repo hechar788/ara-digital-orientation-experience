@@ -34,7 +34,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-elevator-1',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_elevator_1.webp',
-      startingAngle: 240,
+      startingAngle: 233.5,
       directions: {
         forwardRight: { connection: 's-f4-mid-2' },
         elevator: 'ns-elevator-interior'
@@ -57,7 +57,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-mid-2',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_mid_2.webp',
-      startingAngle: 180,
+      startingAngle: 187.5,
       directions: {
         forward: { connection: 's-f4-mid-3' },
         back: { connection: 's-f4-elevator-1' },
@@ -95,7 +95,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-corner-5',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_corner_5.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         forward: { connection: 's-f4-north-6' },
         left: { connection: 's-f4-mid-4' }
@@ -175,7 +175,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-switch-2',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_2.webp',
-      startingAngle: 180,
+      startingAngle: 187.5,
       directions: {
         forward: { connection: 's-f4-switch-3' },
         back: { connection: 's-f4-switch-1' },
@@ -192,7 +192,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-switch-3',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_3.webp',
-      startingAngle: 90,
+      startingAngle: 95,
       directions: {
         forward: { connection: 's-f4-switch-4' },
         left: { connection: 's-f4-switch-2' },
@@ -209,7 +209,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-switch-4',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_4.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         forward: { connection: 's-f4-switch-5' },
         left: { connection: 's-f4-switch-3' },
@@ -226,7 +226,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-switch-5',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_5.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         forward: { connection: 's-f4-switch-6' },
         back: { connection: 's-f4-switch-4' },
@@ -243,7 +243,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-switch-6',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_switch_6.webp',
-      startingAngle: 100,
+      startingAngle: 102.5,
       directions: {
         left: { connection: 's-f4-switch-5' },
         forward: { connection: 's-f4-switch-1' },
@@ -265,7 +265,7 @@ export const sBlockFloor4Area: Area = {
     {
       id: 's-f4-north-8',
       imageUrl: '/360_photos_compressed/n_s_block/s_block/floor_4/s_north_8.webp',
-      startingAngle: 180,
+      startingAngle: 190,
       directions: {
         back: { connection: 's-f4-north-7' },
         door: 's-f4-switch-4'

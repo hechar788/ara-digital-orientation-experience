@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
-import { DirectionalNavigation } from '../components/tour/DirectionalNavigation'
 import { Spinner } from '../components/ui/shadcn-io/spinner'
 import { useTourNavigation } from '../hooks/useTourNavigation'
 
@@ -104,14 +103,7 @@ function App() {
         currentPhoto={currentPhoto}
         onNavigate={navigateDirection}
         onNavigateToPhoto={jumpToPhoto}
-      />
-
-      {/* Directional navigation buttons - ONLY horizontal movement */}
-      <DirectionalNavigation
-        currentPhoto={currentPhoto}
         cameraLon={cameraLon}
-        onNavigate={(direction: 'forward' | 'back' | 'left' | 'right') => navigateDirection(direction)}
-        isLoading={isLoading}
       />
 
       {/* Navigation loading spinner */}

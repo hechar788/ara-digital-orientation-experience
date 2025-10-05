@@ -87,7 +87,7 @@ export const aBlockFloor1Area: Area = {
     {
       id: 'a-f1-north-3',
       imageUrl: '/360_photos_compressed/a_block/floor_1/a_north_3.webp',
-      startingAngle: 180,
+      startingAngle: 182.5,
       directions: {
         back: { connection: 'a-f1-north-2' },
         forward: { connection: 'a-f1-mid-4' },

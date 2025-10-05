@@ -33,7 +33,7 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-east-4',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_east_4.webp',
-      startingAngle: 180,
+      startingAngle: 177.5,
       directions: {
         back: { connection: 'x-f2-north-entry' },
         forward: { connection: 'n-f2-mid-3' }
@@ -46,7 +46,7 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-mid-3',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_mid_3.webp',
-      startingAngle: 175,
+      startingAngle: 170,
       directions: {
         back: { connection: 'n-f2-east-4' },
         forward: { connection: 'n-f2-west-2' }
@@ -59,7 +59,7 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-west-2',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_2.webp',
-      startingAngle: 180,
+      startingAngle: 185,
       directions: {
         back: { connection: 'n-f2-mid-3' },
         forward: { connection: 'n-f2-west-1' }
@@ -68,7 +68,7 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-west-1',
       imageUrl: '/360_photos_compressed/n_s_block/n_block/floor_2/n_west_1.webp',
-      startingAngle: 180,
+      startingAngle: 177.5,
       directions: {
         back: { connection: 'n-f2-west-2' },
         forward: { connection: 'n-f2-elevator-entrance' }
@@ -81,7 +81,7 @@ export const nBlockFloor2Area: Area = {
     {
       id: 'n-f2-elevator-entrance',
       imageUrl: '/360_photos_compressed/n_s_block/n_s_2nd_floor_elevators_entrance.webp',
-      startingAngle: 270,
+      startingAngle: 265,
       directions: {
         back: { connection: 'n-f2-west-1' },
         forward: { connection: 's-f2-mid-1' },
