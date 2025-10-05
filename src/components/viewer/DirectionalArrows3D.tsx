@@ -193,11 +193,6 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
 
           // TEMP: Always show arrows for debugging positioning/rotation
           arrow.visible = true // shouldBeVisible
-
-          // Debug logging
-          if (arrow.userData.direction === 'forward') {
-            console.log('Forward arrow - Camera:', currentCameraLon, 'Target:', targetAngle, 'Would be visible:', shouldBeVisible)
-          }
         }
       })
 

@@ -150,10 +150,8 @@ function findClosestAvailableDirection(
   movementType: 'forward' | 'backward'
 ): DirectionType | null {
   const availableDirs = getAvailableDirections(photo, movementType)
-  console.log(`    [findClosest] Target: ${targetAngle}°, Type: ${movementType}, Available: [${availableDirs.join(', ')}]`)
 
   if (availableDirs.length === 0) {
-    console.log(`    [findClosest] No available directions!`)
     return null
   }
 
@@ -163,7 +161,6 @@ function findClosestAvailableDirection(
   for (const dir of availableDirs) {
     const dirAngle = getDirectionAngle(photo, dir)
     const diff = calculateAngularDifference(dirAngle, targetAngle)
-    console.log(`      ${dir}: ${dirAngle}° (diff: ${diff}°)`)
 
     if (diff < minDiff) {
       minDiff = diff
@@ -171,7 +168,6 @@ function findClosestAvailableDirection(
     }
   }
 
-  console.log(`    [findClosest] Result: ${closestDir} at ${closestDir ? getDirectionAngle(photo, closestDir) : 'N/A'}°`)
   return closestDir
 }
 
@@ -222,13 +218,11 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
 
         // Forward-family directions = forward oriented
         if (dir === 'forward' || dir === 'forwardLeft' || dir === 'forwardRight') {
-          console.log(`[getUserOrientation] Camera ${currentCameraAngle}° matches ${dir} at ${dirAngle}° (diff: ${angleDiff.toFixed(1)}°) → forward`)
           return 'forward'
         }
 
         // Back-family directions = backward oriented
         if (dir === 'back' || dir === 'backLeft' || dir === 'backRight') {
-          console.log(`[getUserOrientation] Camera ${currentCameraAngle}° matches ${dir} at ${dirAngle}° (diff: ${angleDiff.toFixed(1)}°) → backward`)
           return 'backward'
         }
 
@@ -244,12 +238,10 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
             if (reverseDir) {
               // If reverse is forward-family, this direction was backward continuation
               if (reverseDir === 'forward' || reverseDir === 'forwardLeft' || reverseDir === 'forwardRight') {
-                console.log(`[getUserOrientation] Camera ${currentCameraAngle}° at ${dir} at ${dirAngle}° (diff: ${angleDiff.toFixed(1)}°), reverse is ${reverseDir} → backward`)
                 return 'backward'
               }
               // If reverse is back-family, this direction was forward continuation
               if (reverseDir === 'back' || reverseDir === 'backLeft' || reverseDir === 'backRight') {
-                console.log(`[getUserOrientation] Camera ${currentCameraAngle}° at ${dir} at ${dirAngle}° (diff: ${angleDiff.toFixed(1)}°), reverse is ${reverseDir} → forward`)
                 return 'forward'
               }
             }
@@ -273,8 +265,6 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
 
   const diff = calculateAngularDifference(currentCameraAngle, forwardAngle)
   const result = diff < 90 ? 'forward' : 'backward'
-
-  console.log(`[getUserOrientation] Photo: ${photo.id}, Camera: ${currentCameraAngle}°, Forward ref: ${forwardAngle}°, Diff: ${diff}° → ${result}`)
 
   return result
 }
@@ -391,9 +381,6 @@ function calculateNavigationAngle(
   direction: DirectionType,
   navigationType: NavigationType
 ): number {
-  console.log(`\n[calculateNavigationAngle] ${currentPhoto.id} →(${direction})→ ${destinationPhoto.id}`)
-  console.log(`  Camera: ${currentCameraAngle}°, NavType: ${navigationType}`)
-
   const isForwardMovement = direction === 'forward' || direction === 'forwardLeft' || direction === 'forwardRight'
   const isBackMovement = direction === 'back' || direction === 'backLeft' || direction === 'backRight'
   const isPureTurn = direction === 'left' || direction === 'right'
@@ -409,16 +396,12 @@ function calculateNavigationAngle(
     effectiveMovementType = getUserOrientation(currentCameraAngle, currentPhoto)
   }
 
-  console.log(`  Movement type: ${effectiveMovementType}`)
-
   // Strategy 1: Reverse Connection Analysis (Primary - handles corners perfectly)
   const reverseDirection = findReverseConnection(currentPhoto, destinationPhoto)
-  console.log(`  Reverse connection: ${reverseDirection || 'none'}`)
 
   if (reverseDirection) {
     const reverseAngle = getDirectionAngle(destinationPhoto, reverseDirection)
     const targetAngle = (reverseAngle + 180) % 360
-    console.log(`  Reverse angle: ${reverseAngle}°, Target angle: ${targetAngle}°`)
 
     // For same-corridor bidirectional movement, preserve relative orientation
     // BUT only when there's an EXACT primary direction match (forward/back, not diagonal variants)
@@ -428,7 +411,6 @@ function calculateNavigationAngle(
         (isBackMovement && destinationPhoto.directions.back)
 
       if (hasExactPrimaryDirection) {
-        console.log(`  Using preserved orientation (same-corridor with exact primary direction)`)
         // Use preserved orientation for smooth corridor movement
         return calculatePreservedOrientation(currentCameraAngle, currentPhoto, destinationPhoto)
       }
@@ -437,11 +419,9 @@ function calculateNavigationAngle(
     // Find closest available direction matching movement intent (including inferred for pure turns)
     if (effectiveMovementType) {
       const closestDirection = findClosestAvailableDirection(destinationPhoto, targetAngle, effectiveMovementType)
-      console.log(`  Closest direction: ${closestDirection || 'none'}`)
 
       if (closestDirection) {
         const result = getDirectionAngle(destinationPhoto, closestDirection)
-        console.log(`  ✓ Returning: ${result}° (${closestDirection})`)
         return result
       }
     }
@@ -451,29 +431,23 @@ function calculateNavigationAngle(
   if (isForwardMovement) {
     if (destinationPhoto.directions.forward) {
       const result = getDirectionAngle(destinationPhoto, 'forward')
-      console.log(`  Strategy 2: Using forward at ${result}°`)
       return result
     } else if (destinationPhoto.directions.forwardLeft) {
       const result = getDirectionAngle(destinationPhoto, 'forwardLeft')
-      console.log(`  Strategy 2: Using forwardLeft at ${result}°`)
       return result
     } else if (destinationPhoto.directions.forwardRight) {
       const result = getDirectionAngle(destinationPhoto, 'forwardRight')
-      console.log(`  Strategy 2: Using forwardRight at ${result}°`)
       return result
     }
   } else if (isBackMovement) {
     if (destinationPhoto.directions.back) {
       const result = getDirectionAngle(destinationPhoto, 'back')
-      console.log(`  Strategy 2: Using back at ${result}°`)
       return result
     } else if (destinationPhoto.directions.backLeft) {
       const result = getDirectionAngle(destinationPhoto, 'backLeft')
-      console.log(`  Strategy 2: Using backLeft at ${result}°`)
       return result
     } else if (destinationPhoto.directions.backRight) {
       const result = getDirectionAngle(destinationPhoto, 'backRight')
-      console.log(`  Strategy 2: Using backRight at ${result}°`)
       return result
     }
   }
@@ -486,12 +460,10 @@ function calculateNavigationAngle(
   // Strategy 4: Final Fallback - Use startingAngle or opposite for backward movement
   if (isBackMovement) {
     const result = ((destinationPhoto.startingAngle ?? 0) + 180) % 360
-    console.log(`  ✗ Fallback (backward): ${result}°`)
     return result
   }
 
   const result = destinationPhoto.startingAngle ?? 0
-  console.log(`  ✗ Fallback (default): ${result}°`)
   return result
 }
 
