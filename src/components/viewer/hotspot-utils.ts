@@ -569,7 +569,7 @@ export async function createDirectionalArrow(
  */
 export function calculateArrowPosition(
   angle: number,
-  distance: number = 3.25  // Reduced from 7 to bring 25% closer
+  distance: number = 3.85  // Reduced from 7 to bring 25% closer
 ): THREE.Vector3 {
   // Convert angle to radians (theta in spherical coordinates)
   const theta = angle * (Math.PI / 180)
