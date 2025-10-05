@@ -297,8 +297,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
     // Primary path: Use photoImage if available (navigation with preloaded Image)
     if (photoImage) {
-      setStatus('loading')
-
       if (sceneDataRef.current) {
         const { sphere } = sceneDataRef.current
 
@@ -338,7 +336,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         cameraControlRef.current.lat = targetLat
         onCameraChange?.(targetLon, targetLat)
 
-        setStatus('ready')
+        // No status update needed - instant operation, isLoading in nav hook handles UX
       }
     }
     // Fallback: Use TextureLoader if no photoImage (backward compatibility)
