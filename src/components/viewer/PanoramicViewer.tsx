@@ -21,6 +21,8 @@ interface PanoramicViewerProps {
   onNavigate?: (direction: string) => void
   onNavigateToPhoto?: (photoId: string) => void
   cameraLon?: number
+  onFovChange?: (fov: number) => void
+  initialFov?: number
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -34,10 +36,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onCameraChange,
   currentPhoto = null,
   onNavigate,
-  onNavigateToPhoto
+  onNavigateToPhoto,
+  onFovChange,
+  initialFov = 75
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-  const [fov, setFov] = useState(75)
+  const [fov, setFov] = useState(initialFov)
   const [showAIChat, setShowAIChat] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
@@ -58,7 +62,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     geometry: THREE.SphereGeometry
     sphere: THREE.Mesh
   } | null>(null)
-  const fovRef = useRef(75)
+  const fovRef = useRef(initialFov)
   const cameraControlRef = useRef<{ lon: number; lat: number }>({
     lon: calculatedCameraAngle !== undefined
       ? calculatedCameraAngle
@@ -79,7 +83,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
       // Basic Three.js setup
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000)
+      const camera = new THREE.PerspectiveCamera(fovRef.current, mount.clientWidth / mount.clientHeight, 0.1, 1000)
       const renderer = new THREE.WebGLRenderer({ antialias: true })
 
       renderer.setSize(mount.clientWidth, mount.clientHeight)
@@ -185,6 +189,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         
         // Update state
         setFov(fovRef.current)
+        onFovChange?.(fovRef.current)
       }
 
       // Window resize handler
@@ -411,6 +416,16 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
   const handleInfoToggle = () => {
     setShowInfo(!showInfo)
+  }
+
+  const handleFovChange = (newFov: number) => {
+    setFov(newFov)
+    fovRef.current = newFov
+    if (sceneDataRef.current) {
+      sceneDataRef.current.camera.fov = newFov
+      sceneDataRef.current.camera.updateProjectionMatrix()
+    }
+    onFovChange?.(newFov)
   }
 
   return (
