@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { PanoramicViewerControls } from './PanoramicViewerControls'
-import { PanoramicHotspots } from './PanoramicHotspots'
-import { DirectionalArrows3D } from './DirectionalArrows3D'
-import { AIChatPopup } from '../AIChatPopup'
-import { InformationPopup } from '../InformationPopup'
+import { PanoramicViewerControls } from '../tour/TourControls'
+import { PanoramicHotspots } from './hotspots/PanoramicHotspots' 
+import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
+import { AIChatPopup } from '../tour/AIChatPopup'
+import { InformationPopup } from '../tour/InformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
 import type { Photo } from '../../types/tour'
 
@@ -34,8 +34,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onCameraChange,
   currentPhoto = null,
   onNavigate,
-  onNavigateToPhoto,
-  cameraLon = 0
+  onNavigateToPhoto
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(75)
@@ -308,9 +307,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         const { sphere } = sceneDataRef.current
 
         // Dispose of old material to prevent memory leaks
-        if (sphere.material && sphere.material.map) {
-          sphere.material.map.dispose()
-          sphere.material.dispose()
+        if (sphere.material && !Array.isArray(sphere.material)) {
+          const material = sphere.material as THREE.MeshBasicMaterial
+          if (material.map) {
+            material.map.dispose()
+          }
+          material.dispose()
         }
 
         // Create texture directly from Image element (no download!)
@@ -358,9 +360,12 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           if (sceneDataRef.current) {
             const { sphere } = sceneDataRef.current
 
-            if (sphere.material && sphere.material.map) {
-              sphere.material.map.dispose()
-              sphere.material.dispose()
+            if (sphere.material && !Array.isArray(sphere.material)) {
+              const material = sphere.material as THREE.MeshBasicMaterial
+              if (material.map) {
+                material.map.dispose()
+              }
+              material.dispose()
             }
 
             sphere.material = new THREE.MeshBasicMaterial({
@@ -400,27 +405,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   }, [photoImage, imageUrl, initialLoadComplete])
 
   // Handler functions for controls
-  const handleZoomIn = () => {
-    const newFov = Math.max(10, fov - 10)
-    setFov(newFov)
-    fovRef.current = newFov
-    if (sceneDataRef.current) {
-      sceneDataRef.current.camera.fov = newFov
-      sceneDataRef.current.camera.updateProjectionMatrix()
-    }
-  }
-
-  const handleZoomOut = () => {
-    const newFov = Math.min(120, fov + 10)
-    setFov(newFov)
-    fovRef.current = newFov
-    if (sceneDataRef.current) {
-      sceneDataRef.current.camera.fov = newFov
-      sceneDataRef.current.camera.updateProjectionMatrix()
-    }
-  }
-
-
   const handleAIChatToggle = () => {
     setShowAIChat(!showAIChat)
   }
@@ -444,7 +428,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       {currentPhoto && onNavigate && sceneDataRef.current && status === 'ready' && (
         <PanoramicHotspots
           currentPhoto={currentPhoto}
-          sceneRef={sceneDataRef}
+          sceneRef={sceneDataRef as React.RefObject<NonNullable<typeof sceneDataRef.current>>}
           fov={fov}
           onNavigate={onNavigate}
           onNavigateToPhoto={onNavigateToPhoto}
@@ -455,7 +439,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       {currentPhoto && onNavigate && sceneDataRef.current && status === 'ready' && (
         <DirectionalArrows3D
           currentPhoto={currentPhoto}
-          sceneRef={sceneDataRef}
+          sceneRef={sceneDataRef as React.RefObject<NonNullable<typeof sceneDataRef.current>>}
           cameraControlRef={cameraControlRef}
           onNavigate={onNavigate as (direction: 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft') => void}
         />
@@ -465,9 +449,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       <PanoramicViewerControls
         className="fixed left-1/2 transform -translate-x-1/2 z-20"
         style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-        currentFov={fov}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
         onAIChat={handleAIChatToggle}
         onInfo={handleInfoToggle}
       />
