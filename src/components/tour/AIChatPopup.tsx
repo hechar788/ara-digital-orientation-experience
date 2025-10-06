@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { Send, X } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
 interface Message {
   id: string
@@ -124,6 +124,9 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({ isOpen, onClose }) => 
               <X className="w-4 h-4" />
             </button>
           </div>
+          <DialogDescription className="sr-only">
+            Chat with the AI assistant to get help with the panoramic viewer navigation and controls
+          </DialogDescription>
         </DialogHeader>
 
         <Messages messages={messages} isLoading={isLoading} />
