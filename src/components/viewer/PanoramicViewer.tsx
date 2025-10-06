@@ -54,6 +54,18 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       sessionStorage.setItem('hasSeenInfoPopup', 'true')
     }
   }, [])
+
+  // Sync FOV from parent when initialFov prop changes
+  useEffect(() => {
+    if (initialFov !== fov) {
+      setFov(initialFov)
+      fovRef.current = initialFov
+      if (sceneDataRef.current) {
+        sceneDataRef.current.camera.fov = initialFov
+        sceneDataRef.current.camera.updateProjectionMatrix()
+      }
+    }
+  }, [initialFov])
   const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
