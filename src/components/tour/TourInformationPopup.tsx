@@ -1,12 +1,12 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 
-interface InformationPopupProps {
+interface TourInformationPopupProps {
   isOpen: boolean
   onClose: () => void
 }
 
-export const InformationPopup: React.FC<InformationPopupProps> = ({ isOpen, onClose }) => {
+export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOpen, onClose }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">

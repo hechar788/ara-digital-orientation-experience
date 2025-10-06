@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
 
-interface PanoramicViewerControlsProps {
+interface PanoramicTourControlsProps {
   className?: string
   style?: React.CSSProperties
   onInfo?: () => void
   onAIChat?: () => void
 }
 
-export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = ({
+export const PanoramicTourControls: React.FC<PanoramicTourControlsProps> = ({
   className = '',
   style,
   onInfo,
