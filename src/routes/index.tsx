@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
+import { PanoramicZoomSlider } from '../components/viewer/PanoramicZoomSlider'
 import { Spinner } from '../components/ui/shadcn-io/spinner'
 import { useTourNavigation } from '../hooks/useTourNavigation'
 
@@ -22,6 +23,8 @@ function App() {
     calculatedCameraAngle,
     handleCameraChange
   } = useTourNavigation()
+
+  const [currentFov, setCurrentFov] = useState(75)
 
   // Temporary keyboard controls for Phase 1 testing
   useEffect(() => {
@@ -91,6 +94,14 @@ function App() {
         </div>
       </div>
 
+      {/* Zoom Slider - positioned below debug info */}
+      <div className="absolute top-[150px] left-4 z-50">
+        <PanoramicZoomSlider
+          currentFov={currentFov}
+          onZoomChange={setCurrentFov}
+        />
+      </div>
+
       <PanoramicViewer
         imageUrl={currentPhoto?.imageUrl}
         photoImage={currentPhotoImage}
@@ -104,6 +115,8 @@ function App() {
         onNavigate={navigateDirection}
         onNavigateToPhoto={jumpToPhoto}
         cameraLon={cameraLon}
+        initialFov={currentFov}
+        onFovChange={setCurrentFov}
       />
 
       {/* Navigation loading spinner */}
