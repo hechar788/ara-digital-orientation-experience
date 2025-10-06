@@ -144,8 +144,16 @@ export const nBlockFloor1Area: Area = {
       startingAngle: 35,
       directions: {
         forward: { connection: 's-f1-north-4' },
-        back: { connection: 'n-f1-west-8' }
+        back: { connection: 'n-f1-west-8' },
+        door: 'n-f1-sandys-office'
       },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: 3.25, y: -0.75, z: -2.75 },
+          destination: 'n-f1-sandys-office'
+        }
+      ],
       buildingContext: {
         wing: 'west',
         facilities: ['classrooms', 'faculty offices']
