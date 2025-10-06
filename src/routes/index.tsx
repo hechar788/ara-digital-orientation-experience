@@ -4,6 +4,7 @@ import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
 import { PanoramicZoomSlider } from '../components/viewer/PanoramicZoomSlider'
 import { Spinner } from '../components/ui/shadcn-io/spinner'
 import { useTourNavigation } from '../hooks/useTourNavigation'
+import type { DirectionType } from '../types/tour'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -103,7 +104,7 @@ function App() {
       </div>
 
       <PanoramicViewer
-        imageUrl={currentPhoto?.imageUrl}
+        imageUrl={currentPhoto?.imageUrl ?? ''}
         photoImage={currentPhotoImage}
         className="w-full h-full"
         startingAngle={currentPhoto?.startingAngle}
@@ -112,7 +113,7 @@ function App() {
         initialLat={cameraLat}
         onCameraChange={handleCameraChange}
         currentPhoto={currentPhoto}
-        onNavigate={navigateDirection}
+        onNavigate={(direction) => navigateDirection(direction as DirectionType)}
         onNavigateToPhoto={jumpToPhoto}
         cameraLon={cameraLon}
         initialFov={currentFov}

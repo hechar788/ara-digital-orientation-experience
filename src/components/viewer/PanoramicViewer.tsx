@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { PanoramicViewerControls } from '../tour/TourControls'
+import { PanoramicTourControls } from '../tour/TourControls'
 import { PanoramicHotspots } from './hotspots/PanoramicHotspots' 
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
 import { AIChatPopup } from '../tour/AIChatPopup'
-import { InformationPopup } from '../tour/InformationPopup'
+import { TourInformationPopup } from '../tour/TourInformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
 import type { Photo } from '../../types/tour'
 
@@ -514,7 +514,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       )}
 
 
-      <PanoramicViewerControls
+      <PanoramicTourControls
         className="fixed left-1/2 transform -translate-x-1/2 z-20"
         style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
         onAIChat={handleAIChatToggle}
@@ -526,7 +526,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         onClose={() => setShowAIChat(false)}
       />
 
-      <InformationPopup
+      <TourInformationPopup
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
       />
