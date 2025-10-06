@@ -29,7 +29,8 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
     }
   }, [])
 
-  const toggleFullscreen = async () => {
+  const toggleFullscreen = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur() // Remove focus to prevent sticky highlight
     try {
       if (!isFullscreen) {
         await document.documentElement.requestFullscreen()
@@ -57,7 +58,7 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
               <TooltipTrigger asChild>
                 <button
                   onClick={toggleFullscreen}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation"
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   {isFullscreen ? (
                     <>
@@ -80,8 +81,8 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => console.log("start race")} // TODO: Implement race functionality in the future
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation"
+                  onClick={(e) => { e.currentTarget.blur(); console.log("start race"); }} // TODO: Implement race functionality in the future
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <img
                     src="/svg/flag.svg"
@@ -99,8 +100,8 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={onAIChat}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation"
+                  onClick={(e) => { e.currentTarget.blur(); onAIChat?.(); }}
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <Bot className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
                   <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
@@ -114,8 +115,8 @@ export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={onInfo}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation"
+                  onClick={(e) => { e.currentTarget.blur(); onInfo?.(); }}
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <Info className="flex-shrink-0 lg:w-8 lg:h-8 w-6 h-6" />
                   <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
