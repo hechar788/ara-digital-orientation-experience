@@ -5,8 +5,8 @@
  * Positioned above the control bar for easy access on mobile devices.
  */
 import React from 'react'
-import type { Photo } from '../../types/tour'
-import { DIRECTION_ANGLES } from '../../types/tour'
+import type { Photo } from '@/types/tour'
+import { DIRECTION_ANGLES } from '@/types/tour'
 
 /**
  * Props for DirectionalNavigation component
