@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { PanoramicTourControls } from '../tour/TourControls'
-import { PanoramicHotspots } from './hotspots/PanoramicHotspots' 
+import { TourControls } from '../tour/TourControls'
+import { RaceControls } from '../race/RaceControls'
+import { PanoramicHotspots } from './hotspots/PanoramicHotspots'
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
 import { AIChatPopup } from '../tour/AIChatPopup'
 import { TourInformationPopup } from '../tour/TourInformationPopup'
@@ -44,6 +45,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const [fov, setFov] = useState(initialFov)
   const [showAIChat, setShowAIChat] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [isRaceMode, setIsRaceMode] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
 
   // Check for new session (hard refresh) and show info popup
@@ -471,6 +473,14 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     setShowInfo(!showInfo)
   }
 
+  const handleStartRace = () => {
+    setIsRaceMode(true)
+  }
+
+  const handleEndRace = () => {
+    setIsRaceMode(false)
+  }
+
   const handleFovChange = (newFov: number) => {
     setFov(newFov)
     fovRef.current = newFov
@@ -514,12 +524,22 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       )}
 
 
-      <PanoramicTourControls
-        className="fixed left-1/2 transform -translate-x-1/2 z-20"
-        style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-        onAIChat={handleAIChatToggle}
-        onInfo={handleInfoToggle}
-      />
+      {isRaceMode ? (
+        <RaceControls
+          className="fixed left-1/2 transform -translate-x-1/2 z-20"
+          style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
+          onInfo={handleInfoToggle}
+          onEndRace={handleEndRace}
+        />
+      ) : (
+        <TourControls
+          className="fixed left-1/2 transform -translate-x-1/2 z-20"
+          style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
+          onAIChat={handleAIChatToggle}
+          onInfo={handleInfoToggle}
+          onStartRace={handleStartRace}
+        />
+      )}
 
       <AIChatPopup
         isOpen={showAIChat}

@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
 
-interface PanoramicTourControlsProps {
+interface TourControlsProps {
   className?: string
   style?: React.CSSProperties
   onInfo?: () => void
   onAIChat?: () => void
+  onStartRace?: () => void
 }
 
-export const PanoramicTourControls: React.FC<PanoramicTourControlsProps> = ({
+export const TourControls: React.FC<TourControlsProps> = ({
   className = '',
   style,
   onInfo,
-  onAIChat
+  onAIChat,
+  onStartRace
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -81,7 +83,7 @@ export const PanoramicTourControls: React.FC<PanoramicTourControlsProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={(e) => { e.currentTarget.blur(); console.log("start race"); }} // TODO: Implement race functionality in the future
+                  onClick={(e) => { e.currentTarget.blur(); onStartRace?.(); }}
                   className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <img
