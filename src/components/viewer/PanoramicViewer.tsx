@@ -191,17 +191,54 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Zoom handler
       const onWheel = (event: WheelEvent) => {
         event.preventDefault()
-        
+
         // Adjust FOV based on wheel direction
         fovRef.current += event.deltaY * 0.05
         fovRef.current = Math.max(10, Math.min(120, fovRef.current))
-        
+
         camera.fov = fovRef.current
         camera.updateProjectionMatrix()
-        
+
         // Update state
         setFov(fovRef.current)
         onFovChange?.(fovRef.current)
+      }
+
+      // Pinch-to-zoom handler for mobile
+      let lastTouchDistance = 0
+      const onTouchMove = (event: TouchEvent) => {
+        if (event.touches.length === 2) {
+          event.preventDefault()
+
+          // Calculate distance between two touch points
+          const touch1 = event.touches[0]
+          const touch2 = event.touches[1]
+          const dx = touch2.clientX - touch1.clientX
+          const dy = touch2.clientY - touch1.clientY
+          const distance = Math.sqrt(dx * dx + dy * dy)
+
+          if (lastTouchDistance > 0) {
+            // Calculate zoom delta based on distance change
+            const delta = lastTouchDistance - distance
+            fovRef.current += delta * 0.2
+            fovRef.current = Math.max(10, Math.min(120, fovRef.current))
+
+            camera.fov = fovRef.current
+            camera.updateProjectionMatrix()
+
+            // Update state
+            setFov(fovRef.current)
+            onFovChange?.(fovRef.current)
+          }
+
+          lastTouchDistance = distance
+        } else {
+          lastTouchDistance = 0
+        }
+      }
+
+      const onTouchEnd = () => {
+        lastTouchDistance = 0
       }
 
       // Window resize handler
@@ -222,6 +259,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       mount.addEventListener('pointerdown', onPointerDown)
       mount.addEventListener('touchstart', onPointerDown, { passive: false })
       mount.addEventListener('wheel', onWheel)
+      mount.addEventListener('touchmove', onTouchMove, { passive: false })
+      mount.addEventListener('touchend', onTouchEnd)
       window.addEventListener('resize', handleResize)
 
       // Watch for container size changes
@@ -281,6 +320,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         mount.removeEventListener('pointerdown', onPointerDown)
         mount.removeEventListener('touchstart', onPointerDown)
         mount.removeEventListener('wheel', onWheel)
+        mount.removeEventListener('touchmove', onTouchMove)
+        mount.removeEventListener('touchend', onTouchEnd)
         // Clean up any remaining document listeners
         document.removeEventListener('pointermove', onPointerMove)
         document.removeEventListener('touchmove', onPointerMove)
