@@ -1,0 +1,132 @@
+import React, { useState, useEffect } from 'react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
+
+interface PanoramicViewerControlsProps {
+  className?: string
+  style?: React.CSSProperties
+  onInfo?: () => void
+  onAIChat?: () => void
+}
+
+export const PanoramicViewerControls: React.FC<PanoramicViewerControlsProps> = ({
+  className = '',
+  style,
+  onInfo,
+  onAIChat
+}) => {
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Listen for fullscreen changes (e.g., user pressing ESC)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!isFullscreen) {
+        await document.documentElement.requestFullscreen()
+      } else {
+        await document.exitFullscreen()
+      }
+    } catch (error) {
+      console.error('Fullscreen toggle failed:', error)
+    }
+  }
+
+
+  return (
+    <TooltipProvider>
+      {/* Control Pane - Responsive */}
+      <div
+        className={`h-14 lg:h-14 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center`}
+        style={{
+          clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
+          ...style
+        }}
+      >
+        <div className="flex items-center h-full w-full">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleFullscreen}
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                >
+                  {isFullscreen ? (
+                    <>
+                      <Minimize className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                      <span className="text-xs lg:hidden whitespace-nowrap">Minimize</span>
+                    </>
+                  ) : (
+                    <>
+                      <Fullscreen className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                      <span className="text-xs lg:hidden whitespace-nowrap">Fullscreen</span>
+                    </>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:block hidden">
+                <p>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => console.log("start race")} // TODO: Implement race functionality in the future
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                >
+                  <img
+                    src="/svg/flag.svg"
+                    alt="Flag"
+                    className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5"
+                  />
+                  <span className="text-xs lg:hidden whitespace-nowrap">Start Race</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:block hidden">
+                <p>Start Race</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onAIChat}
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                >
+                  <Bot className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                  <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:block hidden">
+                <p>AI Chat</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onInfo}
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-6 lg:last:pr-8"
+                >
+                  <Info className="flex-shrink-0 lg:w-8 lg:h-8 w-6 h-6" />
+                  <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="lg:block hidden">
+                <p>Info</p>
+              </TooltipContent>
+            </Tooltip>
+        </div>
+      </div>
+    </TooltipProvider>
+  )
+}
