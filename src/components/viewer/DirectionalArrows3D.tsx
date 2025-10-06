@@ -81,8 +81,8 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
 
   // Detect mobile and calculate appropriate arrow distance (memoized to prevent dependency array issues)
   const arrowDistance = useMemo(() => {
-    const isMobile = window.innerWidth <= 768
-    return isMobile ? 5 : 4.25 // 15% further on mobile (5.25 * 1.15 ≈ 6.04)
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    return isMobile ? 5 : 4.25
   }, [])
 
   /**

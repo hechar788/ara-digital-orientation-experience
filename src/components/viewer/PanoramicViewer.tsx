@@ -111,6 +111,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       // Store scene data for cleanup
       sceneDataRef.current = { scene, camera, renderer, geometry, sphere }
 
+      // Detect mobile device for drag sensitivity
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const dragSensitivity = isMobile ? 0.35 : 0.285
+
       // Mouse control variables - camera orientation is managed by cameraControlRef
       let isMouseDown = false
       let onPointerDownPointerX = 0
@@ -147,8 +151,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
         
-        cameraControlRef.current.lon = (onPointerDownPointerX - clientX) * 0.3 + onPointerDownLon
-        cameraControlRef.current.lat = (clientY - onPointerDownPointerY) * 0.3 + onPointerDownLat
+        cameraControlRef.current.lon = (onPointerDownPointerX - clientX) * dragSensitivity + onPointerDownLon
+        cameraControlRef.current.lat = (clientY - onPointerDownPointerY) * dragSensitivity + onPointerDownLat
         cameraControlRef.current.lat = Math.max(-25, Math.min(85, cameraControlRef.current.lat))
 
         // Emit camera change for persistence
