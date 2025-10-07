@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { RaceControls } from './RaceControls'
-import { TourInformationPopup } from './RaceInformationPopup'
+import { RaceInformationPopup } from './RaceInformationPopup'
 import { RaceTimer } from './RaceTimer'
+import { RaceResults } from './RaceResults'
 import { usePopup } from '@/hooks/usePopup'
 
 /**
@@ -13,13 +14,19 @@ import { usePopup } from '@/hooks/usePopup'
  * @property className - Optional CSS class names for the controls container
  * @property style - Optional inline styles for the controls
  * @property timerClassName - Optional CSS class names for the timer positioning
- * @property onEndRace - Callback triggered when user ends race mode
+ * @property onEndRace - Callback triggered when user ends race mode and returns to orientation
+ * @property onRestart - Callback triggered when user restarts the race (parent handles navigation reset)
+ * @property areasDiscovered - Number of areas discovered during the race
+ * @property keyLocationsFound - Number of key locations found during the race
  */
 interface RaceProps {
   className?: string
   style?: React.CSSProperties
   timerClassName?: string
   onEndRace?: () => void
+  onRestart?: () => void
+  areasDiscovered?: number
+  keyLocationsFound?: number
 }
 
 /**
@@ -54,10 +61,65 @@ export const Race: React.FC<RaceProps> = ({
   className = '',
   style,
   timerClassName = '',
-  onEndRace
+  onEndRace,
+  onRestart,
+  areasDiscovered = 0,
+  keyLocationsFound = 0
 }) => {
   const info = usePopup()
-  const [isTimerPaused, setIsTimerPaused] = useState(false)
+  const results = usePopup()
+  const [isEndPopupPaused, setIsEndPopupPaused] = useState(false)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [capturedTime, setCapturedTime] = useState(0)
+
+  // Timer should be paused when end popup, results, or info popup are showing
+  const isTimerPaused = isEndPopupPaused || results.isOpen || info.isOpen
+
+  // Show race info popup every time the race starts
+  useEffect(() => {
+    info.open()
+  }, [])
+
+  /**
+   * Formats elapsed milliseconds into HH:MM:SS display format
+   */
+  const formatTime = useCallback((ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+
+    return [hours, minutes, seconds]
+      .map(val => val.toString().padStart(2, '0'))
+      .join(':')
+  }, [])
+
+  /**
+   * Handles showing results - captures current time and opens results
+   */
+  const handleShowResults = useCallback(() => {
+    setCapturedTime(elapsedTime)
+    results.open()
+  }, [elapsedTime, results])
+
+  /**
+   * Handles race restart - resets timer, shows info popup, and delegates navigation to parent
+   */
+  const handleRestart = useCallback(() => {
+    setElapsedTime(0)
+    setCapturedTime(0)
+    results.close()
+    info.open()
+    onRestart?.()
+  }, [onRestart, results, info])
+
+  /**
+   * Handles ending race and returning to orientation
+   */
+  const handleReturnToOrientation = useCallback(() => {
+    results.close()
+    onEndRace?.()
+  }, [onEndRace, results])
 
   return (
     <>
@@ -65,12 +127,12 @@ export const Race: React.FC<RaceProps> = ({
         className={className}
         style={style}
         onInfo={info.toggle}
-        onEndRace={onEndRace}
+        onShowResults={handleShowResults}
         isTimerPaused={isTimerPaused}
-        onTimerPauseChange={setIsTimerPaused}
+        onTimerPauseChange={setIsEndPopupPaused}
       />
 
-      <TourInformationPopup
+      <RaceInformationPopup
         isOpen={info.isOpen}
         onClose={info.close}
       />
@@ -78,7 +140,19 @@ export const Race: React.FC<RaceProps> = ({
       <RaceTimer
         isActive={true}
         isPaused={isTimerPaused}
+        elapsedTime={elapsedTime}
+        onTimeUpdate={setElapsedTime}
         className={timerClassName}
+      />
+
+      <RaceResults
+        isOpen={results.isOpen}
+        onClose={results.close}
+        areasDiscovered={areasDiscovered}
+        keyLocationsFound={keyLocationsFound}
+        timeTaken={formatTime(capturedTime)}
+        onRestart={handleRestart}
+        onReturnToOrientation={handleReturnToOrientation}
       />
     </>
   )

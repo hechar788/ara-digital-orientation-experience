@@ -10,6 +10,16 @@ import type { Photo, DirectionType } from '../types/tour'
 import { DIRECTION_ANGLES } from '../types/tour'
 
 /**
+ * Starting photo location for the VR tour
+ *
+ * This is the default location where users begin their tour and where
+ * they are reset to when starting/restarting The Amazing Race.
+ */
+// export const TOUR_START_PHOTO_ID = 'a-f1-north-entrance'
+export const TOUR_START_PHOTO_ID = 'n-f1-mid-7'
+
+
+/**
  * Calculates the absolute angle for a direction based on photo's startingAngle
  *
  * @param photo - Photo containing the direction and startingAngle
@@ -530,8 +540,7 @@ function calculatePreservedOrientation(
  * ```
  */
 export function useTourNavigation() {
-  // const [currentPhotoId, setCurrentPhotoId] = useState<string>('a-f1-north-entrance')
-  const [currentPhotoId, setCurrentPhotoId] = useState<string>('n-f1-mid-7')
+  const [currentPhotoId, setCurrentPhotoId] = useState<string>(TOUR_START_PHOTO_ID)
   const [isLoading, setIsLoading] = useState(false)
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)

@@ -5,6 +5,7 @@ import { Race } from '../race/Race'
 import { PanoramicHotspots } from './hotspots/PanoramicHotspots'
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
 import { Spinner } from '../ui/shadcn-io/spinner'
+import { TOUR_START_PHOTO_ID } from '../../hooks/useTourNavigation'
 import type { Photo } from '../../types/tour'
 
 interface PanoramicViewerProps {
@@ -502,12 +503,16 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
           timerClassName={timerClassName}
           onEndRace={() => setIsRaceMode(false)}
+          onRestart={() => onNavigateToPhoto?.(TOUR_START_PHOTO_ID)}
         />
       ) : (
         <Tour
           className="fixed left-1/2 transform -translate-x-1/2 z-20"
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-          onStartRace={() => setIsRaceMode(true)}
+          onStartRace={() => {
+            onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
+            setIsRaceMode(true)
+          }}
         />
       )}
     </div>

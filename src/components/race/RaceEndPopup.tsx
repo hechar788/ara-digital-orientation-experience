@@ -67,7 +67,10 @@ export const RaceEndPopup: React.FC<RaceEndPopupProps> = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button
+            onClick={onConfirm}
+            className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600"
+          >
             Confirm
           </Button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Timer as TimerIcon } from 'lucide-react'
 
 /**
@@ -8,11 +8,15 @@ import { Timer as TimerIcon } from 'lucide-react'
  *
  * @property isActive - Whether the timer is currently running
  * @property isPaused - Whether the timer should be paused (e.g., during popup display)
+ * @property elapsedTime - Current elapsed time in milliseconds (controlled from parent)
+ * @property onTimeUpdate - Callback to update elapsed time in parent component
  * @property className - Optional CSS class names for custom styling
  */
 interface RaceTimerProps {
   isActive: boolean
   isPaused?: boolean
+  elapsedTime: number
+  onTimeUpdate: (time: number) => void
   className?: string
 }
 
@@ -40,42 +44,36 @@ interface RaceTimerProps {
  * />
  * ```
  */
-export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, isPaused = false, className = '' }) => {
-  const [elapsedTime, setElapsedTime] = useState(0)
+export const RaceTimer: React.FC<RaceTimerProps> = ({
+  isActive,
+  isPaused = false,
+  elapsedTime,
+  onTimeUpdate,
+  className = ''
+}) => {
   const startTimeRef = useRef<number | null>(null)
-  const pausedTimeRef = useRef<number>(0)
   const animationFrameRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (isActive && !isPaused) {
       // Start or resume timer
-      startTimeRef.current = Date.now() - pausedTimeRef.current
+      startTimeRef.current = Date.now() - elapsedTime
 
       const updateTimer = () => {
         if (startTimeRef.current !== null) {
           const newElapsedTime = Date.now() - startTimeRef.current
-          setElapsedTime(newElapsedTime)
-          pausedTimeRef.current = newElapsedTime
+          onTimeUpdate(newElapsedTime)
           animationFrameRef.current = requestAnimationFrame(updateTimer)
         }
       }
 
       animationFrameRef.current = requestAnimationFrame(updateTimer)
-    } else if (isActive && isPaused) {
-      // Pause timer - keep the current elapsed time
+    } else if (isPaused || !isActive) {
+      // Pause or stop timer - cancel animation frame
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current)
         animationFrameRef.current = null
       }
-    } else {
-      // Stop and reset timer
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current)
-        animationFrameRef.current = null
-      }
-      startTimeRef.current = null
-      pausedTimeRef.current = 0
-      setElapsedTime(0)
     }
 
     return () => {
@@ -83,7 +81,7 @@ export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, isPaused = false
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [isActive, isPaused])
+  }, [isActive, isPaused, elapsedTime, onTimeUpdate])
 
   /**
    * Formats elapsed milliseconds into HH:MM:SS display format

@@ -4,6 +4,17 @@ import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
 import { usePopup } from '@/hooks/usePopup'
 import { RaceStartPopup } from './RaceStartPopup'
 
+/**
+ * Props for the TourControls component
+ *
+ * Defines the callback handlers and styling options for the tour control interface.
+ *
+ * @property className - Optional CSS class names for custom styling
+ * @property style - Optional inline styles for the control pane
+ * @property onInfo - Callback triggered when info button is clicked
+ * @property onAIChat - Callback triggered when AI chat button is clicked
+ * @property onStartRace - Callback triggered when user confirms race start (should navigate to race start location and switch to race mode)
+ */
 interface TourControlsProps {
   className?: string
   style?: React.CSSProperties
@@ -52,7 +63,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
     <TooltipProvider>
       {/* Control Pane - Responsive */}
       <div
-        className={`h-16 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
+        className={`h-14 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
         style={{
           clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
           ...style
