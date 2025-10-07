@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
+import { usePopup } from '@/hooks/usePopup'
+import { RaceStartPopup } from './RaceStartPopup'
 
 interface TourControlsProps {
   className?: string
@@ -18,6 +20,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
   onStartRace
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const raceStartPopup = usePopup()
 
   // Listen for fullscreen changes (e.g., user pressing ESC)
   useEffect(() => {
@@ -83,7 +86,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={(e) => { e.currentTarget.blur(); onStartRace?.(); }}
+                  onClick={(e) => { e.currentTarget.blur(); raceStartPopup.open(); }}
                   className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <img
@@ -130,6 +133,15 @@ export const TourControls: React.FC<TourControlsProps> = ({
             </Tooltip>
         </div>
       </div>
+
+      <RaceStartPopup
+        isOpen={raceStartPopup.isOpen}
+        onClose={raceStartPopup.close}
+        onConfirm={() => {
+          raceStartPopup.close()
+          onStartRace?.()
+        }}
+      />
     </TooltipProvider>
   )
 }

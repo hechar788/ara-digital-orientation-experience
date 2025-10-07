@@ -7,10 +7,12 @@ import { Timer as TimerIcon } from 'lucide-react'
  * Controls the timer's active state for race mode timing.
  *
  * @property isActive - Whether the timer is currently running
+ * @property isPaused - Whether the timer should be paused (e.g., during popup display)
  * @property className - Optional CSS class names for custom styling
  */
 interface RaceTimerProps {
   isActive: boolean
+  isPaused?: boolean
   className?: string
 }
 
@@ -38,24 +40,33 @@ interface RaceTimerProps {
  * />
  * ```
  */
-export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, className = '' }) => {
+export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, isPaused = false, className = '' }) => {
   const [elapsedTime, setElapsedTime] = useState(0)
   const startTimeRef = useRef<number | null>(null)
+  const pausedTimeRef = useRef<number>(0)
   const animationFrameRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (isActive) {
-      // Start timer
-      startTimeRef.current = Date.now() - elapsedTime
+    if (isActive && !isPaused) {
+      // Start or resume timer
+      startTimeRef.current = Date.now() - pausedTimeRef.current
 
       const updateTimer = () => {
         if (startTimeRef.current !== null) {
-          setElapsedTime(Date.now() - startTimeRef.current)
+          const newElapsedTime = Date.now() - startTimeRef.current
+          setElapsedTime(newElapsedTime)
+          pausedTimeRef.current = newElapsedTime
           animationFrameRef.current = requestAnimationFrame(updateTimer)
         }
       }
 
       animationFrameRef.current = requestAnimationFrame(updateTimer)
+    } else if (isActive && isPaused) {
+      // Pause timer - keep the current elapsed time
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
     } else {
       // Stop and reset timer
       if (animationFrameRef.current !== null) {
@@ -63,6 +74,7 @@ export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, className = '' }
         animationFrameRef.current = null
       }
       startTimeRef.current = null
+      pausedTimeRef.current = 0
       setElapsedTime(0)
     }
 
@@ -71,7 +83,7 @@ export const RaceTimer: React.FC<RaceTimerProps> = ({ isActive, className = '' }
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [isActive])
+  }, [isActive, isPaused])
 
   /**
    * Formats elapsed milliseconds into HH:MM:SS display format

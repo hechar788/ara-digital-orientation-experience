@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Fullscreen, Minimize, Pause } from 'lucide-react'
+import { usePopup } from '@/hooks/usePopup'
+import { RaceEndPopup } from './RaceEndPopup'
 
 /**
  * Props for the RaceControls component
@@ -11,12 +13,16 @@ import { Info, Fullscreen, Minimize, Pause } from 'lucide-react'
  * @property style - Optional inline styles for the control pane
  * @property onInfo - Callback triggered when info button is clicked
  * @property onEndRace - Callback triggered when end race button is clicked
+ * @property isTimerPaused - Whether the race timer is currently paused
+ * @property onTimerPauseChange - Callback to control timer pause state
  */
 interface RaceControlsProps {
   className?: string
   style?: React.CSSProperties
   onInfo?: () => void
   onEndRace?: () => void
+  isTimerPaused?: boolean
+  onTimerPauseChange?: (paused: boolean) => void
 }
 
 /**
@@ -48,9 +54,16 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
   className = '',
   style,
   onInfo,
-  onEndRace
+  onEndRace,
+  isTimerPaused,
+  onTimerPauseChange
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const raceEndPopup = usePopup()
+
+  useEffect(() => {
+    onTimerPauseChange?.(raceEndPopup.isOpen)
+  }, [raceEndPopup.isOpen, onTimerPauseChange])
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -128,7 +141,7 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={(e) => { e.currentTarget.blur(); onEndRace?.(); }}
+                onClick={(e) => { e.currentTarget.blur(); raceEndPopup.open(); }}
                 className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
               >
                 <Pause className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
@@ -141,6 +154,15 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
           </Tooltip>
         </div>
       </div>
+
+      <RaceEndPopup
+        isOpen={raceEndPopup.isOpen}
+        onClose={raceEndPopup.close}
+        onConfirm={() => {
+          raceEndPopup.close()
+          onEndRace?.()
+        }}
+      />
     </TooltipProvider>
   )
 }

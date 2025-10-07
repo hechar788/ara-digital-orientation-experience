@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { RaceControls } from './RaceControls'
 import { TourInformationPopup } from './RaceInformationPopup'
 import { RaceTimer } from './RaceTimer'
@@ -57,6 +57,7 @@ export const Race: React.FC<RaceProps> = ({
   onEndRace
 }) => {
   const info = usePopup()
+  const [isTimerPaused, setIsTimerPaused] = useState(false)
 
   return (
     <>
@@ -65,6 +66,8 @@ export const Race: React.FC<RaceProps> = ({
         style={style}
         onInfo={info.toggle}
         onEndRace={onEndRace}
+        isTimerPaused={isTimerPaused}
+        onTimerPauseChange={setIsTimerPaused}
       />
 
       <TourInformationPopup
@@ -74,6 +77,7 @@ export const Race: React.FC<RaceProps> = ({
 
       <RaceTimer
         isActive={true}
+        isPaused={isTimerPaused}
         className={timerClassName}
       />
     </>
