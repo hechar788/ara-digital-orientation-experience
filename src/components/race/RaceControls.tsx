@@ -12,7 +12,7 @@ import { RaceEndPopup } from './RaceEndPopup'
  * @property className - Optional CSS class names for custom styling
  * @property style - Optional inline styles for the control pane
  * @property onInfo - Callback triggered when info button is clicked
- * @property onEndRace - Callback triggered when end race button is clicked
+ * @property onShowResults - Callback triggered when user confirms ending race (shows results)
  * @property isTimerPaused - Whether the race timer is currently paused
  * @property onTimerPauseChange - Callback to control timer pause state
  */
@@ -20,7 +20,7 @@ interface RaceControlsProps {
   className?: string
   style?: React.CSSProperties
   onInfo?: () => void
-  onEndRace?: () => void
+  onShowResults?: () => void
   isTimerPaused?: boolean
   onTimerPauseChange?: (paused: boolean) => void
 }
@@ -54,7 +54,7 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
   className = '',
   style,
   onInfo,
-  onEndRace,
+  onShowResults,
   isTimerPaused,
   onTimerPauseChange
 }) => {
@@ -92,7 +92,7 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
   return (
     <TooltipProvider>
       <div
-        className={`h-16 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
+        className={`h-14 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
         style={{
           clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
           ...style
@@ -160,7 +160,7 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
         onClose={raceEndPopup.close}
         onConfirm={() => {
           raceEndPopup.close()
-          onEndRace?.()
+          onShowResults?.()
         }}
       />
     </TooltipProvider>

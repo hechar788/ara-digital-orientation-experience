@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
@@ -57,12 +58,16 @@ export const RaceStartPopup: React.FC<RaceStartPopupProps> = ({
       <DialogContent className="sm:max-w-md pt-8 pb-6">
         <DialogHeader className="pb-7 text-left">
           <DialogTitle className="text-xl text-left">Ready to start The Amazing Race?</DialogTitle>
+          <DialogDescription className="sr-only">Confirm to begin the race or cancel to continue the standard orientation</DialogDescription>
         </DialogHeader>
         <div className="flex flex-row justify-between items-center gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={onConfirm}>
+          <Button
+            onClick={onConfirm}
+            className="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600"
+          >
             Confirm
           </Button>
         </div>
