@@ -50,7 +50,7 @@ function App() {
                   <img
                     src="/campus_map/map.webp"
                     alt="Campus Map"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-pointer"
                   />
                 </button>
               </TooltipTrigger>
@@ -62,10 +62,10 @@ function App() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setIsMinimapOpen(false)}
-                  className="absolute top-0 right-0 w-10 h-10 bg-gray-800/80 border-2 border-gray-600 rounded-bl-lg flex items-center justify-center hover:bg-gray-700/80 text-white transition-colors"
+                  className="absolute top-0 right-0 w-10 h-10 bg-gray-800/80 border-2 border-gray-600 rounded-bl-lg flex items-center justify-center hover:bg-gray-700/80 text-white transition-colors cursor-pointer"
                   aria-label="Minimize map"
                 >
-                  <img src="/svg/map-minus.svg" alt="Minimize" className="w-5 h-5" />
+                  <img src="/svg/map-minus.svg" alt="Minimize" className="w-5 h-5 cursor-pointer" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
@@ -78,7 +78,7 @@ function App() {
             <TooltipTrigger asChild>
               <button
                 onClick={() => setIsMinimapOpen(true)}
-                className="w-62 bg-gray-800/90 px-4 py-2 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors"
+                className="w-62 bg-gray-800/90 px-4 py-2 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
                 aria-label="Open map"
               >
                 <span className="text-white text-sm font-medium">Minimap</span>
