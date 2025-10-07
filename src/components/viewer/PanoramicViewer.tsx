@@ -1,11 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
-import { TourControls } from '../tour/TourControls'
-import { RaceControls } from '../race/RaceControls'
+import { Tour } from '../tour/Tour'
+import { Race } from '../race/Race'
 import { PanoramicHotspots } from './hotspots/PanoramicHotspots'
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
-import { AIChatPopup } from '../tour/AIChatPopup'
-import { TourInformationPopup } from '../tour/TourInformationPopup'
 import { Spinner } from '../ui/shadcn-io/spinner'
 import type { Photo } from '../../types/tour'
 
@@ -24,6 +22,7 @@ interface PanoramicViewerProps {
   cameraLon?: number
   onFovChange?: (fov: number) => void
   initialFov?: number
+  timerClassName?: string
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -39,23 +38,13 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onNavigate,
   onNavigateToPhoto,
   onFovChange,
-  initialFov = 75
+  initialFov = 75,
+  timerClassName = ''
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(initialFov)
-  const [showAIChat, setShowAIChat] = useState(false)
-  const [showInfo, setShowInfo] = useState(false)
   const [isRaceMode, setIsRaceMode] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
-
-  // Check for new session (hard refresh) and show info popup
-  useEffect(() => {
-    const hasSeenInSession = sessionStorage.getItem('hasSeenInfoPopup')
-    if (!hasSeenInSession) {
-      setShowInfo(true)
-      sessionStorage.setItem('hasSeenInfoPopup', 'true')
-    }
-  }, [])
 
   // Sync FOV from parent when initialFov prop changes
   useEffect(() => {
@@ -464,23 +453,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     }
   }, [photoImage, imageUrl, initialLoadComplete])
 
-  // Handler functions for controls
-  const handleAIChatToggle = () => {
-    setShowAIChat(!showAIChat)
-  }
-
-  const handleInfoToggle = () => {
-    setShowInfo(!showInfo)
-  }
-
-  const handleStartRace = () => {
-    setIsRaceMode(true)
-  }
-
-  const handleEndRace = () => {
-    setIsRaceMode(false)
-  }
-
   const handleFovChange = (newFov: number) => {
     setFov(newFov)
     fovRef.current = newFov
@@ -525,31 +497,19 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
 
       {isRaceMode ? (
-        <RaceControls
+        <Race
           className="fixed left-1/2 transform -translate-x-1/2 z-20"
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-          onInfo={handleInfoToggle}
-          onEndRace={handleEndRace}
+          timerClassName={timerClassName}
+          onEndRace={() => setIsRaceMode(false)}
         />
       ) : (
-        <TourControls
+        <Tour
           className="fixed left-1/2 transform -translate-x-1/2 z-20"
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
-          onAIChat={handleAIChatToggle}
-          onInfo={handleInfoToggle}
-          onStartRace={handleStartRace}
+          onStartRace={() => setIsRaceMode(true)}
         />
       )}
-
-      <AIChatPopup
-        isOpen={showAIChat}
-        onClose={() => setShowAIChat(false)}
-      />
-
-      <TourInformationPopup
-        isOpen={showInfo}
-        onClose={() => setShowInfo(false)}
-      />
     </div>
   )
 }

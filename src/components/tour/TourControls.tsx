@@ -49,7 +49,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
     <TooltipProvider>
       {/* Control Pane - Responsive */}
       <div
-        className={`h-14 lg:h-14 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
+        className={`h-16 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
         style={{
           clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
           ...style
@@ -60,7 +60,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={toggleFullscreen}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   {isFullscreen ? (
                     <>
@@ -84,7 +84,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => { e.currentTarget.blur(); onStartRace?.(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <img
                     src="/svg/flag.svg"
@@ -103,7 +103,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => { e.currentTarget.blur(); onAIChat?.(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <Bot className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
                   <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
@@ -118,7 +118,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => { e.currentTarget.blur(); onInfo?.(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-4 lg:px-6 truncate first:pl-6 lg:first:pl-8 last:pr-4 lg:last:pr-8 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
                 >
                   <Info className="flex-shrink-0 lg:w-8 lg:h-8 w-6 h-6" />
                   <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
