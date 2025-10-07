@@ -8,7 +8,7 @@
  * @fileoverview Component for rendering and managing 3D hotspots in panoramic viewer
  */
 
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '../../../types/tour'
 import {
@@ -21,10 +21,21 @@ import {
   type DialogPosition
 } from './HotspotUtils'
 import { HotspotConfirmationDialog } from './HotspotConfirmationDialog'
+import { HiddenLocationFoundDialog } from '../../race/HiddenLocationFoundDialog'
 import { getAreaForPhoto } from '../../../data/tourUtilities'
+import { getHiddenLocationsForPhoto } from '../../../data/hiddenLocations'
 
 /**
  * Props for PanoramicHotspots component
+ *
+ * @property currentPhoto - Current photo with navigation hotspot data
+ * @property sceneRef - Reference to Three.js scene objects
+ * @property fov - Current field of view for scaling calculations
+ * @property onNavigate - Callback for navigation hotspot clicks
+ * @property onNavigateToPhoto - Callback for direct photo navigation
+ * @property isRaceMode - Whether race mode is currently active
+ * @property foundHiddenLocations - Set of already-found hidden location IDs
+ * @property onHiddenLocationFound - Callback when a hidden location is discovered
  */
 interface PanoramicHotspotsProps {
   currentPhoto: Photo | null
@@ -38,6 +49,9 @@ interface PanoramicHotspotsProps {
   fov: number
   onNavigate: (direction: string) => void
   onNavigateToPhoto?: (photoId: string) => void
+  isRaceMode?: boolean
+  foundHiddenLocations?: Set<string>
+  onHiddenLocationFound?: (id: string, name: string, description: string) => void
 }
 
 /**
@@ -80,19 +94,32 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   sceneRef,
   fov,
   onNavigate,
-  onNavigateToPhoto
+  onNavigateToPhoto,
+  isRaceMode = false,
+  foundHiddenLocations = new Set(),
+  onHiddenLocationFound
 }) => {
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const hotspots = currentPhoto?.hotspots || []
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
+  const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
+
+  // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
+  const hiddenLocationsForPhoto = useMemo(() => {
+    if (!isRaceMode || !currentPhoto) return []
+    return getHiddenLocationsForPhoto(currentPhoto.id).filter(loc => !foundHiddenLocations.has(loc.id))
+  }, [isRaceMode, currentPhoto?.id, foundHiddenLocations])
 
   /**
    * Create and position hotspot meshes in the scene
    */
   useEffect(() => {
-    if (!sceneRef.current || !hotspots.length) {
+    const hasNavigationHotspots = hotspots.length > 0
+    const hasHiddenLocationHotspots = hiddenLocationsForPhoto.length > 0
+
+    if (!sceneRef.current || (!hasNavigationHotspots && !hasHiddenLocationHotspots)) {
       // Clean up existing hotspots if no hotspots in current photo
-      if (hotspotsGroupRef.current) {
+      if (hotspotsGroupRef.current && sceneRef.current) {
         const sphere = sceneRef.current.sphere
         sphere.remove(hotspotsGroupRef.current)
         hotspotsGroupRef.current = null
@@ -132,7 +159,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     })
     hotspotsGroup.clear()
 
-    // Create new hotspots asynchronously
+    // Create navigation hotspots asynchronously
     hotspots.forEach(async (hotspot, index) => {
       const position = new THREE.Vector3(hotspot.position.x, hotspot.position.y, hotspot.position.z)
 
@@ -162,22 +189,59 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         }
 
         hotspotObject.userData = {
+          type: 'navigation',
           direction: hotspot.direction,
           destination: destination,
           index,
           originalPosition: position.clone()
         }
-        hotspotObject.name = `hotspot-${index}`
+        hotspotObject.name = `nav-hotspot-${index}`
 
         // Orient hotspot to face camera
         orientHotspotToCamera(hotspotObject)
 
         hotspotsGroup.add(hotspotObject)
       } catch (error) {
-        console.error(`Failed to create hotspot ${index}:`, error)
+        console.error(`Failed to create navigation hotspot ${index}:`, error)
       }
     })
-  }, [hotspots, sceneRef])
+
+    // Create hidden location hotspots asynchronously (race mode only)
+    hiddenLocationsForPhoto.forEach(async (hiddenLocation, index) => {
+      const position = new THREE.Vector3(hiddenLocation.position.x, hiddenLocation.position.y, hiddenLocation.position.z)
+
+      try {
+        const { geometry, material } = await createHotspotGeometry('hiddenLocation')
+
+        let hotspotObject: THREE.Object3D
+
+        if (geometry instanceof THREE.Group) {
+          hotspotObject = geometry
+        } else {
+          hotspotObject = new THREE.Mesh(geometry, material)
+        }
+
+        hotspotObject.position.copy(position)
+
+        hotspotObject.userData = {
+          type: 'hiddenLocation',
+          hiddenLocationId: hiddenLocation.id,
+          hiddenLocationName: hiddenLocation.name,
+          hiddenLocationDescription: hiddenLocation.description,
+          index,
+          originalPosition: position.clone()
+        }
+        hotspotObject.name = `hidden-location-${index}`
+
+        // Orient hotspot to face camera
+        orientHotspotToCamera(hotspotObject)
+
+        hotspotsGroup.add(hotspotObject)
+      } catch (error) {
+        console.error(`Failed to create hidden location hotspot ${index}:`, error)
+      }
+    })
+  }, [hotspots, hiddenLocationsForPhoto, sceneRef])
 
   /**
    * Update hotspot scaling based on camera zoom level
@@ -279,56 +343,76 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     if (intersects.length > 0) {
       const clickedObject = intersects[0].object
 
-      // Find the parent hotspot object that contains the direction data
+      // Find the parent hotspot object that contains the type data
       let hotspotObject = clickedObject
-      while (hotspotObject && !hotspotObject.userData.direction && hotspotObject.parent) {
+      while (hotspotObject && !hotspotObject.userData.type && hotspotObject.parent) {
         hotspotObject = hotspotObject.parent
       }
 
-      if (hotspotObject && hotspotObject.userData.direction) {
-        const worldPosition = hotspotObject.userData.originalPosition as THREE.Vector3
+      if (hotspotObject && hotspotObject.userData.type) {
+        const hotspotType = hotspotObject.userData.type
 
-        if (!worldPosition || !sceneRef.current) return
+        // Handle hidden location hotspot click
+        if (hotspotType === 'hiddenLocation') {
+          const hiddenLocationId = hotspotObject.userData.hiddenLocationId
+          const hiddenLocationName = hotspotObject.userData.hiddenLocationName
+          const hiddenLocationDescription = hotspotObject.userData.hiddenLocationDescription
 
-        const { camera, renderer } = sceneRef.current
-
-        const screenPos = getScreenPosition(worldPosition, camera, renderer)
-
-        if (!screenPos.isVisible) return
-
-        const dialogPos = getDialogPosition(screenPos)
-
-        const destinationId = hotspotObject.userData.destination
-        const direction = hotspotObject.userData.direction
-        const area = destinationId ? getAreaForPhoto(destinationId) : null
-
-        let navigationType: 'elevator' | 'stairs' | 'door' = 'door'
-        if (direction === 'elevator') {
-          navigationType = 'elevator'
-        } else if (direction === 'up' || direction === 'down' || direction.startsWith('floor')) {
-          navigationType = 'stairs'
-        }
-
-        let areaName = 'this location'
-        let floorLevel: number | undefined
-
-        if (area) {
-          areaName = area.name
-          if (navigationType === 'stairs' && area.floorLevel !== 0) {
-            floorLevel = area.floorLevel
+          if (hiddenLocationId && hiddenLocationName && hiddenLocationDescription) {
+            // Show congratulations dialog
+            setPendingHiddenLocation({
+              id: hiddenLocationId,
+              name: hiddenLocationName,
+              description: hiddenLocationDescription
+            })
           }
         }
+        // Handle navigation hotspot click
+        else if (hotspotType === 'navigation' && hotspotObject.userData.direction) {
+          const worldPosition = hotspotObject.userData.originalPosition as THREE.Vector3
 
-        setPendingNavigation({
-          destination: destinationId,
-          direction,
-          worldPosition,
-          screenPosition: screenPos,
-          dialogPosition: dialogPos,
-          areaName,
-          floorLevel,
-          navigationType
-        })
+          if (!worldPosition || !sceneRef.current) return
+
+          const { camera, renderer } = sceneRef.current
+
+          const screenPos = getScreenPosition(worldPosition, camera, renderer)
+
+          if (!screenPos.isVisible) return
+
+          const dialogPos = getDialogPosition(screenPos)
+
+          const destinationId = hotspotObject.userData.destination
+          const direction = hotspotObject.userData.direction
+          const area = destinationId ? getAreaForPhoto(destinationId) : null
+
+          let navigationType: 'elevator' | 'stairs' | 'door' = 'door'
+          if (direction === 'elevator') {
+            navigationType = 'elevator'
+          } else if (direction === 'up' || direction === 'down' || direction.startsWith('floor')) {
+            navigationType = 'stairs'
+          }
+
+          let areaName = 'this location'
+          let floorLevel: number | undefined
+
+          if (area) {
+            areaName = area.name
+            if (navigationType === 'stairs' && area.floorLevel !== 0) {
+              floorLevel = area.floorLevel
+            }
+          }
+
+          setPendingNavigation({
+            destination: destinationId,
+            direction,
+            worldPosition,
+            screenPosition: screenPos,
+            dialogPosition: dialogPos,
+            areaName,
+            floorLevel,
+            navigationType
+          })
+        }
       }
     }
   }, [sceneRef])
@@ -442,15 +526,39 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     }
   }, [sceneRef])
 
+  /**
+   * Handle hidden location found confirmation
+   */
+  const handleHiddenLocationClose = useCallback(() => {
+    if (pendingHiddenLocation) {
+      // Mark as found in race state
+      onHiddenLocationFound?.(
+        pendingHiddenLocation.id,
+        pendingHiddenLocation.name,
+        pendingHiddenLocation.description
+      )
+      setPendingHiddenLocation(null)
+    }
+  }, [pendingHiddenLocation, onHiddenLocationFound])
+
   return (
-    <HotspotConfirmationDialog
-      isOpen={!!pendingNavigation}
-      areaName={pendingNavigation?.areaName || ''}
-      floorLevel={pendingNavigation?.floorLevel}
-      isStairs={pendingNavigation?.navigationType || 'door'}
-      position={pendingNavigation?.dialogPosition || { x: 0, y: 0, flippedHorizontal: false }}
-      onConfirm={handleConfirmNavigation}
-      onCancel={handleCancelNavigation}
-    />
+    <>
+      <HotspotConfirmationDialog
+        isOpen={!!pendingNavigation}
+        areaName={pendingNavigation?.areaName || ''}
+        floorLevel={pendingNavigation?.floorLevel}
+        isStairs={pendingNavigation?.navigationType || 'door'}
+        position={pendingNavigation?.dialogPosition || { x: 0, y: 0, flippedHorizontal: false }}
+        onConfirm={handleConfirmNavigation}
+        onCancel={handleCancelNavigation}
+      />
+
+      <HiddenLocationFoundDialog
+        isOpen={!!pendingHiddenLocation}
+        name={pendingHiddenLocation?.name || ''}
+        description={pendingHiddenLocation?.description || ''}
+        onClose={handleHiddenLocationClose}
+      />
+    </>
   )
 }

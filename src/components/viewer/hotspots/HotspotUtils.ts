@@ -143,6 +143,58 @@ async function createFloorNumberTexture(floorNumber: number): Promise<THREE.Text
 }
 
 /**
+ * Create canvas texture with star icon for hidden locations
+ *
+ * Generates a texture with a gold star icon rendered as an SVG path
+ * on transparent background for overlay on gold sphere hotspots.
+ *
+ * @returns Promise resolving to Three.js texture with star icon
+ */
+async function createStarIconTexture(): Promise<THREE.Texture> {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')!
+
+  // Clear with transparent background
+  ctx.clearRect(0, 0, 64, 64)
+
+  // Draw a star using path
+  ctx.fillStyle = '#000000' // Black star for contrast on gold sphere
+  ctx.strokeStyle = '#000000'
+  ctx.lineWidth = 2
+
+  // Star path (5-pointed star centered at 32, 32)
+  const centerX = 32
+  const centerY = 32
+  const outerRadius = 24
+  const innerRadius = 10
+  const points = 5
+
+  ctx.beginPath()
+  for (let i = 0; i < points * 2; i++) {
+    const radius = i % 2 === 0 ? outerRadius : innerRadius
+    const angle = (i * Math.PI) / points - Math.PI / 2
+    const x = centerX + radius * Math.cos(angle)
+    const y = centerY + radius * Math.sin(angle)
+
+    if (i === 0) {
+      ctx.moveTo(x, y)
+    } else {
+      ctx.lineTo(x, y)
+    }
+  }
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+
+  // Create and return texture
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+/**
  * Create hotspot geometry and material based on direction type
  *
  * Generates appropriate 3D geometry and material for different types of
@@ -330,6 +382,51 @@ export async function createHotspotGeometry(direction: string): Promise<{
       }
     } catch (error) {
       console.warn('Failed to create floor number texture, using fallback:', error)
+      return { geometry: sphereGeometry, material: sphereMaterial }
+    }
+  }
+
+  if (direction === 'hiddenLocation') {
+    // Gold sphere with star icon for hidden locations in race mode
+    const sphereGeometry = new THREE.SphereGeometry(0.45, 16, 12)
+
+    // Create solid gold sphere material
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+      color: 0xFFD700, // Gold color (#FFD700)
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.DoubleSide
+    })
+
+    // Create a plane for the star icon that sits on top
+    try {
+      const starTexture = await createStarIconTexture()
+      const iconGeometry = new THREE.PlaneGeometry(0.4, 0.4)
+      const iconMaterial = new THREE.MeshBasicMaterial({
+        map: starTexture,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        alphaTest: 0.1 // Only render non-transparent parts
+      })
+
+      // Create meshes
+      const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+      const iconMesh = new THREE.Mesh(iconGeometry, iconMaterial)
+      iconMesh.position.z = 0.46 // Position slightly in front of sphere
+
+      // Create a group containing both the sphere and icon
+      const group = new THREE.Group()
+      group.add(sphereMesh)
+      group.add(iconMesh)
+
+      return {
+        geometry: group, // Return the group containing sphere + icon
+        material: sphereMaterial // Return sphere material as main material
+      }
+    } catch (error) {
+      console.warn('Failed to load star texture, using fallback:', error)
+      // Fallback to just the gold sphere
       return { geometry: sphereGeometry, material: sphereMaterial }
     }
   }

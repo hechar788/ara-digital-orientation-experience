@@ -6,6 +6,8 @@ import { PanoramicHotspots } from './hotspots/PanoramicHotspots'
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
 import { Spinner } from '../ui/shadcn-io/spinner'
 import { TOUR_START_PHOTO_ID } from '../../hooks/useTourNavigation'
+import { useRaceState } from '../../hooks/useRaceState'
+import { getAreaForPhoto } from '../../data/tourUtilities'
 import type { Photo } from '../../types/tour'
 
 interface PanoramicViewerProps {
@@ -46,6 +48,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const [fov, setFov] = useState(initialFov)
   const [isRaceMode, setIsRaceMode] = useState(false)
   const mountRef = useRef<HTMLDivElement>(null)
+  const raceState = useRaceState()
 
   // Sync FOV from parent when initialFov prop changes
   useEffect(() => {
@@ -58,6 +61,16 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       }
     }
   }, [initialFov])
+
+  // Track discovered areas in race mode
+  useEffect(() => {
+    if (isRaceMode && currentPhoto) {
+      const area = getAreaForPhoto(currentPhoto.id)
+      if (area) {
+        raceState.addArea(area.id)
+      }
+    }
+  }, [currentPhoto, isRaceMode, raceState.addArea])
   const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
@@ -483,6 +496,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           fov={fov}
           onNavigate={onNavigate}
           onNavigateToPhoto={onNavigateToPhoto}
+          isRaceMode={isRaceMode}
+          foundHiddenLocations={raceState.foundHiddenLocations}
+          onHiddenLocationFound={raceState.addHiddenLocation}
         />
       )}
 
@@ -503,13 +519,19 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
           timerClassName={timerClassName}
           onEndRace={() => setIsRaceMode(false)}
-          onRestart={() => onNavigateToPhoto?.(TOUR_START_PHOTO_ID)}
+          onRestart={() => {
+            raceState.reset()
+            onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
+          }}
+          areasDiscovered={raceState.discoveredAreas.size}
+          keyLocationsFound={raceState.foundHiddenLocations.size}
         />
       ) : (
         <Tour
           className="fixed left-1/2 transform -translate-x-1/2 z-20"
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
           onStartRace={() => {
+            raceState.reset()
             onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
             setIsRaceMode(true)
           }}
