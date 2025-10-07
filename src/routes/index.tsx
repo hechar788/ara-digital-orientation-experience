@@ -118,6 +118,7 @@ function App() {
         cameraLon={cameraLon}
         initialFov={currentFov}
         onFovChange={setCurrentFov}
+        timerClassName="absolute top-[94px] left-4 z-50"
       />
 
       {/* Navigation loading spinner */}
