@@ -1,0 +1,72 @@
+import React from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+
+/**
+ * Props for the RaceStartPopup component
+ *
+ * Defines the popup state and callback handlers for race start confirmation.
+ *
+ * @property isOpen - Whether the popup is currently visible
+ * @property onClose - Callback triggered when popup is closed or cancelled
+ * @property onConfirm - Callback triggered when user confirms race start
+ */
+interface RaceStartPopupProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+}
+
+/**
+ * Confirmation popup for starting The Amazing Race
+ *
+ * Displays a modal dialog asking the user to confirm they're ready to begin
+ * the race experience. Provides confirm and cancel actions.
+ *
+ * @param isOpen - Controls popup visibility state
+ * @param onClose - Handler for cancel/close actions
+ * @param onConfirm - Handler for confirmed race start
+ * @returns React component displaying race start confirmation dialog
+ *
+ * @example
+ * ```typescript
+ * const raceStart = usePopup()
+ *
+ * <RaceStartPopup
+ *   isOpen={raceStart.isOpen}
+ *   onClose={raceStart.close}
+ *   onConfirm={() => {
+ *     raceStart.close()
+ *     handleRaceStart()
+ *   }}
+ * />
+ * ```
+ */
+export const RaceStartPopup: React.FC<RaceStartPopupProps> = ({
+  isOpen,
+  onClose,
+  onConfirm
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md pt-8 pb-6">
+        <DialogHeader className="pb-7 text-left">
+          <DialogTitle className="text-xl text-left">Ready to start The Amazing Race?</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-row justify-between items-center gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={onConfirm}>
+            Confirm
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
