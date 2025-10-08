@@ -128,8 +128,30 @@ export interface NavigationHotspot {
 }
 
 /**
+ * Represents a single appearance of a hidden location in a specific photo
+ *
+ * @property photoId - ID of the photo where this appearance occurs
+ * @property position - 3D coordinates on the sphere for this specific view
+ * @property position.x - X coordinate in 3D space
+ * @property position.y - Y coordinate in 3D space
+ * @property position.z - Z coordinate in 3D space
+ */
+export interface HiddenLocationAppearance {
+  photoId: string
+  position: {
+    x: number
+    y: number
+    z: number
+  }
+}
+
+/**
  * Represents a hidden location hotspot for The Amazing Race game mode.
  * These collectible locations only appear during race mode and award points when discovered.
+ *
+ * A single hidden location can appear in multiple photos with different positions,
+ * representing the same location viewed from different vantage points. Once found
+ * in any photo, it's marked as discovered and won't appear in other photos.
  *
  * Stored centrally in hiddenLocations.ts and injected at runtime based on photoId,
  * maintaining separation of concerns from tour navigation data.
@@ -137,22 +159,13 @@ export interface NavigationHotspot {
  * @property id - Unique identifier for this hidden location
  * @property name - Display name shown in congratulations dialog (e.g., "Dean's Office")
  * @property description - Descriptive subtitle providing context about the location
- * @property photoId - ID of the photo where this hidden location should be rendered
- * @property position - 3D coordinates on the sphere (Cartesian coordinates)
- * @property position.x - X coordinate in 3D space
- * @property position.y - Y coordinate in 3D space
- * @property position.z - Z coordinate in 3D space
+ * @property appearances - Array of photo IDs and positions where this location is visible
  */
 export interface HiddenLocationHotspot {
   id: string
   name: string
   description: string
-  photoId: string
-  position: {
-    x: number  // X coordinate in 3D space
-    y: number  // Y coordinate in 3D space
-    z: number  // Z coordinate in 3D space
-  }
+  appearances: HiddenLocationAppearance[]
 }
 
 /**
