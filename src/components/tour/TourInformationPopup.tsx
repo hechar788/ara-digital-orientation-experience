@@ -89,7 +89,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                 </p>
               ))}
             </div>
-            <p className="text-base text-foreground">{activeSection.footerNote}</p>
+            <p className="mb-0 text-base text-foreground sm:mb-2">{activeSection.footerNote}</p>
             {activeSection.renderMedia ? (
               <div className="flex justify-center pt-2 sm:pt-4">{activeSection.renderMedia()}</div>
             ) : null}
