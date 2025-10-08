@@ -54,16 +54,16 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0">
+      <DialogContent className="sm:max-w-xl p-0 max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">Digital Orientation Experience</DialogTitle>
-        <div className="px-6 pt-6 pb-5 space-y-4">
+        <div className="px-6 pt-9 pb-2 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
           <div className="space-y-1">
             <p className="text-xs text-foreground uppercase tracking-wide">
               ARA Institute of Canterbury - Computing Department
             </p>
             <h2 className="text-2xl font-semibold text-foreground">Digital Orientation Experience</h2>
           </div>
-          <nav aria-label="Tour sections" className="flex flex-wrap gap-2 py-3">
+          <nav aria-label="Tour sections" className="flex flex-wrap gap-2 py-2 sm:py-3">
             {sections.map((section, index) => (
               <button
                 key={section.key}
@@ -80,9 +80,9 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
               </button>
             ))}
           </nav>
-          <div className="space-y-3.5">
+          <div className="space-y-3 sm:space-y-3.5">
             <h3 className="text-xl font-semibold text-foreground">{activeSection.heading}</h3>
-            <div className="space-y-3">
+            <div className="space-y-2.5 sm:space-y-3">
               {activeSection.paragraphs.map((paragraph) => (
                 <p key={paragraph} className="text-base leading-relaxed text-foreground">
                   {paragraph}
@@ -91,11 +91,11 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             </div>
             <p className="text-base text-foreground">{activeSection.footerNote}</p>
             {activeSection.renderMedia ? (
-              <div className="flex justify-center pt-4">{activeSection.renderMedia()}</div>
+              <div className="flex justify-center pt-2 sm:pt-4">{activeSection.renderMedia()}</div>
             ) : null}
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-4">
+        <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-3 sm:py-4">
           <button
             type="button"
             onClick={handleBack}
