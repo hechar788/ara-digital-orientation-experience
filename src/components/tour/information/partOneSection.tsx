@@ -26,7 +26,7 @@ export const partOneSection: TourInformationSection = {
     <img
       src="/ara_logos/logo_secondary_colour.svg"
       alt="ARA Institute of Canterbury secondary logo"
-      className="h-32 w-full max-w-xs object-contain"
+      className="h-24 w-full max-w-[160px] object-contain sm:h-32 sm:max-w-xs"
     />
   )
 }
