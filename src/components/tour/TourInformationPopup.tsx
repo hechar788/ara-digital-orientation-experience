@@ -82,16 +82,16 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             ))}
           </nav>
           <div className="space-y-3 sm:space-y-3.5">
-            <h3 className="text-lg font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
+            <h3 className="text-base font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
             <div className="space-y-2.5 sm:space-y-3">
               {activeSection.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
+                <p key={paragraph} className="text-xs leading-relaxed text-foreground sm:text-base">
                   {paragraph}
                 </p>
               ))}
             </div>
             <p
-              className={`text-sm text-foreground sm:text-base ${mediaContent ? 'mb-0 sm:mb-2' : 'mb-3 sm:mb-2'}`}
+              className={`text-xs text-foreground sm:text-base ${mediaContent ? 'mb-0 sm:mb-2' : 'mb-3 sm:mb-2'}`}
             >
               {activeSection.footerNote}
             </p>
