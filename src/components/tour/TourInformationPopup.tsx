@@ -56,7 +56,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-xl p-0 max-h-[90vh] overflow-y-auto">
         <DialogTitle className="sr-only">Digital Orientation Experience</DialogTitle>
-        <div className="px-6 pt-9 pb-2 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
+        <div className="px-6 pt-9 pb-0 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
           <div className="space-y-1">
             <p className="text-xs text-foreground uppercase tracking-wide">
               ARA Institute of Canterbury - Computing Department
