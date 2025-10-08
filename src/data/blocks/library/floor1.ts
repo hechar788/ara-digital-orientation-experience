@@ -91,7 +91,7 @@ export const libraryFloor1Area: Area = {
       startingAngle: 180,
       directions: {
         back: { connection: 'library-f1-3' },
-        left: { connection: 'library-f1-7' },
+        right: { connection: 'library-f1-7' },
         forward: { connection: 'library-f1-5' }
       }
     },

@@ -16,6 +16,7 @@ import {
   calculateHotspotScale,
   orientHotspotToCamera,
   getScreenPosition,
+  HIDDEN_LOCATION_SCALE_FACTOR,
   getDialogPosition,
   type ScreenPosition,
   type DialogPosition
@@ -103,12 +104,60 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const hotspots = currentPhoto?.hotspots || []
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
   const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
+  const pointerDownRef = useRef<{ x: number, y: number, active: boolean }>({
+    x: 0,
+    y: 0,
+    active: false
+  })
+  const DRAG_CLICK_THRESHOLD_PX = 8
 
   // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
   const hiddenLocationsForPhoto = useMemo(() => {
     if (!isRaceMode || !currentPhoto) return []
     return getHiddenLocationsForPhoto(currentPhoto.id).filter(loc => !foundHiddenLocations.has(loc.id))
   }, [isRaceMode, currentPhoto?.id, foundHiddenLocations])
+
+  /**
+   * Update hotspot scaling based on camera zoom level
+   */
+  const updateHotspotDisplay = useCallback(() => {
+    if (!hotspotsGroupRef.current) return
+
+    const scale = calculateHotspotScale(fov)
+    const hiddenLocationScale = scale * HIDDEN_LOCATION_SCALE_FACTOR
+
+    hotspotsGroupRef.current.children.forEach((object) => {
+      const hotspotType = object.userData?.type
+
+      object.visible = true
+      object.scale.setScalar(
+        hotspotType === 'hiddenLocation' ? hiddenLocationScale : scale
+      )
+    })
+  }, [fov])
+
+  /**
+   * Track pointer down position to differentiate drag vs. click interactions
+   */
+  const handleCanvasPointerDown = useCallback((event: PointerEvent | TouchEvent) => {
+    let clientX: number
+    let clientY: number
+
+    if ('touches' in event) {
+      if (event.touches.length === 0) return
+      clientX = event.touches[0].clientX
+      clientY = event.touches[0].clientY
+    } else {
+      clientX = event.clientX
+      clientY = event.clientY
+    }
+
+    pointerDownRef.current = {
+      x: clientX,
+      y: clientY,
+      active: true
+    }
+  }, [])
 
   /**
    * Create and position hotspot meshes in the scene
@@ -159,108 +208,134 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     })
     hotspotsGroup.clear()
 
-    // Create navigation hotspots asynchronously
-    hotspots.forEach(async (hotspot, index) => {
-      const position = new THREE.Vector3(hotspot.position.x, hotspot.position.y, hotspot.position.z)
+    let isCancelled = false
 
-      try {
-        const { geometry, material } = await createHotspotGeometry(hotspot.direction)
+    const disposeHotspotObject = (object: THREE.Object3D | null) => {
+      if (!object) return
 
-        let hotspotObject: THREE.Object3D
-
-        if (geometry instanceof THREE.Group) {
-          // For stairs hotspots that return a group (sphere + icon)
-          hotspotObject = geometry
-        } else {
-          // For regular hotspots that return geometry
-          hotspotObject = new THREE.Mesh(geometry, material)
+      if (object instanceof THREE.Mesh) {
+        object.geometry.dispose()
+        if (object.material instanceof THREE.Material) {
+          object.material.dispose()
         }
-
-        hotspotObject.position.copy(position)
-
-        let destination = hotspot.destination
-        if (!destination && currentPhoto) {
-          const directionConnection = currentPhoto.directions[hotspot.direction as keyof typeof currentPhoto.directions]
-          if (typeof directionConnection === 'string') {
-            destination = directionConnection
-          } else if (Array.isArray(directionConnection)) {
-            destination = directionConnection[0]
+      } else if (object instanceof THREE.Group) {
+        object.children.forEach(child => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose()
+            if (child.material instanceof THREE.Material) {
+              child.material.dispose()
+            }
           }
-        }
-
-        hotspotObject.userData = {
-          type: 'navigation',
-          direction: hotspot.direction,
-          destination: destination,
-          index,
-          originalPosition: position.clone()
-        }
-        hotspotObject.name = `nav-hotspot-${index}`
-
-        // Orient hotspot to face camera
-        orientHotspotToCamera(hotspotObject)
-
-        hotspotsGroup.add(hotspotObject)
-      } catch (error) {
-        console.error(`Failed to create navigation hotspot ${index}:`, error)
+        })
       }
-    })
+    }
 
-    // Create hidden location hotspots asynchronously (race mode only)
-    hiddenLocationsForPhoto.forEach(async (hiddenLocation, index) => {
-      const position = new THREE.Vector3(hiddenLocation.position.x, hiddenLocation.position.y, hiddenLocation.position.z)
+    const buildHotspots = async () => {
+      const navigationHotspots = await Promise.all(
+        hotspots.map(async (hotspot, index) => {
+          const position = new THREE.Vector3(hotspot.position.x, hotspot.position.y, hotspot.position.z)
 
-      try {
-        const { geometry, material } = await createHotspotGeometry('hiddenLocation')
+          try {
+            const { geometry, material } = await createHotspotGeometry(hotspot.direction)
 
-        let hotspotObject: THREE.Object3D
+            let hotspotObject: THREE.Object3D
 
-        if (geometry instanceof THREE.Group) {
-          hotspotObject = geometry
-        } else {
-          hotspotObject = new THREE.Mesh(geometry, material)
-        }
+            if (geometry instanceof THREE.Group) {
+              hotspotObject = geometry
+            } else {
+              hotspotObject = new THREE.Mesh(geometry, material)
+            }
 
-        hotspotObject.position.copy(position)
+            hotspotObject.position.copy(position)
 
-        hotspotObject.userData = {
-          type: 'hiddenLocation',
-          hiddenLocationId: hiddenLocation.id,
-          hiddenLocationName: hiddenLocation.name,
-          hiddenLocationDescription: hiddenLocation.description,
-          index,
-          originalPosition: position.clone()
-        }
-        hotspotObject.name = `hidden-location-${index}`
+            let destination = hotspot.destination
+            if (!destination && currentPhoto) {
+              const directionConnection = currentPhoto.directions[hotspot.direction as keyof typeof currentPhoto.directions]
+              if (typeof directionConnection === 'string') {
+                destination = directionConnection
+              } else if (Array.isArray(directionConnection)) {
+                destination = directionConnection[0]
+              }
+            }
 
-        // Orient hotspot to face camera
-        orientHotspotToCamera(hotspotObject)
+            hotspotObject.userData = {
+              type: 'navigation',
+              direction: hotspot.direction,
+              destination: destination,
+              index,
+              originalPosition: position.clone()
+            }
+            hotspotObject.name = `nav-hotspot-${index}`
 
-        hotspotsGroup.add(hotspotObject)
-      } catch (error) {
-        console.error(`Failed to create hidden location hotspot ${index}:`, error)
+            // Orient hotspot to face camera
+            orientHotspotToCamera(hotspotObject)
+
+            return hotspotObject
+          } catch (error) {
+            console.error(`Failed to create navigation hotspot ${index}:`, error)
+            return null
+          }
+        })
+      )
+
+      const hiddenHotspots = await Promise.all(
+        hiddenLocationsForPhoto.map(async (hiddenLocation, index) => {
+          const position = new THREE.Vector3(hiddenLocation.position.x, hiddenLocation.position.y, hiddenLocation.position.z)
+
+          try {
+            const { geometry, material } = await createHotspotGeometry('hiddenLocation')
+
+            let hotspotObject: THREE.Object3D
+
+            if (geometry instanceof THREE.Group) {
+              hotspotObject = geometry
+            } else {
+              hotspotObject = new THREE.Mesh(geometry, material)
+            }
+
+            hotspotObject.position.copy(position)
+
+            hotspotObject.userData = {
+              type: 'hiddenLocation',
+              hiddenLocationId: hiddenLocation.id,
+              hiddenLocationName: hiddenLocation.name,
+              hiddenLocationDescription: hiddenLocation.description,
+              index,
+              originalPosition: position.clone()
+            }
+            hotspotObject.name = `hidden-location-${index}`
+
+            // Orient hotspot to face camera
+            orientHotspotToCamera(hotspotObject)
+
+            return hotspotObject
+          } catch (error) {
+            console.error(`Failed to create hidden location hotspot ${index}:`, error)
+            return null
+          }
+        })
+      )
+
+      if (isCancelled || !hotspotsGroupRef.current) {
+        [...navigationHotspots, ...hiddenHotspots].forEach(disposeHotspotObject)
+        return
       }
-    })
-  }, [hotspots, hiddenLocationsForPhoto, sceneRef])
 
-  /**
-   * Update hotspot scaling based on camera zoom level
-   */
-  const updateHotspotDisplay = useCallback(() => {
-    if (!hotspotsGroupRef.current) return
+      [...navigationHotspots, ...hiddenHotspots]
+        .filter((object): object is THREE.Object3D => object !== null)
+        .forEach(object => {
+          hotspotsGroupRef.current!.add(object)
+        })
 
-    const scale = calculateHotspotScale(fov)
+      updateHotspotDisplay()
+    }
 
-    hotspotsGroupRef.current.children.forEach((object, index) => {
-      if (hotspots[index]) {
-        // Hotspots are always visible
-        object.visible = true
+    buildHotspots()
 
-        // Update scale based on zoom level
-        object.scale.setScalar(scale)
-      }
-    })
-  }, [hotspots, fov])
+    return () => {
+      isCancelled = true
+    }
+  }, [currentPhoto, hotspots, hiddenLocationsForPhoto, sceneRef, updateHotspotDisplay])
 
   /**
    * Update display when camera or zoom changes
@@ -324,6 +399,17 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
       clientY = event.clientY
     } else {
       return
+    }
+
+    const pointerInfo = pointerDownRef.current
+    if (pointerInfo.active) {
+      const dx = clientX - pointerInfo.x
+      const dy = clientY - pointerInfo.y
+      if ((dx * dx + dy * dy) > (DRAG_CLICK_THRESHOLD_PX * DRAG_CLICK_THRESHOLD_PX)) {
+        pointerDownRef.current.active = false
+        return
+      }
+      pointerDownRef.current.active = false
     }
 
     // Convert to normalized device coordinates
@@ -428,14 +514,18 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     // Add event listeners for both mouse and touch
     canvas.addEventListener('click', handleCanvasClick)
     canvas.addEventListener('touchend', handleCanvasClick)
+    canvas.addEventListener('pointerdown', handleCanvasPointerDown)
+    canvas.addEventListener('touchstart', handleCanvasPointerDown)
     canvas.addEventListener('mousemove', handleCanvasMouseMove)
 
     return () => {
       canvas.removeEventListener('click', handleCanvasClick)
       canvas.removeEventListener('touchend', handleCanvasClick)
+      canvas.removeEventListener('pointerdown', handleCanvasPointerDown)
+      canvas.removeEventListener('touchstart', handleCanvasPointerDown)
       canvas.removeEventListener('mousemove', handleCanvasMouseMove)
     }
-  }, [handleCanvasClick, handleCanvasMouseMove, sceneRef])
+  }, [handleCanvasClick, handleCanvasMouseMove, handleCanvasPointerDown, sceneRef])
 
   /**
    * Handle confirmation of navigation

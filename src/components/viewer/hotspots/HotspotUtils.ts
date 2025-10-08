@@ -11,6 +11,11 @@
 import * as THREE from 'three'
 
 /**
+ * Hidden location hotspots render smaller than standard navigation markers.
+ * Keep the scale factor centralized so geometry generation and runtime scaling stay in sync.
+ */
+export const HIDDEN_LOCATION_SCALE_FACTOR = 0.65
+/**
  * Cache for loaded SVG textures to avoid reloading
  */
 const textureCache = new Map<string, THREE.Texture>()

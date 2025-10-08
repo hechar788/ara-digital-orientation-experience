@@ -38,20 +38,23 @@ import type { HiddenLocationHotspot } from '../types/tour'
 export const hiddenLocations: HiddenLocationHotspot[] = [
   {
     id: 'library-study-room',
-    name: 'Secret Study Room',
-    description: 'A quiet sanctuary for focused learning',
+    name: 'The Pod',
+    description: 'A quiet computing sanctuary for focused learning.',
     appearances: [
       {
-        photoId: 'library-f1-main',
-        position: { x: -2, y: 0.5, z: 3 }
+        photoId: 'library-f1-7',
+        position: { x: 4.5, y: -0.5, z: 3 }
+      },
+      {
+        photoId: 'library-f1-6',
+        position: { x: -4.5, y: -0.5, z: 2 }
       }
-      // Add more appearances here if visible from other photos
     ]
   },
   {
-    id: 'gym-equipment',
-    name: 'Gym Equipment Storage',
-    description: 'Where all the athletic gear is kept',
+    id: 'rec-centre-hidden',
+    name: 'The Recreation Centre',
+    description: 'Home of the athletes and sporting enthusiasts.',
     appearances: [
       {
         photoId: 'gym-main',
@@ -60,9 +63,9 @@ export const hiddenLocations: HiddenLocationHotspot[] = [
     ]
   },
   {
-    id: 'rooftop-access',
-    name: 'Rooftop Access Point',
-    description: 'The gateway to stunning campus views',
+    id: 'bird-statue',
+    name: 'The Bird Statue... ?',
+    description: 'What a hoot! Now thats chirp-tacular!',
     appearances: [
       {
         photoId: 'outside-s-north-1',
@@ -70,73 +73,22 @@ export const hiddenLocations: HiddenLocationHotspot[] = [
       },
       {
         photoId: 'outside-s-north-1-aside',
-        position: { x: -3, y: 1, z: -2 }
-      }
-    ]
-  },
-  {
-    id: 'science-lab',
-    name: 'Advanced Science Lab',
-    description: 'Where scientific discoveries are made',
-    appearances: [
+        position: { x: -3.5, y: 4, z: -0.5 }
+      },
       {
-        photoId: 's-f4-mid-2',
-        position: { x: 2, y: 0, z: -3 }
-      }
-    ]
-  },
-  {
-    id: 'art-studio',
-    name: 'Creative Arts Studio',
-    description: 'A space for artistic expression and creation',
-    appearances: [
-      {
-        photoId: 'a-f2-north-1',
-        position: { x: -4, y: 0.5, z: 0 }
-      }
-    ]
-  },
-  {
-    id: 'computer-lab',
-    name: 'Innovation Computer Lab',
-    description: 'Cutting-edge technology for student projects',
-    appearances: [
-      {
-        photoId: 'x-f2-mid-3',
-        position: { x: 1, y: 0, z: 4 }
+        photoId: 'outside-s-north-1-aside-1',
+        position: { x: 6, y: 2, z: 0.65 }
       }
     ]
   },
   {
     id: 'student-lounge-hidden',
-    name: 'Hidden Student Lounge',
+    name: 'Student Lounge',
     description: 'A cozy retreat for student relaxation',
     appearances: [
       {
         photoId: 'student-lounge-main',
         position: { x: 0, y: -0.5, z: -4 }
-      }
-    ]
-  },
-  {
-    id: 'music-practice',
-    name: 'Music Practice Room',
-    description: 'Where melodies come to life',
-    appearances: [
-      {
-        photoId: 'w-f2-mid-2',
-        position: { x: -1, y: 0.5, z: 3 }
-      }
-    ]
-  },
-  {
-    id: 'historic-plaque',
-    name: 'Historic Campus Plaque',
-    description: 'A piece of campus history preserved in time',
-    appearances: [
-      {
-        photoId: 'outside-main-entrance',
-        position: { x: 3, y: -1, z: -1 }
       }
     ]
   }
