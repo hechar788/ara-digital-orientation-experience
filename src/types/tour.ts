@@ -128,6 +128,34 @@ export interface NavigationHotspot {
 }
 
 /**
+ * Represents a hidden location hotspot for The Amazing Race game mode.
+ * These collectible locations only appear during race mode and award points when discovered.
+ *
+ * Stored centrally in hiddenLocations.ts and injected at runtime based on photoId,
+ * maintaining separation of concerns from tour navigation data.
+ *
+ * @property id - Unique identifier for this hidden location
+ * @property name - Display name shown in congratulations dialog (e.g., "Dean's Office")
+ * @property description - Descriptive subtitle providing context about the location
+ * @property photoId - ID of the photo where this hidden location should be rendered
+ * @property position - 3D coordinates on the sphere (Cartesian coordinates)
+ * @property position.x - X coordinate in 3D space
+ * @property position.y - Y coordinate in 3D space
+ * @property position.z - Z coordinate in 3D space
+ */
+export interface HiddenLocationHotspot {
+  id: string
+  name: string
+  description: string
+  photoId: string
+  position: {
+    x: number  // X coordinate in 3D space
+    y: number  // Y coordinate in 3D space
+    z: number  // Z coordinate in 3D space
+  }
+}
+
+/**
  * Provides location-specific contextual information within a photo location.
  * Building name and floor level are inherited from the parent Area.
  *
