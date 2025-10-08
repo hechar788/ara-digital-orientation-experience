@@ -70,22 +70,22 @@ export const HiddenLocationFoundDialog: React.FC<HiddenLocationFoundDialogProps>
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader className="items-center text-center">
+        <DialogHeader className="items-center gap-3 text-center sm:text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
             <Star className="h-10 w-10 text-yellow-600 fill-yellow-600" />
           </div>
-          <DialogTitle className="text-2xl">
+          <DialogTitle className="text-2xl text-center sm:text-center">
             Congratulations you found <span className="font-bold">{name}</span>
           </DialogTitle>
-          <DialogDescription className="text-base pt-2">
+          <DialogDescription className="text-base pt-4 pb-4 text-center sm:text-center">
             {description}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex justify-center pt-4">
+        <div className="flex justify-center pt-2">
           <Button
             onClick={onClose}
-            className="w-full sm:w-auto px-8 bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
+            className="w-full sm:w-auto px-8 py-3 bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
             size="lg"
           >
             Close

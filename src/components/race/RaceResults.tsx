@@ -7,6 +7,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { TOTAL_HIDDEN_LOCATIONS } from '@/data/hiddenLocations'
 
 /**
  * Props for the RaceResults component
@@ -18,7 +19,6 @@ import { Button } from '@/components/ui/button'
  * @property areasDiscovered - Number of areas discovered during the race
  * @property totalAreas - Total number of areas available (default: 20)
  * @property keyLocationsFound - Number of hidden locations found during the race
- * @property totalKeyLocations - Total number of hidden locations (default: 10)
  * @property timeTaken - Formatted time string (HH:MM:SS)
  * @property onRestart - Callback triggered when user clicks restart
  * @property onReturnToOrientation - Callback triggered when user returns to orientation
@@ -29,7 +29,6 @@ interface RaceResultsProps {
   areasDiscovered: number
   totalAreas?: number
   keyLocationsFound: number
-  totalKeyLocations?: number
   timeTaken: string
   onRestart: () => void
   onReturnToOrientation: () => void
@@ -47,7 +46,6 @@ interface RaceResultsProps {
  * @param areasDiscovered - Number of areas discovered
  * @param totalAreas - Total areas available (defaults to 20)
  * @param keyLocationsFound - Number of hidden locations found
- * @param totalKeyLocations - Total hidden locations (defaults to 10)
  * @param timeTaken - Time taken formatted as HH:MM:SS
  * @param onRestart - Handler for restarting the race
  * @param onReturnToOrientation - Handler for returning to orientation tour
@@ -72,11 +70,12 @@ export const RaceResults: React.FC<RaceResultsProps> = ({
   areasDiscovered,
   totalAreas = 20,
   keyLocationsFound,
-  totalKeyLocations = 10,
   timeTaken,
   onRestart,
   onReturnToOrientation
 }) => {
+  const totalHiddenLocations = TOTAL_HIDDEN_LOCATIONS
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md pt-8 pb-6">
@@ -90,7 +89,7 @@ export const RaceResults: React.FC<RaceResultsProps> = ({
             <span className="font-medium">Areas Discovered:</span> {areasDiscovered}/{totalAreas}
           </div>
           <div className="text-lg">
-            <span className="font-medium">Hidden Locations Found:</span> {keyLocationsFound}/{totalKeyLocations}
+            <span className="font-medium">Hidden Locations Found:</span> {keyLocationsFound}/{totalHiddenLocations}
           </div>
           <div className="text-lg">
             <span className="font-medium">Time Taken:</span> {timeTaken}

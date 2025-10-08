@@ -19,15 +19,6 @@ import { nsBlockElevator } from './blocks/n_s_shared/elevator'
 import { xBlockElevator } from './blocks/x_block/elevator'
 import type { Photo, Area, Elevator } from '../types/tour'
 
-/**
- * Get all available areas in the tour system (private utility)
- *
- * Collects and returns all area definitions from all building blocks
- * and elevator systems. Used internally by public utility functions.
- *
- * @private
- * @returns Array of all area definitions and elevators
- */
 const getAllAreas = (): any[] => {
   return [
     ...aBlockAreas,
@@ -42,6 +33,20 @@ const getAllAreas = (): any[] => {
     xBlockElevator
   ]
 }
+
+/**
+ * Get all available areas in the tour system (private utility)
+ *
+ * Collects and returns all area definitions from all building blocks
+ * and elevator systems. Used internally by public utility functions.
+ *
+ * @private
+ * @returns Array of all area definitions and elevators
+ */
+export const TOTAL_TOUR_AREAS = ((): number => {
+  const areas = getAllAreas();
+  return areas.length
+})()
 
 /**
  * Find a specific photo by its ID across all areas and elevators
@@ -128,4 +133,3 @@ export const getAreaForPhoto = (photoId: string): Area | null => {
 
   return null
 }
-
