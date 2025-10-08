@@ -35,6 +35,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   const sections = tourInformationSections
   const activeSection = sections[activeIndex]
   const isLastSection = activeIndex === sections.length - 1
+  const mediaContent = activeSection.renderMedia ? activeSection.renderMedia() : null
   const handleNext = () => {
     if (isLastSection) {
       onClose()
@@ -89,10 +90,12 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                 </p>
               ))}
             </div>
-            <p className="mb-0 text-sm text-foreground sm:mb-2 sm:text-base">{activeSection.footerNote}</p>
-            {activeSection.renderMedia ? (
-              <div className="flex justify-center pt-2 sm:pt-4">{activeSection.renderMedia()}</div>
-            ) : null}
+            <p
+              className={`text-sm text-foreground sm:text-base ${mediaContent ? 'mb-0 sm:mb-2' : 'mb-3 sm:mb-2'}`}
+            >
+              {activeSection.footerNote}
+            </p>
+            {mediaContent ? <div className="flex justify-center pt-2 sm:pt-4">{mediaContent}</div> : null}
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-3 sm:py-4">
