@@ -63,7 +63,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             </p>
             <h2 className="text-2xl font-semibold text-foreground">Digital Orientation Experience</h2>
           </div>
-          <nav aria-label="Tour sections" className="flex flex-wrap gap-2 py-2 sm:py-3">
+          <nav aria-label="Tour sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-3">
             {sections.map((section, index) => (
               <button
                 key={section.key}
