@@ -61,7 +61,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             <p className="text-xs text-foreground uppercase tracking-wide">
               ARA Institute of Canterbury - Computing Department
             </p>
-            <h2 className="text-2xl font-semibold text-foreground">Digital Orientation Experience</h2>
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Digital Orientation Experience</h2>
           </div>
           <nav aria-label="Tour sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-3">
             {sections.map((section, index) => (
@@ -81,15 +81,15 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             ))}
           </nav>
           <div className="space-y-3 sm:space-y-3.5">
-            <h3 className="text-xl font-semibold text-foreground">{activeSection.heading}</h3>
+            <h3 className="text-lg font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
             <div className="space-y-2.5 sm:space-y-3">
               {activeSection.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="text-base leading-relaxed text-foreground">
+                <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
                   {paragraph}
                 </p>
               ))}
             </div>
-            <p className="mb-0 text-base text-foreground sm:mb-2">{activeSection.footerNote}</p>
+            <p className="mb-0 text-sm text-foreground sm:mb-2 sm:text-base">{activeSection.footerNote}</p>
             {activeSection.renderMedia ? (
               <div className="flex justify-center pt-2 sm:pt-4">{activeSection.renderMedia()}</div>
             ) : null}
