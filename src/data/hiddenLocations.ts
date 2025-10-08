@@ -20,86 +20,125 @@ import type { HiddenLocationHotspot } from '../types/tour'
  * These locations are strategically distributed across different buildings
  * and floors to encourage campus exploration during race mode.
  *
+ * Each hidden location can appear in multiple photos, representing different
+ * vantage points of the same location. Once found in any photo, the location
+ * is marked as discovered and won't appear in other photos.
+ *
  * Architecture:
  * - Centralized: All race data in one file
  * - Injected at runtime: PanoramicHotspots filters by currentPhoto.id
  * - State-driven: Found locations tracked in useRaceState hook
+ * - Multi-appearance: Same location visible from multiple photos
  *
  * To add a hidden location:
- * 1. Choose a photo ID from tour data
- * 2. Determine 3D position (x, y, z) on sphere
- * 3. Add entry to array below with unique id, name, description
+ * 1. Choose unique ID, name, and description
+ * 2. Add appearance entries with photoId and position (x, y, z) on sphere
+ * 3. Can add multiple appearances for the same location in different photos
  */
 export const hiddenLocations: HiddenLocationHotspot[] = [
-  {
-    id: 'dean-office',
-    name: "Dean's Office",
-    description: 'The administrative heart of the campus',
-    photoId: 'n-f1-mid-7', // Temporary - update with actual photo
-    position: { x: 3, y: 0, z: 2 } // Temporary - update with actual coordinates
-  },
   {
     id: 'library-study-room',
     name: 'Secret Study Room',
     description: 'A quiet sanctuary for focused learning',
-    photoId: 'library-f1-main',
-    position: { x: -2, y: 0.5, z: 3 }
+    appearances: [
+      {
+        photoId: 'library-f1-main',
+        position: { x: -2, y: 0.5, z: 3 }
+      }
+      // Add more appearances here if visible from other photos
+    ]
   },
   {
     id: 'gym-equipment',
     name: 'Gym Equipment Storage',
     description: 'Where all the athletic gear is kept',
-    photoId: 'gym-main',
-    position: { x: 4, y: -0.5, z: 1 }
+    appearances: [
+      {
+        photoId: 'gym-main',
+        position: { x: 4, y: -0.5, z: 1 }
+      }
+    ]
   },
   {
     id: 'rooftop-access',
     name: 'Rooftop Access Point',
     description: 'The gateway to stunning campus views',
-    photoId: 'x-f3-north-1',
-    position: { x: -3, y: 1, z: -2 }
+    appearances: [
+      {
+        photoId: 'outside-s-north-1',
+        position: { x: -5.35, y: 1.75, z: -5 }
+      },
+      {
+        photoId: 'outside-s-north-1-aside',
+        position: { x: -3, y: 1, z: -2 }
+      }
+    ]
   },
   {
     id: 'science-lab',
     name: 'Advanced Science Lab',
     description: 'Where scientific discoveries are made',
-    photoId: 's-f4-mid-2',
-    position: { x: 2, y: 0, z: -3 }
+    appearances: [
+      {
+        photoId: 's-f4-mid-2',
+        position: { x: 2, y: 0, z: -3 }
+      }
+    ]
   },
   {
     id: 'art-studio',
     name: 'Creative Arts Studio',
     description: 'A space for artistic expression and creation',
-    photoId: 'a-f2-north-1',
-    position: { x: -4, y: 0.5, z: 0 }
+    appearances: [
+      {
+        photoId: 'a-f2-north-1',
+        position: { x: -4, y: 0.5, z: 0 }
+      }
+    ]
   },
   {
     id: 'computer-lab',
     name: 'Innovation Computer Lab',
     description: 'Cutting-edge technology for student projects',
-    photoId: 'x-f2-mid-3',
-    position: { x: 1, y: 0, z: 4 }
+    appearances: [
+      {
+        photoId: 'x-f2-mid-3',
+        position: { x: 1, y: 0, z: 4 }
+      }
+    ]
   },
   {
     id: 'student-lounge-hidden',
     name: 'Hidden Student Lounge',
     description: 'A cozy retreat for student relaxation',
-    photoId: 'student-lounge-main',
-    position: { x: 0, y: -0.5, z: -4 }
+    appearances: [
+      {
+        photoId: 'student-lounge-main',
+        position: { x: 0, y: -0.5, z: -4 }
+      }
+    ]
   },
   {
     id: 'music-practice',
     name: 'Music Practice Room',
     description: 'Where melodies come to life',
-    photoId: 'w-f2-mid-2',
-    position: { x: -1, y: 0.5, z: 3 }
+    appearances: [
+      {
+        photoId: 'w-f2-mid-2',
+        position: { x: -1, y: 0.5, z: 3 }
+      }
+    ]
   },
   {
     id: 'historic-plaque',
     name: 'Historic Campus Plaque',
     description: 'A piece of campus history preserved in time',
-    photoId: 'outside-main-entrance',
-    position: { x: 3, y: -1, z: -1 }
+    appearances: [
+      {
+        photoId: 'outside-main-entrance',
+        position: { x: 3, y: -1, z: -1 }
+      }
+    ]
   }
 ]
 
@@ -109,20 +148,60 @@ export const hiddenLocations: HiddenLocationHotspot[] = [
 export const TOTAL_HIDDEN_LOCATIONS = hiddenLocations.length
 
 /**
- * Get hidden locations for a specific photo ID
+ * Hidden location with resolved position for a specific photo
  *
- * Filters the complete list of hidden locations to only those
- * that should be rendered in the specified photo.
+ * Flattened structure used by rendering system, containing the location
+ * metadata along with the specific position for the current photo.
+ *
+ * @property id - Unique identifier for the hidden location
+ * @property name - Display name for the location
+ * @property description - Descriptive text about the location
+ * @property position - 3D position specific to this photo view
+ */
+export interface HiddenLocationForPhoto {
+  id: string
+  name: string
+  description: string
+  position: {
+    x: number
+    y: number
+    z: number
+  }
+}
+
+/**
+ * Get hidden locations visible in a specific photo
+ *
+ * Filters the complete list of hidden locations to only those with
+ * appearances in the specified photo, and returns them with the
+ * position specific to that photo view.
  *
  * @param photoId - ID of the current photo
- * @returns Array of hidden locations for this photo
+ * @returns Array of hidden locations visible in this photo with resolved positions
  *
  * @example
  * ```typescript
- * const locations = getHiddenLocationsForPhoto('n-f1-mid-7')
- * // Returns: [{ id: 'dean-office', ... }]
+ * const locations = getHiddenLocationsForPhoto('library-f1-main')
+ * // Returns: [{ id: 'library-study-room', name: '...', position: { x, y, z } }]
  * ```
  */
-export function getHiddenLocationsForPhoto(photoId: string): HiddenLocationHotspot[] {
-  return hiddenLocations.filter(location => location.photoId === photoId)
+export function getHiddenLocationsForPhoto(photoId: string): HiddenLocationForPhoto[] {
+  const result: HiddenLocationForPhoto[] = []
+
+  for (const location of hiddenLocations) {
+    // Find if this location has an appearance in the current photo
+    const appearance = location.appearances.find(app => app.photoId === photoId)
+
+    if (appearance) {
+      // Add the location with its position specific to this photo
+      result.push({
+        id: location.id,
+        name: location.name,
+        description: location.description,
+        position: appearance.position
+      })
+    }
+  }
+
+  return result
 }
