@@ -12,7 +12,7 @@ import type { ReactNode } from 'react'
  * @property footerNote - Supporting note displayed after the paragraphs (`string`)
  * @property renderMedia - Optional factory returning additional JSX (for example, an image component)
  */
-export interface TourInformation {
+export interface Information {
   key: string
   tabLabel: string
   heading: string
