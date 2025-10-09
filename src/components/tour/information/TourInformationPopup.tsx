@@ -49,7 +49,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
       : 'mb-3 sm:mb-2'
   const isRaceSection = activeSection.key === 'race'
   const mediaWrapperClass = isDocumentsSection
-    ? 'flex justify-center pt-2 sm:pt-6'
+    ? 'flex justify-center pt-1 sm:pt-6'
     : isRaceSection
       ? 'flex justify-center -mt-3 sm:mt-1'
       : isIntroductionSection
@@ -126,7 +126,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             <button
               type="button"
               onClick={handleBack}
-              className="rounded-sm bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/80"
+              className="rounded-sm bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/80 cursor-pointer"
             >
               Back
             </button>
@@ -144,7 +144,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
           <button
             type="button"
             onClick={handleNext}
-            className="rounded-sm bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90"
+            className="rounded-sm bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 cursor-pointer"
           >
             {isLastSection ? 'Finish' : 'Next'}
           </button>
