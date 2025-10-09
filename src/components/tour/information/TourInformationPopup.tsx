@@ -44,12 +44,12 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
     ? 'mb-0'
     : mediaContent
       ? isDocumentsSection
-        ? 'mb-4 sm:mb-5'
+        ? 'mb-2 sm:mb-2'
         : 'mb-0 sm:mb-2'
       : 'mb-3 sm:mb-2'
   const isRaceSection = activeSection.key === 'race'
   const mediaWrapperClass = isDocumentsSection
-    ? 'flex justify-center pt-2 sm:pt-4'
+    ? 'flex justify-center pt-1 sm:pt-6'
     : isRaceSection
       ? 'flex justify-center -mt-3 sm:mt-1'
       : isIntroductionSection
@@ -74,7 +74,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 max-h-[97.5vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl p-0 max-h-[98.5vh] overflow-y-auto">
         <DialogTitle className="sr-only">Digital Orientation Experience</DialogTitle>
         <DialogDescription className="sr-only">
           Interactive campus tour with navigation and information sections
@@ -126,7 +126,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             <button
               type="button"
               onClick={handleBack}
-              className="rounded-sm bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/80"
+              className="rounded-sm bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/80 cursor-pointer"
             >
               Back
             </button>
@@ -144,7 +144,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
           <button
             type="button"
             onClick={handleNext}
-            className="rounded-sm bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90"
+            className="rounded-sm bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-foreground/90 cursor-pointer"
           >
             {isLastSection ? 'Finish' : 'Next'}
           </button>
