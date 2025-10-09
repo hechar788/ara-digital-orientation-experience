@@ -1,6 +1,6 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { tourInformationSections } from '.'
+import { tourInformationSections } from './parts'
 
 /**
  * Configuration options for rendering the tour information popup component.

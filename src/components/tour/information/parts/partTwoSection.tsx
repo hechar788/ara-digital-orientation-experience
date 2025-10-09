@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react'
-import type { TourInformation } from './tourInformation'
+import type { Information } from '../../../types/information'
 
 const documentLinks = [
   {
@@ -25,7 +25,7 @@ const documentLinks = [
  * const section = partTwoSection
  * ```
  */
-export const partTwoSection: TourInformation = {
+export const partTwoSection: Information = {
   key: 'documents',
   tabLabel: 'Part 2: Documents',
   heading: 'Get access to campus documents',

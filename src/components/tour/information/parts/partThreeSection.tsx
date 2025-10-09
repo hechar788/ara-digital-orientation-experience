@@ -1,4 +1,4 @@
-import type { TourInformation } from './tourInformation'
+import type { Information } from '../../../types/information'
 
 /**
  * Shares the Amazing Race overview for the final tab of the digital orientation popup.
@@ -10,7 +10,7 @@ import type { TourInformation } from './tourInformation'
  * const section = partThreeSection
  * ```
  */
-export const partThreeSection: TourInformation = {
+export const partThreeSection: Information = {
   key: 'race',
   tabLabel: 'Part 3: Amazing Race',
   heading: 'The Amazing Race',
