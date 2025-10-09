@@ -48,7 +48,7 @@ interface RaceStartPopupProps {
  * />
  * ```
  */
-export const RaceStartPopup: React.FC<RaceStartPopupProps> = ({
+export const RaceStartConfirmationPopup: React.FC<RaceStartPopupProps> = ({
   isOpen,
   onClose,
   onConfirm
