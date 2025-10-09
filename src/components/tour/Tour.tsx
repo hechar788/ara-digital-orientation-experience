@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { TourControls } from './TourControls'
 import { AIChatPopup } from './AIChatPopup'
-import { TourInformationPopup } from './TourInformationPopup'
+import { TourInformationPopup } from './information/TourInformationPopup'
 import { usePopup } from '@/hooks/usePopup'
 
 /**
