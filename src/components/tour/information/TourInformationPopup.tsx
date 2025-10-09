@@ -1,6 +1,6 @@
 import React from 'react'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { tourInformationSections } from './information'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { tourInformationSections } from '.'
 
 /**
  * Configuration options for rendering the tour information popup component.
@@ -35,7 +35,21 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   const sections = tourInformationSections
   const activeSection = sections[activeIndex]
   const isLastSection = activeIndex === sections.length - 1
+  const isDocumentsSection = activeSection.key === 'documents'
+  const isIntroductionSection = activeSection.key === 'introduction'
   const mediaContent = activeSection.renderMedia ? activeSection.renderMedia() : null
+  const footerNote = activeSection.footerNote ?? ''
+  const shouldRenderFooterNote = footerNote.trim().length > 0
+  const footnoteSpacingClass = isIntroductionSection
+    ? 'mb-0'
+    : mediaContent
+      ? isDocumentsSection
+        ? 'mb-4 sm:mb-5'
+        : 'mb-0 sm:mb-2'
+      : 'mb-3 sm:mb-2'
+  const mediaWrapperClass = isDocumentsSection
+    ? 'flex justify-center pt-2 sm:pt-4'
+    : 'flex justify-center -mt-3 sm:-mt-3.5'
   const handleNext = () => {
     if (isLastSection) {
       onClose()
@@ -55,8 +69,11 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl p-0 max-h-[95vh] overflow-y-auto">
         <DialogTitle className="sr-only">Digital Orientation Experience</DialogTitle>
+        <DialogDescription className="sr-only">
+          Interactive campus tour with navigation and information sections
+        </DialogDescription>
         <div className="px-6 pt-9 pb-0 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
           <div className="space-y-1">
             <p className="text-xs text-foreground uppercase tracking-wide">
@@ -64,6 +81,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             </p>
             <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Digital Orientation Experience</h2>
           </div>
+          <hr className="border-t border-border" />
           <nav aria-label="Tour sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-3">
             {sections.map((section, index) => (
               <button
@@ -84,18 +102,16 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
           <div className="space-y-3 sm:space-y-3.5">
             <h3 className="text-base font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
             <div className="space-y-2.5 sm:space-y-3">
-              {activeSection.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="text-xs leading-relaxed text-foreground sm:text-base">
+              {activeSection.paragraphs.map((paragraph: string) => (
+                <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
                   {paragraph}
                 </p>
               ))}
             </div>
-            <p
-              className={`text-xs text-foreground sm:text-base ${mediaContent ? 'mb-0 sm:mb-2' : 'mb-3 sm:mb-2'}`}
-            >
-              {activeSection.footerNote}
-            </p>
-            {mediaContent ? <div className="flex justify-center pt-2 sm:pt-4">{mediaContent}</div> : null}
+            {shouldRenderFooterNote ? (
+              <p className={`text-sm text-foreground sm:text-base ${footnoteSpacingClass}`}>{footerNote}</p>
+            ) : null}
+            {mediaContent ? <div className={mediaWrapperClass}>{mediaContent}</div> : null}
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-3 sm:py-4">

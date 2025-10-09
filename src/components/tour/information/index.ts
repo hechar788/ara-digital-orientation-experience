@@ -1,7 +1,7 @@
 import { partOneSection } from './partOneSection'
 import { partTwoSection } from './partTwoSection'
 import { partThreeSection } from './partThreeSection'
-import type { TourInformationSection } from './tourInformationSection'
+import type { TourInformation } from './tourInformation'
 
 /**
  * Ordered collection of tour sections rendered by the popup component.
@@ -13,7 +13,7 @@ import type { TourInformationSection } from './tourInformationSection'
  * const sections = tourInformationSections
  * ```
  */
-export const tourInformationSections: TourInformationSection[] = [
+export const tourInformationSections: TourInformation[] = [
   partOneSection,
   partTwoSection,
   partThreeSection
@@ -22,4 +22,4 @@ export const tourInformationSections: TourInformationSection[] = [
 /**
  * Re-exports the section interface for consumers that configure custom sections.
  */
-export type { TourInformationSection } from './tourInformationSection'
+export type { TourInformation } from './tourInformation'

@@ -1,5 +1,4 @@
-import React from 'react'
-import type { TourInformationSection } from './tourInformationSection'
+import type { TourInformation } from './tourInformation'
 
 /**
  * Provides the introductory section for the digital orientation popup, including branding and overview copy.
@@ -11,7 +10,7 @@ import type { TourInformationSection } from './tourInformationSection'
  * const section = partOneSection
  * ```
  */
-export const partOneSection: TourInformationSection = {
+export const partOneSection: TourInformation = {
   key: 'introduction',
   tabLabel: 'Part 1: Introduction',
   heading: 'Welcome to Orientation',
