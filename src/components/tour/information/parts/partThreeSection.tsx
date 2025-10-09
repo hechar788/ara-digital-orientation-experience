@@ -1,4 +1,4 @@
-import type { Information } from '../../../types/information'
+import type { Information } from "@/types/information";
 
 /**
  * Shares the Amazing Race overview for the final tab of the digital orientation popup.
@@ -20,7 +20,7 @@ export const partThreeSection: Information = {
   ],
   footerNote: '',
   renderMedia: () => (
-    <div className="flex w-full flex-col gap-2 sm:gap-4">
+    <div className="flex w-full flex-col gap-2 sm:gap-4 mt-1">
       <div className="flex justify-center">
         <div className="flex max-w-[90px] flex-col items-center rounded-sm bg-foreground px-3 py-2 text-center text-background shadow-sm sm:max-w-[135px] sm:px-4 sm:py-3">
           <img

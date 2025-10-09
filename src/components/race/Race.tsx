@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { RaceControls } from './RaceControls'
-import { RaceInformationPopup } from './RaceInformationPopup'
+import { RaceInformationPopup } from './information/RaceInformationPopup'
 import { RaceTimer } from './RaceTimer'
 import { RaceResults } from './RaceResults'
 import { usePopup } from '@/hooks/usePopup'
