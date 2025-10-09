@@ -47,9 +47,14 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
         ? 'mb-4 sm:mb-5'
         : 'mb-0 sm:mb-2'
       : 'mb-3 sm:mb-2'
+  const isRaceSection = activeSection.key === 'race'
   const mediaWrapperClass = isDocumentsSection
     ? 'flex justify-center pt-2 sm:pt-4'
-    : 'flex justify-center -mt-3 sm:-mt-3.5'
+    : isRaceSection
+      ? 'flex justify-center -mt-3 sm:mt-1'
+      : isIntroductionSection
+        ? 'flex justify-center -mt-3 sm:mt-8.5'
+        : 'flex justify-center -mt-3 sm:-mt-3.5'
   const handleNext = () => {
     if (isLastSection) {
       onClose()
@@ -69,7 +74,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 max-h-[95vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl p-0 max-h-[97.5vh] overflow-y-auto">
         <DialogTitle className="sr-only">Digital Orientation Experience</DialogTitle>
         <DialogDescription className="sr-only">
           Interactive campus tour with navigation and information sections
@@ -115,18 +120,17 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-3 sm:py-4">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={activeIndex === 0}
-            className={`rounded-sm px-4 py-2 text-sm font-medium transition ${
-              activeIndex === 0
-                ? 'bg-muted text-muted-foreground cursor-not-allowed opacity-60'
-                : 'bg-muted text-foreground hover:bg-muted/80'
-            }`}
-          >
-            Back
-          </button>
+          {activeIndex === 0 ? (
+            <div className="px-4 py-2" />
+          ) : (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="rounded-sm bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/80"
+            >
+              Back
+            </button>
+          )}
           <div className="flex items-center gap-2" aria-hidden="true">
             {sections.map((section, index) => (
               <span

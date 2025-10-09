@@ -20,18 +20,20 @@ export const partThreeSection: TourInformation = {
   ],
   footerNote: '',
   renderMedia: () => (
-    <div className="flex w-full flex-col items-center gap-6 sm:gap-7">
-      <div className="flex w-full max-w-[180px] flex-col items-center rounded-sm bg-foreground px-6 py-5 text-center text-background shadow-sm sm:max-w-[200px]">
-        <img
-          src="/svg/flag.svg"
-          alt="Checkered flag icon representing The Amazing Race challenge"
-          className="h-10 w-10 object-contain sm:h-12 sm:w-12"
-        />
-        <span className="mt-3 text-sm font-semibold uppercase tracking-wide">Amazing Race</span>
+    <div className="flex w-full flex-col gap-2 sm:gap-4">
+      <div className="flex justify-center">
+        <div className="flex max-w-[90px] flex-col items-center rounded-sm bg-foreground px-3 py-2 text-center text-background shadow-sm sm:max-w-[135px] sm:px-4 sm:py-3">
+          <img
+            src="/svg/flag.svg"
+            alt="Checkered flag icon representing The Amazing Race challenge"
+            className="h-6 w-6 object-contain sm:h-8 sm:w-8"
+          />
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide sm:mt-2 sm:text-xs">Start Race</span>
+        </div>
       </div>
-      <div className="w-full max-w-md space-y-3 text-left">
+      <div className="w-full space-y-1.5 sm:space-y-2">
         <h4 className="text-sm font-semibold text-foreground sm:text-base">How it works</h4>
-        <ul className="list-disc space-y-2 pl-5 text-sm text-foreground sm:text-base">
+        <ul className="list-disc space-y-1 pl-5 text-sm text-foreground sm:space-y-1.5 sm:text-base">
           <li>Follow clues to find different campus locations</li>
           <li>Learn about student services at each stop</li>
           <li>Unlock areas as you explore</li>

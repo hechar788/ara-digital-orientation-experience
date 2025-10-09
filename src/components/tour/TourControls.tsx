@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
 import { usePopup } from '@/hooks/usePopup'
-import { RaceStartPopup } from './RaceStartPopup'
+import { RaceStartConfirmationPopup } from './RaceStartConfirmationPopup'
 
 /**
  * Props for the TourControls component
@@ -145,7 +145,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
         </div>
       </div>
 
-      <RaceStartPopup
+      <RaceStartConfirmationPopup
         isOpen={raceStartPopup.isOpen}
         onClose={raceStartPopup.close}
         onConfirm={() => {
