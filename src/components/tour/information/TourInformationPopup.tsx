@@ -79,10 +79,11 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
         <DialogDescription className="sr-only">
           Interactive campus tour with navigation and information sections
         </DialogDescription>
-        <div className="px-6 pt-9 pb-0 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
+        <div className="px-6 pt-6 pb-0 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
           <div className="space-y-1">
             <p className="text-xs text-foreground uppercase tracking-wide">
-              ARA Institute of Canterbury - Computing Department
+              <span className="sm:hidden">ARA Institute of Canterbury - Computing</span>
+              <span className="hidden sm:inline">ARA Institute of Canterbury - Computing Department</span>
             </p>
             <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Digital Orientation Experience</h2>
           </div>
@@ -93,7 +94,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                 key={section.key}
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                className={`rounded-sm border px-3 py-1.5 text-xs font-medium transition ${
+                className={`rounded-sm border px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
                   activeIndex === index
                     ? 'border-border bg-muted text-foreground'
                     : 'border-border/70 bg-background text-muted-foreground hover:bg-muted/50'
