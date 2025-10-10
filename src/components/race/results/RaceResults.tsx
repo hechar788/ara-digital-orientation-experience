@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TOTAL_HIDDEN_LOCATIONS } from '@/data/hiddenLocations'
-import { TOTAL_TOUR_AREAS } from '@/data/tourUtilities'
+import { TOTAL_TOUR_AREAS } from '@/data/blockUtils'
 
 /**
  * Props for the RaceResults component

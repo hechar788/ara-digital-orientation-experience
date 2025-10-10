@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } fr
 import { usePopup } from '../../hooks/usePopup'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
-import { TOTAL_TOUR_AREAS } from '../../data/tourUtilities'
+import { TOTAL_TOUR_AREAS } from '../../data/blockUtils'
 import type { Area } from '../../types/tour'
 
 /**

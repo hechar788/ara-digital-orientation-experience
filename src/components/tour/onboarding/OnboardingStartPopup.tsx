@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { SkipOnboardingPopup } from './SkipOnboardingPopup'
 
 /**
  * Props controlling the completion dialog that appears after the information tour wraps up.
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
  * @property isOpen - Indicates whether the dialog should be visible (`true`) or hidden (`false`)
  * @property onSkip - Handler fired when the user selects Skip Tutorial; expected to close the dialog and resume normal tour mode
  */
-export interface OnboardingStartDialogProps {
+export interface OnboardingStartPopupProps {
   isOpen: boolean
   onSkip: () => void
 }
@@ -30,11 +31,26 @@ export interface OnboardingStartDialogProps {
  * <TourCompletionDialog isOpen={isCompletionOpen} onSkip={handleSkip} />
  * ```
  */
-export const OnboardingStartDialog: React.FC<OnboardingStartDialogProps> = ({ isOpen, onSkip }) => {
+export const OnboardingStartPopup: React.FC<OnboardingStartPopupProps> = ({ isOpen, onSkip }) => {
+  const [isSkipPopupOpen, setIsSkipPopupOpen] = useState(false)
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       onSkip()
     }
+  }
+
+  const handleSkipClick = () => {
+    setIsSkipPopupOpen(true)
+  }
+
+  const handleSkipConfirm = () => {
+    setIsSkipPopupOpen(false)
+    onSkip()
+  }
+
+  const handleSkipCancel = () => {
+    setIsSkipPopupOpen(false)
   }
 
   return (
@@ -68,8 +84,8 @@ export const OnboardingStartDialog: React.FC<OnboardingStartDialogProps> = ({ is
           <div className="flex w-full flex-col gap-3 sm:gap-3.5">
             <button
               type="button"
-              onClick={onSkip}
-              className="w-full rounded-sm bg-muted px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted/80 cursor-pointer sm:text-base"
+              onClick={handleSkipClick}
+              className="group flex w-full items-center justify-center gap-2 rounded-sm border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted/60 cursor-pointer sm:text-base"
             >
               Skip Tutorial
             </button>
@@ -84,6 +100,11 @@ export const OnboardingStartDialog: React.FC<OnboardingStartDialogProps> = ({ is
           </div>
         </div>
       </DialogContent>
+      <SkipOnboardingPopup
+        isOpen={isSkipPopupOpen}
+        onClose={handleSkipCancel}
+        onConfirm={handleSkipConfirm}
+      />
     </Dialog>
   )
 }

@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
  * @property onClose - Callback triggered when popup is closed or cancelled
  * @property onConfirm - Callback triggered when user confirms race end
  */
-interface RaceEndPopupProps {
+interface RaceEndConfirmationPopupProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
@@ -49,7 +49,7 @@ interface RaceEndPopupProps {
  * />
  * ```
  */
-export const RaceEndPopup: React.FC<RaceEndPopupProps> = ({
+export const RaceEndConfirmationPopup: React.FC<RaceEndConfirmationPopupProps> = ({
   isOpen,
   onClose,
   onConfirm
