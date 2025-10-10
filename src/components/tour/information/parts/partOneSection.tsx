@@ -21,17 +21,11 @@ export const partOneSection: Information = {
   ],
   footerNote:
     'Everything here will remain accessible throughout your studies, so you can return whenever you need a refresher.',
-  renderMedia: () => {
-    if (typeof window !== 'undefined' && window.innerHeight < 800) {
-      return null
-    }
-
-    return (
-      <img
-        src="/ara_logos/logo_secondary_colour.svg"
-        alt="ARA Institute of Canterbury secondary logo"
-        className="h-24 w-full max-w-[160px] object-contain sm:h-32 sm:max-w-xs"
-      />
-    )
-  }
+  renderMedia: () => (
+    <img
+      src="/ara_logos/logo_secondary_colour.svg"
+      alt="ARA Institute of Canterbury secondary logo"
+      className="hide-logo-on-short-screen mt-3 h-24 w-full max-w-[160px] object-contain sm:mt-0 sm:h-32 sm:max-w-xs"
+    />
+  )
 }

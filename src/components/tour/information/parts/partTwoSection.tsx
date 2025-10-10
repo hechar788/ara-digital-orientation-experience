@@ -34,7 +34,7 @@ export const partTwoSection: Information = {
   ],
   footerNote: 'Select any document to open the latest version in a new tab.',
   renderMedia: () => (
-    <ul className="flex w-full flex-col gap-2 sm:gap-2.5" role="list">
+    <ul className="flex w-full flex-col gap-2 py-3 sm:gap-2.5 sm:py-1" role="list">
       {documentLinks.map((document) => (
         <li key={document.id}>
           <a
