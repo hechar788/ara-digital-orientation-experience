@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TOTAL_HIDDEN_LOCATIONS } from '@/data/hiddenLocations'
+import { TOTAL_TOUR_AREAS } from '@/data/tourUtilities'
 
 /**
  * Props for the RaceResults component
@@ -17,7 +18,6 @@ import { TOTAL_HIDDEN_LOCATIONS } from '@/data/hiddenLocations'
  * @property isOpen - Whether the results popup is currently visible
  * @property onClose - Callback triggered when popup is closed
  * @property areasDiscovered - Number of areas discovered during the race
- * @property totalAreas - Total number of areas available (default: 20)
  * @property keyLocationsFound - Number of hidden locations found during the race
  * @property timeTaken - Formatted time string (HH:MM:SS)
  * @property onRestart - Callback triggered when user clicks restart
@@ -27,7 +27,6 @@ interface RaceResultsProps {
   isOpen: boolean
   onClose: () => void
   areasDiscovered: number
-  totalAreas?: number
   keyLocationsFound: number
   timeTaken: string
   onRestart: () => void
@@ -44,7 +43,6 @@ interface RaceResultsProps {
  * @param isOpen - Controls popup visibility state
  * @param onClose - Handler for closing the popup
  * @param areasDiscovered - Number of areas discovered
- * @param totalAreas - Total areas available (defaults to 20)
  * @param keyLocationsFound - Number of hidden locations found
  * @param timeTaken - Time taken formatted as HH:MM:SS
  * @param onRestart - Handler for restarting the race
@@ -68,12 +66,12 @@ export const RaceResults: React.FC<RaceResultsProps> = ({
   isOpen,
   onClose,
   areasDiscovered,
-  totalAreas = 20,
   keyLocationsFound,
   timeTaken,
   onRestart,
   onReturnToOrientation
 }) => {
+  const totalAreas = TOTAL_TOUR_AREAS
   const totalHiddenLocations = TOTAL_HIDDEN_LOCATIONS
 
   return (
