@@ -27,7 +27,7 @@ import type { HiddenLocationHotspot } from '../types/tour'
  * Architecture:
  * - Centralized: All race data in one file
  * - Injected at runtime: PanoramicHotspots filters by currentPhoto.id
- * - State-driven: Found locations tracked in useRaceState hook
+ * - State-driven: Found locations tracked in explorationStore (via useExplorationStore hook)
  * - Multi-appearance: Same location visible from multiple photos
  *
  * To add a hidden location:
