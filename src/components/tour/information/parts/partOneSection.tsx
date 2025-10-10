@@ -1,4 +1,4 @@
-import type { Information } from '../../../types/information'
+import type { Information } from "@/types/information"
 
 /**
  * Provides the introductory section for the digital orientation popup, including branding and overview copy.
