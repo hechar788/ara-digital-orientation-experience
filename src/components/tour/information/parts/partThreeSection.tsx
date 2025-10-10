@@ -21,7 +21,16 @@ export const partThreeSection: Information = {
   footerNote: '',
   renderMedia: () => (
     <div className="flex w-full flex-col gap-2 sm:gap-4 mt-3 sm:mt-1.5">
-      <div className="flex justify-center">
+      <style>
+        {`
+          @media (max-height: 717.5px) {
+            .hide-on-short-screen {
+              display: none;
+            }
+          }
+        `}
+      </style>
+      <div className="flex justify-center hide-on-short-screen">
         <div className="flex max-w-[90px] flex-col items-center rounded-sm bg-foreground px-3 py-2 text-center text-background shadow-sm sm:max-w-[135px] sm:px-4 sm:py-3">
           <img
             src="/svg/flag.svg"
