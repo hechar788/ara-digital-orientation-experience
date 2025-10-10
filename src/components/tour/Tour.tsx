@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { TourControls } from './menu/TourControls'
-import { AIChatPopup } from './AIChatPopup'
+import { AIChatPopup } from './chat/AIChatPopup'
 import { TourInformationPopup } from './information/TourInformationPopup'
 import { usePopup } from '@/hooks/usePopup'
 
