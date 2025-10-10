@@ -41,7 +41,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   const footerNote = activeSection.footerNote ?? ''
   const shouldRenderFooterNote = footerNote.trim().length > 0
   const footnoteSpacingClass = isIntroductionSection
-    ? 'mb-0'
+    ? 'mb-0 pb-2 sm:pb-0'
     : mediaContent
       ? isDocumentsSection
         ? 'mb-2 sm:mb-2'
