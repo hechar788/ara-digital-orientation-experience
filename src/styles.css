@@ -151,3 +151,17 @@ code {
     }
   }
 }
+
+@layer utilities {
+  @media (max-height: 717.5px) {
+    .hide-on-short-screen {
+      display: none;
+    }
+  }
+
+  @media (max-height: 797px) {
+    .hide-logo-on-short-screen {
+      display: none;
+    }
+  }
+}
