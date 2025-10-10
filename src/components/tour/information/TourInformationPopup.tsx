@@ -2,7 +2,7 @@ import React from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { usePopup } from '@/hooks/usePopup'
 import { tourInformationSections } from './parts'
-import { OnboardingStartDialog } from '../onboarding/OnboardingStartDialog'
+import { OnboardingStartPopup } from '../onboarding/OnboardingStartPopup'
 
 /**
  * Configuration options for rendering the tour information popup component.
@@ -160,7 +160,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
         </DialogContent>
       </Dialog>
 
-      <OnboardingStartDialog
+      <OnboardingStartPopup
         isOpen={completionDialog.isOpen}
         onSkip={() => {
           completionDialog.close()

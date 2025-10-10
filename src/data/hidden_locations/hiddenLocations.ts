@@ -12,7 +12,7 @@
  * @fileoverview Hidden location hotspot definitions for race game mode
  */
 
-import type { HiddenLocationHotspot } from '../types/tour'
+import type { HiddenLocationHotspot } from "@/types/tour"
 
 /**
  * Array of all hidden locations for The Amazing Race

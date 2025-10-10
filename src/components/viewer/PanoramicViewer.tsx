@@ -8,7 +8,7 @@ import { Spinner } from '../ui/shadcn-io/spinner'
 import { TOUR_START_PHOTO_ID } from '../../hooks/useTourNavigation'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
-import { getAreaForPhoto } from '../../data/tourUtilities'
+import { getAreaForPhoto } from '../../data/blockUtils'
 import type { Photo } from '../../types/tour'
 
 interface PanoramicViewerProps {

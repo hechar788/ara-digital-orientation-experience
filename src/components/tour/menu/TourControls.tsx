@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
 import { usePopup } from '@/hooks/usePopup'
-import { RaceStartConfirmationPopup } from './RaceStartConfirmationPopup'
+import { RaceStartConfirmationPopup } from '../../race/popups/RaceStartConfirmationPopup'
 
 /**
  * Props for the TourControls component

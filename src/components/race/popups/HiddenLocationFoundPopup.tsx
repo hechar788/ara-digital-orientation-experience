@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button'
  * @property description - Descriptive subtitle for the location
  * @property onClose - Callback when user closes the dialog
  */
-interface HiddenLocationFoundDialogProps {
+interface HiddenLocationFoundPopupProps {
   isOpen: boolean
   name: string
   description: string
@@ -61,7 +61,7 @@ interface HiddenLocationFoundDialogProps {
  * />
  * ```
  */
-export const HiddenLocationFoundDialog: React.FC<HiddenLocationFoundDialogProps> = ({
+export const HiddenLocationFoundPopup: React.FC<HiddenLocationFoundPopupProps> = ({
   isOpen,
   name,
   description,

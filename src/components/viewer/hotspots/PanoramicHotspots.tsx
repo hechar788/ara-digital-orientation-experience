@@ -22,9 +22,9 @@ import {
   type DialogPosition
 } from './HotspotUtils'
 import { HotspotConfirmationDialog } from './HotspotConfirmationDialog'
-import { HiddenLocationFoundDialog } from '../../race/HiddenLocationFoundDialog'
-import { getAreaForPhoto } from '../../../data/tourUtilities'
-import { getHiddenLocationsForPhoto } from '../../../data/hiddenLocations'
+import { HiddenLocationFoundPopup } from '../../race/popups/HiddenLocationFoundPopup'
+import { getAreaForPhoto } from '../../../data/blockUtils'
+import { getHiddenLocationsForPhoto } from '@/data/hidden_locations/hiddenLocations'
 
 /**
  * Props for PanoramicHotspots component
@@ -643,7 +643,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         onCancel={handleCancelNavigation}
       />
 
-      <HiddenLocationFoundDialog
+      <HiddenLocationFoundPopup
         isOpen={!!pendingHiddenLocation}
         name={pendingHiddenLocation?.name || ''}
         description={pendingHiddenLocation?.description || ''}

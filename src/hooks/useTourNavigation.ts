@@ -5,7 +5,7 @@
  * @fileoverview Provides navigation logic for the VR campus tour system.
  */
 import { useState, useCallback, useMemo } from 'react'
-import { findPhotoById, getAreaForPhoto } from '../data/tourUtilities'
+import { findPhotoById, getAreaForPhoto } from '../data/blockUtils'
 import type { Photo, DirectionType } from '../types/tour'
 import { DIRECTION_ANGLES } from '../types/tour'
 
