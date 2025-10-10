@@ -27,6 +27,7 @@ function App() {
   } = useTourNavigation()
 
   const [currentFov, setCurrentFov] = useState(75)
+  const [isRaceMode, setIsRaceMode] = useState(false)
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-gray-900 relative">
@@ -35,7 +36,7 @@ function App() {
         <Minimap
           currentArea={currentArea}
           currentPhotoId={currentPhotoId}
-          isRaceMode={false}
+          isRaceMode={isRaceMode}
         />
 
         {/* Zoom Slider */}
@@ -62,6 +63,7 @@ function App() {
         initialFov={currentFov}
         onFovChange={setCurrentFov}
         timerClassName="absolute top-4 left-4 z-50"
+        onRaceModeChange={setIsRaceMode}
       />
 
       {/* Navigation loading spinner */}

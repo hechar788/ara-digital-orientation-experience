@@ -117,22 +117,15 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
             </TooltipContent>
           </Tooltip>
         )}
-
-        {/* Current Area Label */}
-        <div className="w-62 bg-gray-800/90 px-4 py-2 rounded-lg border border-gray-600">
-          <span className="text-white text-sm font-medium">
-            Current Area: {currentPhotoId}
-          </span>
-        </div>
       </div>
 
       {/* Expanded Map Dialog */}
       <Dialog open={expandedMap.isOpen} onOpenChange={expandedMap.close}>
         <DialogContent
           showCloseButton={false}
-          className="w-[95vw] max-w-[95vw] sm:w-[80vw] sm:max-w-[80vw] max-h-[95vh] p-0 overflow-hidden bg-background flex flex-col"
+          className="w-[95vw] max-w-[95vw] sm:w-[80vw] sm:max-w-[1330px] max-h-[95vh] p-0 overflow-hidden bg-background flex flex-col"
         >
-          <DialogClose className="absolute top-4 right-4 z-50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          <DialogClose className="absolute top-2 right-2 z-50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
             <span className="sr-only">Close map</span>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -140,28 +133,30 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
           </DialogClose>
 
           <div className="h-full flex flex-col">
-            <div className="px-4 py-4 border-b shrink-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-semibold text-foreground sm:hidden">
-                    Campus Map
-                  </span>
-                  <div className="hidden sm:flex flex-col gap-0.5">
-                    <span className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-                      ARA Madras Street
-                    </span>
-                    <span className="text-2xl font-semibold text-foreground">
+            <div className="pl-12 pr-12 py-4 border-b shrink-0">
+              <div className="mx-auto flex w-full max-w-full flex-col sm:max-w-[1215px]">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                  <div className="flex flex-col sm:items-start">
+                    <span className="text-2xl font-semibold text-foreground sm:hidden">
                       Campus Map
                     </span>
+                    <div className="hidden sm:flex flex-col gap-0.5">
+                      <span className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                        ARA Madras Street
+                      </span>
+                      <span className="text-2xl font-semibold text-foreground">
+                        Campus Map
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-start text-s text-black sm:hidden gap-1 mt-2">
+                      <span className="w-full text-left truncate">Current Area: {currentAreaName}</span>
+                      <span className="w-full text-left">Areas Discovered: {areasDiscoveredLabel}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground sm:hidden gap-3 mt-2">
-                    <span className="truncate">Current Area: {currentAreaName}</span>
+                  <div className="hidden sm:flex flex-col gap-1 text-right text-s text-black">
+                    <span className="text-right">Current Area: {currentAreaName}</span>
                     <span className="text-right">Areas Discovered: {areasDiscoveredLabel}</span>
                   </div>
-                </div>
-                <div className="hidden sm:flex flex-col text-right text-sm text-muted-foreground gap-1 sm:mr-10">
-                  <span>Current Area: {currentAreaName}</span>
-                  <span>Areas Discovered: {areasDiscoveredLabel}</span>
                 </div>
               </div>
             </div>
@@ -171,12 +166,14 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
               Full view of the ARA Institute of Canterbury campus map
             </DialogDescription>
 
-            <div className="flex items-center justify-center px-2 py-3 sm:px-4 sm:py-6">
-              <img
-                src="/campus_map/chch-official-campusmap-only.svg"
-                alt="Campus Map - Full View"
-                className="w-full max-w-full sm:max-w-[95%] h-auto max-h-[calc(95vh-130px)] sm:max-h-[calc(95vh-160px)] object-contain object-center"
-              />
+            <div className="flex items-center justify-center pl-2 pr-2 py-3 sm:pl-12 sm:pr-12 sm:py-6">
+              <div className="mx-auto w-full max-w-[1215px]">
+                <img
+                  src="/campus_map/chch-official-campusmap-only.svg"
+                  alt="Campus Map - Full View"
+                  className="h-auto w-full max-h-[calc(95vh-130px)] sm:max-h-[calc(95vh-160px)] object-contain object-center"
+                />
+              </div>
             </div>
           </div>
         </DialogContent>

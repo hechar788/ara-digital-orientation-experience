@@ -27,6 +27,7 @@ interface PanoramicViewerProps {
   onFovChange?: (fov: number) => void
   initialFov?: number
   timerClassName?: string
+  onRaceModeChange?: (isRaceMode: boolean) => void
 }
 
 export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
@@ -43,7 +44,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onNavigateToPhoto,
   onFovChange,
   initialFov = 75,
-  timerClassName = ''
+  timerClassName = '',
+  onRaceModeChange
 }) => {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [fov, setFov] = useState(initialFov)
@@ -51,6 +53,11 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const mountRef = useRef<HTMLDivElement>(null)
   const orientation = useOrientationStore()
   const race = useRaceStore()
+
+  // Notify parent of race mode changes
+  useEffect(() => {
+    onRaceModeChange?.(isRaceMode)
+  }, [isRaceMode, onRaceModeChange])
 
   // Sync FOV from parent when initialFov prop changes
   useEffect(() => {
@@ -65,6 +72,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   }, [initialFov])
 
   // Track discovered areas - mode-aware tracking with dedicated stores
+  // IMPORTANT: Only depends on currentPhoto, NOT isRaceMode
+  // This prevents double-counting when mode changes with same photo
   useEffect(() => {
     if (currentPhoto) {
       const area = getAreaForPhoto(currentPhoto.id)
@@ -78,7 +87,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         }
       }
     }
-  }, [currentPhoto, isRaceMode, race.addAreaDiscovery, orientation.addDiscovery])
+  }, [currentPhoto])  // Only currentPhoto dependency - prevents double-counting
   const animationRef = useRef<number | null>(null)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
@@ -539,9 +548,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           className="fixed left-1/2 transform -translate-x-1/2 z-20"
           style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
           onStartRace={() => {
+            // CRITICAL: Set race mode BEFORE navigation to ensure correct tracking
+            setIsRaceMode(true)
             race.reset()
             onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
-            setIsRaceMode(true)
           }}
         />
       )}
