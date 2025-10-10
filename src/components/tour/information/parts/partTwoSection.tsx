@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react'
-import type { Information } from '../../../types/information'
+import type { Information } from '@/types/information'
 
 const documentLinks = [
   {
@@ -11,8 +11,8 @@ const documentLinks = [
     label: 'Full Campus Map', 
     href: 'https://www.ara.ac.nz/siteassets/documents---home/explore-ara/campuses/christchurch---madras-street/chch-campusmap.pdf' 
   },
-  { id: 'document-3', label: 'Document 3', href: '#' },
-  { id: 'document-4', label: 'Document 4', href: '#' }
+  { id: 'academic-support', label: 'Academic Support', href: 'https://www.youtube.com/watch?v=t93ojx2C6dw' },
+  { id: 'student-information', label: 'Key Information for Students', href: 'https://drive.google.com/file/d/1DipWpHY0pWhOGfHWvIU65gDMeBGhIB_2/view?usp=sharing' }
 ] as const
 
 /**
