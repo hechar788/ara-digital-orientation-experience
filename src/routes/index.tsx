@@ -4,7 +4,7 @@ import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
 import { PanoramicZoomSlider } from '../components/viewer/PanoramicZoomSlider'
 import { Minimap } from '../components/viewer/Minimap'
 import { Spinner } from '../components/ui/shadcn-io/spinner'
-import { OnboardingProvider } from '../contexts/OnboardingContext'
+import { OnboardingProvider } from '../components/tour/onboarding/OnboardingContext'
 import { useTourNavigation } from '../hooks/useTourNavigation'
 import type { DirectionType } from '../types/tour'
 

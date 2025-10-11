@@ -1,5 +1,6 @@
 import React from 'react'
-import { useOnboarding, type OnboardingTarget } from '@/contexts/OnboardingContext'
+import { type OnboardingTarget } from '@/components/tour/onboarding/OnboardingContext'
+import { useOnboarding } from '@/hooks/useOnboarding'
 import { cn } from '@/lib/utils'
 
 /**
@@ -49,18 +50,15 @@ export const OnboardingHighlight: React.FC<OnboardingHighlightProps> = ({
   children,
   className
 }) => {
-  const { isActive, highlightTarget } = useOnboarding()
+  const { isActive, highlightTarget, highlightVariant } = useOnboarding()
 
   const isHighlighted = isActive && highlightTarget === targetId
-
-  // Control buttons need filled highlight instead of padding/outline style
-  const isControlButton = ['fullscreen', 'race', 'ai', 'info'].includes(targetId || '')
 
   if (!isHighlighted) {
     return <>{children}</>
   }
 
-  if (isControlButton) {
+  if (highlightVariant === 'overlay') {
     // For control buttons, use an overlay approach to show highlight on top
     return (
       <div className={cn('relative h-full', className)}>

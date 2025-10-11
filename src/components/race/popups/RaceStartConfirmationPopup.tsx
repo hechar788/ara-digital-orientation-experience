@@ -56,8 +56,8 @@ export const RaceStartConfirmationPopup: React.FC<RaceStartPopupProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md pt-8 pb-6">
-        <DialogHeader className="pb-7 text-left">
-          <DialogTitle className="text-xl text-left">Ready to start The Amazing Race?</DialogTitle>
+        <DialogHeader className="pb-7 text-center">
+          <DialogTitle className="text-xl text-center">Ready to start The Amazing Race?</DialogTitle>
           <DialogDescription className="sr-only">Confirm to begin the race or cancel to continue the standard orientation</DialogDescription>
         </DialogHeader>
         <div className="flex flex-row justify-between items-center gap-2">

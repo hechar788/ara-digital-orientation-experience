@@ -12,7 +12,8 @@ import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '@/types/tour'
 import { DIRECTION_ANGLES } from '@/types/tour'
-import { useOnboarding } from '@/contexts/OnboardingContext'
+import { useOnboarding } from '@/hooks/useOnboarding'
+import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 import {
   createDirectionalArrow,
   calculateArrowPosition,
@@ -81,12 +82,10 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
   const [arrowsReady, setArrowsReady] = useState(false)
   const { isActive, highlightTarget } = useOnboarding()
   const highlightPlanesRef = useRef<THREE.Mesh[]>([])
+  const isTouchDevice = useIsTouchDevice()
 
   // Detect mobile and calculate appropriate arrow distance (memoized to prevent dependency array issues)
-  const arrowDistance = useMemo(() => {
-    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-    return isMobile ? 4.75 : 4.5
-  }, [])
+  const arrowDistance = useMemo(() => (isTouchDevice ? 4.75 : 4.5), [isTouchDevice])
 
   /**
    * Create and position directional arrows in the scene

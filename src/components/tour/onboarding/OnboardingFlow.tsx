@@ -1,16 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import React, { useMemo, useState } from 'react'
 import { X } from 'lucide-react'
-import { useOnboarding, ONBOARDING_STEPS } from '@/contexts/OnboardingContext'
+import { type OnboardingInstructionLayout } from '@/components/tour/onboarding/OnboardingContext'
+import { useOnboarding } from '@/hooks/useOnboarding'
 import { SkipOnboardingPopup } from './SkipOnboardingPopup'
 import { cn } from '@/lib/utils'
+import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 
-/**
- * Detects if the current device is mobile
- *
- * @returns True if mobile device, false otherwise
- */
-const isMobileDevice = (): boolean => {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { container: string; position: string }> = {
+  'center-top': {
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    position: 'top-4 sm:top-8'
+  },
+  'center-bottom': {
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    position: 'bottom-4 sm:bottom-8'
+  },
+  'zoom-right': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[200] pointer-events-auto',
+    position: 'top-[17.5rem] sm:right-4'
+  },
+  'minimap-right': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[200] pointer-events-auto',
+    position: 'top-[17.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+  },
+  'controls-bottom': {
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    position: 'bottom-20 sm:bottom-[5.5rem]'
+  }
 }
 
 /**
@@ -18,12 +34,12 @@ const isMobileDevice = (): boolean => {
  *
  * Defines callbacks for flow completion and cancellation.
  *
- * @property onComplete - Callback triggered when user completes all 8 steps
- * @property onSkip - Callback triggered when user confirms skipping onboarding
+ * @property onComplete - Optional callback triggered when user completes all steps
+ * @property onSkip - Optional callback triggered when user confirms skipping onboarding
  */
 interface OnboardingFlowProps {
-  onComplete: () => void
-  onSkip: () => void
+  onComplete?: () => void
+  onSkip?: () => void
 }
 
 /**
@@ -45,8 +61,8 @@ interface OnboardingFlowProps {
  * @example
  * ```tsx
  * <OnboardingFlow
- *   onComplete={() => setOnboardingActive(false)}
- *   onSkip={() => setOnboardingActive(false)}
+ *   onComplete={() => console.log('Onboarding finished')}
+ *   onSkip={() => console.log('Onboarding skipped')}
  * />
  * ```
  */
@@ -54,34 +70,41 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   onComplete,
   onSkip
 }) => {
-  const { currentStep, nextStep, previousStep, skipOnboarding, startOnboarding } = useOnboarding()
+  const {
+    currentStep,
+    currentConfig,
+    totalSteps,
+    isVisible,
+    nextStep,
+    previousStep,
+    skipOnboarding,
+    completeOnboarding
+  } = useOnboarding()
   const [isSkipPopupOpen, setIsSkipPopupOpen] = useState(false)
+  const isTouchDevice = useIsTouchDevice()
 
-  // Start onboarding when component mounts
-  useEffect(() => {
-    startOnboarding()
-  }, [startOnboarding])
+  const displayText = useMemo(() => {
+    if (!currentConfig) {
+      return ''
+    }
+    if (isTouchDevice && currentConfig.mobileText) {
+      return currentConfig.mobileText
+    }
+    return currentConfig.text
+  }, [currentConfig, isTouchDevice])
 
-  const currentConfig = ONBOARDING_STEPS[currentStep - 1]
+  const defaultLayout = INSTRUCTION_LAYOUT_PRESETS['center-bottom']
+  const layoutConfig = currentConfig
+    ? INSTRUCTION_LAYOUT_PRESETS[currentConfig.layout] ?? defaultLayout
+    : defaultLayout
+
   const isFirstStep = currentStep === 1
-  const isLastStep = currentStep === ONBOARDING_STEPS.length
-  const isDragStep = currentStep === 2
-  const isZoomStep = currentStep === 3
-  const isMinimapStep = currentStep === 4
-  const isControlsStep = currentStep >= 5 && currentStep <= 8 // Steps 5-8 (fullscreen, race, ai, info)
-
-  // Dynamic text for zoom step based on device type
-  const isMobile = isMobileDevice()
-  const displayText = isZoomStep
-    ? isMobile
-      ? 'Use the zoom slider or pinch to zoom in and out of the tour.'
-      : 'Use the zoom slider or scroll to zoom in and out of the tour.'
-    : currentConfig.text
+  const isLastStep = currentStep === totalSteps
 
   const handleNext = () => {
     if (isLastStep) {
-      skipOnboarding()
-      onComplete()
+      completeOnboarding()
+      onComplete?.()
     } else {
       nextStep()
     }
@@ -94,36 +117,16 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   const handleSkipConfirm = () => {
     setIsSkipPopupOpen(false)
     skipOnboarding()
-    onSkip()
+    onSkip?.()
   }
 
   const handleSkipCancel = () => {
     setIsSkipPopupOpen(false)
   }
 
-  if (!currentConfig) {
+  if (!currentConfig || !isVisible) {
     return null
   }
-
-  // For drag step (step 2), keep at top like step 1
-  // For zoom step (step 3), position box right-aligned with zoom slider
-  // For minimap step (step 4), position box right-aligned on mobile, left of minimap on desktop
-  // For controls steps (5-8), position box above TourControls to avoid overlap
-  const instructionBoxPositionClass = isDragStep
-    ? 'top-4 sm:top-8'
-    : isZoomStep
-      ? 'top-[17.5rem] sm:right-4'
-      : isMinimapStep
-        ? 'top-[17.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
-        : isControlsStep
-          ? 'bottom-20 sm:bottom-[5.5rem]'
-          : currentConfig.position === 'top'
-            ? 'top-4 sm:top-8'
-            : 'bottom-4 sm:bottom-8'
-
-  const instructionBoxLayoutClass = isZoomStep || isMinimapStep
-    ? 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[200] pointer-events-auto'
-    : 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto'
 
   return (
     <>
@@ -131,8 +134,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       {!isSkipPopupOpen && (
         <div
           className={cn(
-            instructionBoxLayoutClass,
-            instructionBoxPositionClass
+            layoutConfig.container,
+            layoutConfig.position
           )}
         >
           <div className="bg-background border-2 border-border rounded-lg shadow-2xl pt-2 px-6 pb-4 sm:pt-4 sm:px-8 sm:pb-6 max-w-md mx-auto sm:mx-0 relative">
@@ -148,7 +151,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             {/* Step counter */}
             <div className="flex items-center justify-center mb-5 h-6 sm:h-6">
               <span className="text-sm font-medium text-muted-foreground">
-                {currentStep}/{ONBOARDING_STEPS.length}
+                {currentStep}/{totalSteps}
               </span>
             </div>
 

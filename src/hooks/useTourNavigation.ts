@@ -6,7 +6,7 @@
  */
 import { useState, useCallback, useMemo } from 'react'
 import { findPhotoById, getAreaForPhoto } from '../data/blockUtils'
-import type { Photo, DirectionType } from '../types/tour'
+import type { Photo, DirectionType, DirectionDefinition } from '../types/tour'
 import { DIRECTION_ANGLES } from '../types/tour'
 
 /**
@@ -30,6 +30,30 @@ function getDirectionAngle(photo: Photo, direction: DirectionType): number {
   const startingAngle = photo.startingAngle ?? 0
   const offset = DIRECTION_ANGLES[direction] ?? 0
   return (startingAngle + offset) % 360
+}
+
+/**
+ * Type guard verifying a direction definition contains a connection object
+ *
+ * Horizontal navigation directions are stored as objects with a connection id,
+ * while vertical navigation can use raw strings or string arrays. This guard
+ * lets TypeScript safely treat dynamic lookups as `DirectionDefinition`.
+ *
+ * @param direction - Direction value pulled from photo.directions
+ * @returns True when the value is a DirectionDefinition
+ *
+ * @example
+ * ```typescript
+ * const rawDirection = photo.directions.forward
+ * if (isDirectionDefinition(rawDirection)) {
+ *   navigate(rawDirection.connection)
+ * }
+ * ```
+ */
+function isDirectionDefinition(
+  direction: Photo['directions'][DirectionType] | undefined
+): direction is DirectionDefinition {
+  return typeof direction === 'object' && direction !== null && 'connection' in direction
 }
 
 /**
@@ -58,7 +82,7 @@ function findReverseConnection(fromPhoto: Photo, toPhoto: Photo): DirectionType 
 
   for (const dir of horizontalDirections) {
     const dirDef = toPhoto.directions[dir]
-    if (dirDef && dirDef.connection === fromPhoto.id) {
+    if (isDirectionDefinition(dirDef) && dirDef.connection === fromPhoto.id) {
       return dir
     }
   }
@@ -219,7 +243,7 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
 
   for (const dir of horizontalDirections) {
     const dirDef = photo.directions[dir]
-    if (dirDef) {
+    if (isDirectionDefinition(dirDef)) {
       const dirAngle = getDirectionAngle(photo, dir)
       const angleDiff = Math.abs(currentCameraAngle - dirAngle)
       // 15° tolerance accounts for VR navigation imprecision
@@ -237,7 +261,7 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
         }
 
         // Perpendicular directions (left/right) - check how it was used in previous nav
-        if (dir === 'left' || dir === 'right') {
+        if ((dir === 'left' || dir === 'right') && isDirectionDefinition(dirDef)) {
           const connectionId = dirDef.connection
           const destinationPhoto = findPhotoById(connectionId)
 
@@ -327,11 +351,17 @@ function analyzeNavigation(
   }
 
   // Check for bidirectional forward/back connections
-  const currentConnection = currentPhoto.directions[direction]?.connection
+  const currentDirectionDefinition = currentPhoto.directions[direction]
+  const currentConnection = isDirectionDefinition(currentDirectionDefinition)
+    ? currentDirectionDefinition.connection
+    : undefined
 
   // Determine primary reverse direction (forward-based ↔ back-based)
   const reverseDirection: DirectionType = isForwardMovement ? 'back' : 'forward'
-  const destinationConnection = destinationPhoto.directions[reverseDirection]?.connection
+  const destinationDirectionDefinition = destinationPhoto.directions[reverseDirection]
+  const destinationConnection = isDirectionDefinition(destinationDirectionDefinition)
+    ? destinationDirectionDefinition.connection
+    : undefined
 
   // Not bidirectional connections
   if (currentConnection !== destinationPhoto.id || destinationConnection !== currentPhoto.id) {
@@ -588,7 +618,9 @@ export function useTourNavigation() {
     if (direction === 'forward' || direction === 'forwardRight' || direction === 'right' || direction === 'backRight' ||
         direction === 'back' || direction === 'backLeft' || direction === 'left' || direction === 'forwardLeft') {
       const directionDef = currentPhoto.directions[direction]
-      targetPhotoId = directionDef?.connection
+      if (isDirectionDefinition(directionDef)) {
+        targetPhotoId = directionDef.connection
+      }
     } else {
       // Handle vertical movement (up/down), elevator, and floor selection
       targetPhotoId = currentPhoto.directions[direction]
