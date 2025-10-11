@@ -10,8 +10,8 @@
 import { useStore } from '@tanstack/react-store'
 import {
   orientationStore,
+  orientationDiscoveriesCount,
   addOrientationDiscovery,
-  getOrientationDiscoveriesCount,
   hasOrientationDiscovery,
   getOrientationDiscoveries
 } from '../stores/orientationStore'
@@ -66,10 +66,11 @@ export interface UseOrientationStoreReturn {
  */
 export function useOrientationStore(): UseOrientationStoreReturn {
   const state = useStore(orientationStore)
+  const count = useStore(orientationDiscoveriesCount)
 
   return {
     discoveredAreas: state.discoveredAreas,
-    discoveriesCount: getOrientationDiscoveriesCount(),
+    discoveriesCount: count,
     addDiscovery: addOrientationDiscovery,
     hasDiscovery: hasOrientationDiscovery,
     getDiscoveries: getOrientationDiscoveries

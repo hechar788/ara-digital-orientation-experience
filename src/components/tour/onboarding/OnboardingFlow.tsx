@@ -8,23 +8,23 @@ import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 
 const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { container: string; position: string }> = {
   'center-top': {
-    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
     position: 'top-4 sm:top-8'
   },
   'center-bottom': {
-    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
     position: 'bottom-4 sm:bottom-8'
   },
   'zoom-right': {
-    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[200] pointer-events-auto',
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
     position: 'top-[17.5rem] sm:right-4'
   },
   'minimap-right': {
-    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[200] pointer-events-auto',
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
     position: 'top-[17.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
   },
   'controls-bottom': {
-    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[200] pointer-events-auto',
+    container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
     position: 'bottom-20 sm:bottom-[5.5rem]'
   }
 }
@@ -181,8 +181,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         </div>
       )}
 
-      {/* Skip confirmation dialog - highest z-index */}
-      <div className="relative z-[300]">
+      {/* Skip confirmation dialog */}
+      <div className="relative z-[46]">
         <SkipOnboardingPopup
           isOpen={isSkipPopupOpen}
           onClose={handleSkipCancel}

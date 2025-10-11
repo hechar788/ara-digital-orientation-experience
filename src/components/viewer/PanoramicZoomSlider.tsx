@@ -91,7 +91,7 @@ export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
           <Minus className="h-4 w-4" />
         </Button>
         <Slider
-          className="w-[140px] cursor-pointer [&_[data-slot=slider-track]]:bg-gray-600 [&_[data-slot=slider-range]]:bg-white [&_[data-slot=slider-thumb]]:cursor-pointer"
+          className="w-[103px] lg:w-[140px] cursor-pointer [&_[data-slot=slider-track]]:bg-gray-600 [&_[data-slot=slider-range]]:bg-white [&_[data-slot=slider-thumb]]:cursor-pointer"
           value={[zoomLevel]}
           min={0}
           max={maxFov - minFov}

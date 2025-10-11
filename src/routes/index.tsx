@@ -6,6 +6,9 @@ import { Minimap } from '../components/viewer/Minimap'
 import { Spinner } from '../components/ui/shadcn-io/spinner'
 import { OnboardingProvider } from '../components/tour/onboarding/OnboardingContext'
 import { useTourNavigation } from '../hooks/useTourNavigation'
+import { useRaceStore } from '../hooks/useRaceStore'
+import { RaceLocationCounter } from '../components/race/RaceLocationCounter'
+import { TOTAL_HIDDEN_LOCATIONS } from '../data/hidden_locations/hiddenLocations'
 import type { DirectionType } from '../types/tour'
 
 export const Route = createFileRoute('/')({
@@ -29,23 +32,33 @@ function App() {
 
   const [currentFov, setCurrentFov] = useState(75)
   const [isRaceMode, setIsRaceMode] = useState(false)
+  const { hiddenLocationsCount } = useRaceStore()
 
   return (
     <OnboardingProvider>
       <div className="h-screen w-screen overflow-hidden bg-gray-900 relative">
         {/* Map and Navigation Info - Top Right */}
-        <div className="absolute top-4 right-4 z-50 flex flex-col gap-1.5 items-end">
+        <div className="absolute top-4 right-4 z-40 flex flex-col gap-1.5 items-end">
           <Minimap
             currentArea={currentArea}
             currentPhotoId={currentPhotoId}
             isRaceMode={isRaceMode}
           />
 
+          {/* Race Locations Counter - Only in Race Mode */}
+          {isRaceMode && (
+            <RaceLocationCounter
+              locationsFound={hiddenLocationsCount}
+              totalLocations={TOTAL_HIDDEN_LOCATIONS}
+              className="w-[11.55rem] lg:w-62"
+            />
+          )}
+
           {/* Zoom Slider */}
           <PanoramicZoomSlider
             currentFov={currentFov}
             onZoomChange={setCurrentFov}
-            className="w-62 !py-1.5"
+            className="w-[11.55rem] lg:w-62 !py-1.5"
           />
         </div>
 
@@ -64,7 +77,7 @@ function App() {
           cameraLon={cameraLon}
           initialFov={currentFov}
           onFovChange={setCurrentFov}
-          timerClassName="absolute top-4 left-4 z-50"
+          timerClassName="absolute top-4 left-4 z-40"
           onRaceModeChange={setIsRaceMode}
         />
 

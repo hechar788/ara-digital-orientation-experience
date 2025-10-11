@@ -9,7 +9,7 @@
  * @fileoverview TanStack Store for race mode progress tracking
  */
 
-import { Store } from '@tanstack/store'
+import { Derived, Store } from '@tanstack/store'
 
 /**
  * Race progress state interface
@@ -35,6 +35,50 @@ export const raceStore = new Store<RaceState>({
   discoveredAreas: new Set<string>(),
   foundHiddenLocations: new Set<string>()
 })
+
+/**
+ * Derived count of race area discoveries
+ *
+ * Automatically computes and caches the number of areas discovered during
+ * the current Amazing Race session. Updates reactively when discoveredAreas
+ * Set changes.
+ *
+ * This value resets to 0 when race progress is reset.
+ *
+ * @example
+ * ```typescript
+ * const areasCount = useStore(raceAreasCount)
+ * console.log(`Race areas: ${areasCount}`)
+ * ```
+ */
+export const raceAreasCount = new Derived({
+  fn: () => raceStore.state.discoveredAreas.size,
+  deps: [raceStore]
+})
+
+/**
+ * Derived count of race hidden location discoveries
+ *
+ * Automatically computes and caches the number of hidden locations found
+ * during the current Amazing Race session. Updates reactively when
+ * foundHiddenLocations Set changes.
+ *
+ * This value resets to 0 when race progress is reset.
+ *
+ * @example
+ * ```typescript
+ * const locationsCount = useStore(raceHiddenLocationsCount)
+ * console.log(`Hidden locations: ${locationsCount}`)
+ * ```
+ */
+export const raceHiddenLocationsCount = new Derived({
+  fn: () => raceStore.state.foundHiddenLocations.size,
+  deps: [raceStore]
+})
+
+// Mount both derived values to enable reactive updates
+raceAreasCount.mount()
+raceHiddenLocationsCount.mount()
 
 /**
  * Add a discovered area to race progress
@@ -107,42 +151,6 @@ export function resetRace(): void {
     discoveredAreas: new Set<string>(),
     foundHiddenLocations: new Set<string>()
   }))
-}
-
-/**
- * Get the count of areas discovered in current race
- *
- * Returns the number of unique areas visited during the current Amazing Race
- * session. This count resets when starting a new race.
- *
- * @returns Number of race area discoveries
- *
- * @example
- * ```typescript
- * const count = getRaceAreasCount()
- * console.log(`Race areas discovered: ${count}`)
- * ```
- */
-export function getRaceAreasCount(): number {
-  return raceStore.state.discoveredAreas.size
-}
-
-/**
- * Get the count of hidden locations found in current race
- *
- * Returns the number of hidden locations discovered during the current
- * Amazing Race session. This count resets when starting a new race.
- *
- * @returns Number of found hidden locations
- *
- * @example
- * ```typescript
- * const count = getRaceHiddenLocationsCount()
- * console.log(`Hidden locations found: ${count}`)
- * ```
- */
-export function getRaceHiddenLocationsCount(): number {
-  return raceStore.state.foundHiddenLocations.size
 }
 
 /**

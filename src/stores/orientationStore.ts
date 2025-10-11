@@ -10,7 +10,7 @@
  * @fileoverview TanStack Store for orientation mode area discoveries
  */
 
-import { Store } from '@tanstack/store'
+import { Derived, Store } from '@tanstack/store'
 
 /**
  * Orientation exploration state interface
@@ -35,6 +35,32 @@ export const orientationStore = new Store<OrientationState>({
 })
 
 /**
+ * Derived count of orientation discoveries
+ *
+ * Automatically computes and caches the number of areas discovered during
+ * orientation mode. Updates reactively when discoveredAreas Set changes.
+ *
+ * This derived value is memoized and only recalculates when the source
+ * store state changes, providing optimal performance for subscribers.
+ *
+ * @example
+ * ```typescript
+ * // Subscribe in a component
+ * const count = useStore(orientationDiscoveriesCount)
+ *
+ * // Or access directly
+ * const count = orientationDiscoveriesCount.current
+ * ```
+ */
+export const orientationDiscoveriesCount = new Derived({
+  fn: () => orientationStore.state.discoveredAreas.size,
+  deps: [orientationStore]
+})
+
+// Mount to enable reactive updates
+orientationDiscoveriesCount.mount()
+
+/**
  * Add a discovered area to orientation exploration
  *
  * Records that the user has visited a specific area during normal campus
@@ -57,24 +83,6 @@ export function addOrientationDiscovery(areaId: string): void {
   orientationStore.setState(() => ({
     discoveredAreas: newDiscoveredAreas
   }))
-}
-
-/**
- * Get the count of areas discovered in orientation mode
- *
- * Returns the number of unique areas visited during normal campus orientation.
- * This count persists across all mode switches.
- *
- * @returns Number of orientation discoveries
- *
- * @example
- * ```typescript
- * const count = getOrientationDiscoveriesCount()
- * console.log(`Orientation areas discovered: ${count}`)
- * ```
- */
-export function getOrientationDiscoveriesCount(): number {
-  return orientationStore.state.discoveredAreas.size
 }
 
 /**
