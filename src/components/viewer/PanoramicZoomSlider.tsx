@@ -11,6 +11,7 @@ import React from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
+import { OnboardingHighlight } from '@/components/tour/onboarding/OnboardingHighlight'
 import { cn } from '@/lib/utils'
 
 /**
@@ -73,48 +74,50 @@ export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
   const zoomLevel = maxFov - currentFov
 
   return (
-    <div
-      className={cn(
-        'flex gap-1 rounded-md bg-black/70 p-2 text-white',
-        className
-      )}
-    >
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleZoomOut}
-        disabled={currentFov >= maxFov}
-        className="h-8 w-8 text-white hover:bg-white/10 disabled:opacity-50 cursor-pointer"
+    <OnboardingHighlight targetId="zoom">
+      <div
+        className={cn(
+          'flex gap-1 rounded-md bg-black/70 p-2 text-white',
+          className
+        )}
       >
-        <Minus className="h-4 w-4" />
-      </Button>
-      <Slider
-        className="w-[140px] cursor-pointer [&_[data-slot=slider-track]]:bg-gray-600 [&_[data-slot=slider-range]]:bg-white [&_[data-slot=slider-thumb]]:cursor-pointer"
-        value={[zoomLevel]}
-        min={0}
-        max={maxFov - minFov}
-        step={1}
-        onValueChange={(values) => {
-          const newFov = maxFov - values[0]
-          onZoomChange(newFov)
-        }}
-      />
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleZoomIn}
-        disabled={currentFov <= minFov}
-        className="h-8 w-8 text-white hover:bg-white/10 disabled:opacity-50 cursor-pointer"
-      >
-        <Plus className="h-4 w-4" />
-      </Button>
-      <Button
-        className="min-w-16 tabular-nums h-8 text-white hover:bg-white/10 cursor-pointer"
-        variant="ghost"
-        onClick={() => onZoomChange(75)}
-      >
-        {getZoomPercentage()}%
-      </Button>
-    </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleZoomOut}
+          disabled={currentFov >= maxFov}
+          className="h-8 w-8 text-white hover:bg-white/10 disabled:opacity-50 cursor-pointer"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <Slider
+          className="w-[140px] cursor-pointer [&_[data-slot=slider-track]]:bg-gray-600 [&_[data-slot=slider-range]]:bg-white [&_[data-slot=slider-thumb]]:cursor-pointer"
+          value={[zoomLevel]}
+          min={0}
+          max={maxFov - minFov}
+          step={1}
+          onValueChange={(values) => {
+            const newFov = maxFov - values[0]
+            onZoomChange(newFov)
+          }}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleZoomIn}
+          disabled={currentFov <= minFov}
+          className="h-8 w-8 text-white hover:bg-white/10 disabled:opacity-50 cursor-pointer"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+        <Button
+          className="min-w-16 tabular-nums h-8 text-white hover:bg-white/10 cursor-pointer"
+          variant="ghost"
+          onClick={() => onZoomChange(75)}
+        >
+          {getZoomPercentage()}%
+        </Button>
+      </div>
+    </OnboardingHighlight>
   )
 }

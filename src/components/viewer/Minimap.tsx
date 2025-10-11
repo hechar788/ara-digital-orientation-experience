@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Map } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '../ui/dialog'
+import { OnboardingHighlight } from '../tour/onboarding/OnboardingHighlight'
 import { usePopup } from '../../hooks/usePopup'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
@@ -63,9 +64,10 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
   return (
     <>
       {/* Map and Navigation Info */}
-      <div className="flex flex-col gap-1.5 items-end">
-        {/* Campus Map */}
-        {isMinimapOpen ? (
+      <OnboardingHighlight targetId="minimap">
+        <div className="flex flex-col gap-1.5 items-end">
+          {/* Campus Map */}
+          {isMinimapOpen ? (
           <div className="w-62 h-48 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -117,7 +119,8 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
             </TooltipContent>
           </Tooltip>
         )}
-      </div>
+        </div>
+      </OnboardingHighlight>
 
       {/* Expanded Map Dialog */}
       <Dialog open={expandedMap.isOpen} onOpenChange={expandedMap.close}>

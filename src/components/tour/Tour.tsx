@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TourControls } from './menu/TourControls'
 import { AIChatPopup } from './chat/AIChatPopup'
 import { TourInformationPopup } from './information/TourInformationPopup'
+import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePopup } from '@/hooks/usePopup'
 
 /**
@@ -53,6 +54,7 @@ export const Tour: React.FC<TourProps> = ({
 }) => {
   const aiChat = usePopup()
   const info = usePopup()
+  const [onboardingActive, setOnboardingActive] = useState(false)
 
   // Show info popup on first session (hard refresh)
   useEffect(() => {
@@ -81,7 +83,18 @@ export const Tour: React.FC<TourProps> = ({
       <TourInformationPopup
         isOpen={info.isOpen}
         onClose={info.close}
+        onGetStarted={() => {
+          info.close()
+          setOnboardingActive(true)
+        }}
       />
+
+      {onboardingActive && (
+        <OnboardingFlow
+          onComplete={() => setOnboardingActive(false)}
+          onSkip={() => setOnboardingActive(false)}
+        />
+      )}
     </>
   )
 }

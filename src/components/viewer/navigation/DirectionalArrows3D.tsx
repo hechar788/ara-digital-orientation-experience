@@ -12,6 +12,7 @@ import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '@/types/tour'
 import { DIRECTION_ANGLES } from '@/types/tour'
+import { useOnboarding } from '@/contexts/OnboardingContext'
 import {
   createDirectionalArrow,
   calculateArrowPosition,
@@ -78,6 +79,8 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
   const arrowsGroupRef = useRef<THREE.Group | null>(null)
   const [hoveredArrow, setHoveredArrow] = useState<THREE.Mesh | null>(null)
   const [arrowsReady, setArrowsReady] = useState(false)
+  const { isActive, highlightTarget } = useOnboarding()
+  const highlightPlanesRef = useRef<THREE.Mesh[]>([])
 
   // Detect mobile and calculate appropriate arrow distance (memoized to prevent dependency array issues)
   const arrowDistance = useMemo(() => {
@@ -177,6 +180,83 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
       }
     }
   }, [currentPhoto, sceneRef, arrowDistance])
+
+  /**
+   * Add yellow highlight planes under arrows during onboarding step 1
+   */
+  useEffect(() => {
+    if (!arrowsGroupRef.current || !arrowsReady) {
+      return
+    }
+
+    const shouldHighlight = isActive && highlightTarget === 'arrows'
+
+    // Clean up existing highlights first
+    highlightPlanesRef.current.forEach((plane) => {
+      if (arrowsGroupRef.current) {
+        arrowsGroupRef.current.remove(plane)
+        plane.geometry.dispose()
+        if (plane.material instanceof THREE.Material) {
+          plane.material.dispose()
+        }
+      }
+    })
+    highlightPlanesRef.current = []
+
+    if (shouldHighlight) {
+      let highlightCount = 0
+      // Create yellow highlight planes under each arrow
+      arrowsGroupRef.current.children.forEach((child, index) => {
+
+        // Check if this is an arrow by looking for isDirectionalArrow marker
+        if (child instanceof THREE.Mesh && child.userData.isDirectionalArrow) {
+          highlightCount++
+
+          // Create a larger circular plane behind the arrow for highlight
+          const geometry = new THREE.CircleGeometry(0.85, 32)
+          const material = new THREE.MeshBasicMaterial({
+            color: 0xfacc15, // yellow-400
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide,
+            depthTest: false // Render on top
+          })
+          const highlightPlane = new THREE.Mesh(geometry, material)
+
+          // Position the plane slightly FURTHER from camera (radially outward from arrow)
+          // This puts it "behind" the arrow from camera's perspective
+          const scaledPosition = child.position.clone().multiplyScalar(1.08)
+          highlightPlane.position.copy(scaledPosition)
+
+          // Make the plane face the camera (center of sphere)
+          highlightPlane.lookAt(0, 0, 0)
+
+          // Store reference
+          highlightPlane.userData.isHighlight = true
+
+          // Add to scene
+          if (arrowsGroupRef.current) {
+            arrowsGroupRef.current.add(highlightPlane)
+            highlightPlanesRef.current.push(highlightPlane)
+          }
+        }
+      })
+    }
+
+    return () => {
+      // Cleanup on unmount
+      highlightPlanesRef.current.forEach((plane) => {
+        if (arrowsGroupRef.current) {
+          arrowsGroupRef.current.remove(plane)
+          plane.geometry.dispose()
+          if (plane.material instanceof THREE.Material) {
+            plane.material.dispose()
+          }
+        }
+      })
+      highlightPlanesRef.current = []
+    }
+  }, [isActive, highlightTarget, arrowsReady])
 
   /**
    * Update arrow visibility based on camera orientation

@@ -113,7 +113,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({ isOpen, onClose }) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] h-[600px] max-sm:h-[80vh] max-sm:w-[95vw] max-sm:max-w-none flex flex-col p-0">
+      <DialogContent showCloseButton={false} className="sm:max-w-2xl max-h-[85vh] h-[600px] max-sm:h-[80vh] max-sm:w-[95vw] max-sm:max-w-none flex flex-col p-0">
         <DialogHeader className="p-4 pb-2">
           <div className="flex items-center justify-between">
             <DialogTitle>AI Chat Assistant</DialogTitle>
