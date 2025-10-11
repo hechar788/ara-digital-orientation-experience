@@ -10,11 +10,11 @@
 import { useStore } from '@tanstack/react-store'
 import {
   raceStore,
+  raceAreasCount,
+  raceHiddenLocationsCount,
   addRaceAreaDiscovery,
   addRaceHiddenLocation,
   resetRace,
-  getRaceAreasCount,
-  getRaceHiddenLocationsCount,
   hasRaceAreaDiscovery,
   hasRaceHiddenLocation,
   getRaceDiscoveries,
@@ -94,12 +94,14 @@ export interface UseRaceStoreReturn {
  */
 export function useRaceStore(): UseRaceStoreReturn {
   const state = useStore(raceStore)
+  const areasCount = useStore(raceAreasCount)
+  const hiddenLocationsCount = useStore(raceHiddenLocationsCount)
 
   return {
     discoveredAreas: state.discoveredAreas,
     foundHiddenLocations: state.foundHiddenLocations,
-    areasCount: getRaceAreasCount(),
-    hiddenLocationsCount: getRaceHiddenLocationsCount(),
+    areasCount,
+    hiddenLocationsCount,
     addAreaDiscovery: addRaceAreaDiscovery,
     addHiddenLocation: addRaceHiddenLocation,
     reset: resetRace,

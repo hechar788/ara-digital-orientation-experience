@@ -68,7 +68,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
         <div className="flex flex-col gap-1.5 items-end">
           {/* Campus Map */}
           {isMinimapOpen ? (
-          <div className="w-62 h-48 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
+          <div className="w-[11.55rem] lg:w-62 h-44 lg:h-62 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -107,7 +107,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
             <TooltipTrigger asChild>
               <button
                 onClick={() => setIsMinimapOpen(true)}
-                className="w-62 bg-gray-800/90 px-4 py-2 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
+                className="w-[11.55rem] lg:w-62 h-11 bg-gray-800/90 px-4 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
                 aria-label="Open map"
               >
                 <span className="text-white text-sm font-medium">Minimap</span>
