@@ -11,10 +11,12 @@ import { OnboardingStartPopup } from '../onboarding/OnboardingStartPopup'
  *
  * @property isOpen - Boolean flag (`true` to display the modal, `false` to hide it)
  * @property onClose - Function invoked when the popup requests to close; receives no arguments
+ * @property onGetStarted - Function invoked when user clicks Get Started on the onboarding start popup; initiates onboarding flow
  */
 export interface TourInformationPopupProps {
   isOpen: boolean
   onClose: () => void
+  onGetStarted: () => void
 }
 
 /**
@@ -25,14 +27,19 @@ export interface TourInformationPopupProps {
  * @param props - Component props configuring visibility and close behavior
  * @param props.isOpen - Boolean flag indicating whether the popup is visible
  * @param props.onClose - Callback fired when the popup should close
+ * @param props.onGetStarted - Callback fired when user starts the onboarding flow
  * @returns React.ReactElement representing the orientation information dialog
  *
  * @example
  * ```typescript
- * <TourInformationPopup isOpen={isTourOpen} onClose={() => setTourOpen(false)} />
+ * <TourInformationPopup
+ *   isOpen={isTourOpen}
+ *   onClose={() => setTourOpen(false)}
+ *   onGetStarted={() => setOnboardingActive(true)}
+ * />
  * ```
  */
-export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOpen, onClose }) => {
+export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOpen, onClose, onGetStarted }) => {
   const [activeIndex, setActiveIndex] = React.useState(0)
   const completionDialog = usePopup()
   const sections = tourInformationSections
@@ -165,6 +172,10 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
         onSkip={() => {
           completionDialog.close()
           onClose()
+        }}
+        onGetStarted={() => {
+          completionDialog.close()
+          onGetStarted()
         }}
       />
     </>

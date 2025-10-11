@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import { Tour } from '../tour/Tour'
 import { Race } from '../race/Race'
@@ -10,6 +10,7 @@ import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
 import { getAreaForPhoto } from '../../data/blockUtils'
 import type { Photo } from '../../types/tour'
+import { useIsTouchDevice } from '../../hooks/useIsTouchDevice'
 
 interface PanoramicViewerProps {
   imageUrl: string
@@ -53,6 +54,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   const mountRef = useRef<HTMLDivElement>(null)
   const orientation = useOrientationStore()
   const race = useRaceStore()
+  const isTouchDevice = useIsTouchDevice()
+  const dragSensitivity = useMemo(() => (isTouchDevice ? 0.35 : 0.285), [isTouchDevice])
 
   // Notify parent of race mode changes
   useEffect(() => {
@@ -147,10 +150,6 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
       // Store scene data for cleanup
       sceneDataRef.current = { scene, camera, renderer, geometry, sphere }
-
-      // Detect mobile device for drag sensitivity
-      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      const dragSensitivity = isMobile ? 0.35 : 0.285
 
       // Mouse control variables - camera orientation is managed by cameraControlRef
       let isMouseDown = false
@@ -372,7 +371,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         sceneDataRef.current = null
       }
     }
-  }, []) // Only run on mount
+  }, [dragSensitivity]) // Re-run when interaction sensitivity changes
 
   // Texture loading effect - runs when imageUrl changes (but not on initial load)
   const [initialLoadComplete, setInitialLoadComplete] = useState(false)

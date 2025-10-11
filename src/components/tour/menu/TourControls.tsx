@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info, Bot, Fullscreen, Minimize } from 'lucide-react'
+import { OnboardingHighlight } from '../onboarding/OnboardingHighlight'
 import { usePopup } from '@/hooks/usePopup'
 import { RaceStartConfirmationPopup } from '../../race/popups/RaceStartConfirmationPopup'
 
@@ -70,78 +71,86 @@ export const TourControls: React.FC<TourControlsProps> = ({
         }}
       >
         <div className="flex items-center h-full w-full">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleFullscreen}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
-                >
-                  {isFullscreen ? (
-                    <>
-                      <Minimize className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
-                      <span className="text-xs lg:hidden whitespace-nowrap">Minimize</span>
-                    </>
-                  ) : (
-                    <>
-                      <Fullscreen className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
-                      <span className="text-xs lg:hidden whitespace-nowrap">Fullscreen</span>
-                    </>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="lg:block hidden">
-                <p>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</p>
-              </TooltipContent>
-            </Tooltip>
+            <OnboardingHighlight targetId="fullscreen">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleFullscreen}
+                    className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  >
+                    {isFullscreen ? (
+                      <>
+                        <Minimize className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                        <span className="text-xs lg:hidden whitespace-nowrap">Minimize</span>
+                      </>
+                    ) : (
+                      <>
+                        <Fullscreen className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                        <span className="text-xs lg:hidden whitespace-nowrap">Fullscreen</span>
+                      </>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="lg:block hidden">
+                  <p>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </OnboardingHighlight>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={(e) => { e.currentTarget.blur(); raceStartPopup.open(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
-                >
-                  <img
-                    src="/svg/flag.svg"
-                    alt="Flag"
-                    className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5"
-                  />
-                  <span className="text-xs lg:hidden whitespace-nowrap">Start Race</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="lg:block hidden">
-                <p>Start Race</p>
-              </TooltipContent>
-            </Tooltip>
+            <OnboardingHighlight targetId="race">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => { e.currentTarget.blur(); raceStartPopup.open(); }}
+                    className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  >
+                    <img
+                      src="/svg/flag.svg"
+                      alt="Flag"
+                      className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5"
+                    />
+                    <span className="text-xs lg:hidden whitespace-nowrap">Start Race</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="lg:block hidden">
+                  <p>Start Race</p>
+                </TooltipContent>
+              </Tooltip>
+            </OnboardingHighlight>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={(e) => { e.currentTarget.blur(); onAIChat?.(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
-                >
-                  <Bot className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
-                  <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="lg:block hidden">
-                <p>AI Chat</p>
-              </TooltipContent>
-            </Tooltip>
+            <OnboardingHighlight targetId="ai">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => { e.currentTarget.blur(); onAIChat?.(); }}
+                    className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 border-r border-gray-600/50 text-white min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  >
+                    <Bot className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5" />
+                    <span className="text-xs lg:hidden whitespace-nowrap">AI Chat</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="lg:block hidden">
+                  <p>AI Chat</p>
+                </TooltipContent>
+              </Tooltip>
+            </OnboardingHighlight>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={(e) => { e.currentTarget.blur(); onInfo?.(); }}
-                  className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
-                >
-                  <Info className="flex-shrink-0 lg:w-8 lg:h-8 w-6 h-6" />
-                  <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="lg:block hidden">
-                <p>Info</p>
-              </TooltipContent>
-            </Tooltip>
+            <OnboardingHighlight targetId="info">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => { e.currentTarget.blur(); onInfo?.(); }}
+                    className="h-full w-full flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-0 bg-gray-800/90 hover:bg-gray-700/90 active:bg-gray-700/90 text-white cursor-pointer min-w-0 whitespace-nowrap px-6 lg:px-10 truncate first:pl-8 lg:first:pl-12 last:pr-6 lg:last:pr-10 select-none touch-manipulation outline-none focus:outline-none focus-visible:outline-none"
+                  >
+                    <Info className="flex-shrink-0 lg:w-8 lg:h-8 w-6 h-6" />
+                    <span className="text-xs lg:hidden whitespace-nowrap">Info</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="lg:block hidden">
+                  <p>Info</p>
+                </TooltipContent>
+              </Tooltip>
+            </OnboardingHighlight>
         </div>
       </div>
 
