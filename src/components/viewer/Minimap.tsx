@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { Map } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '../ui/dialog'
@@ -6,6 +6,7 @@ import { OnboardingHighlight } from '../tour/onboarding/OnboardingHighlight'
 import { usePopup } from '../../hooks/usePopup'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
+import { useMinimapStore } from '../../hooks/useMinimapStore'
 import { TOTAL_TOUR_AREAS } from '../../data/blockUtils'
 import type { Area } from '../../types/tour'
 
@@ -49,7 +50,7 @@ export interface MinimapProps {
  * ```
  */
 export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: MinimapProps) {
-  const [isMinimapOpen, setIsMinimapOpen] = useState(true)
+  const minimapStore = useMinimapStore()
   const expandedMap = usePopup()
   const orientation = useOrientationStore()
   const race = useRaceStore()
@@ -60,6 +61,9 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
   const areasDiscoveredLabel = isRaceMode
     ? `${race.areasCount}/${TOTAL_TOUR_AREAS}`
     : `${orientation.discoveriesCount}/${TOTAL_TOUR_AREAS}`
+
+  const isMinimapOpen = minimapStore.isOpen
+  const setIsMinimapOpen = minimapStore.setOpen
 
   return (
     <>
@@ -87,37 +91,43 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
                 <p>Expand Minimap</p>
               </TooltipContent>
             </Tooltip>
+            <div className="absolute top-0 right-0">
+              <OnboardingHighlight targetId="minimap-toggle-button">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setIsMinimapOpen(false)}
+                      className="w-10 h-10 bg-gray-800/80 border-2 border-gray-600 rounded-bl-lg flex items-center justify-center hover:bg-gray-700/80 text-white transition-colors cursor-pointer"
+                      aria-label="Minimize map"
+                    >
+                      <img src="/svg/map-minus.svg" alt="Minimize" className="w-5 h-5 cursor-pointer" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Close Minimap</p>
+                  </TooltipContent>
+                </Tooltip>
+              </OnboardingHighlight>
+            </div>
+          </div>
+        ) : (
+          <OnboardingHighlight targetId="minimap-toggle-button">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setIsMinimapOpen(false)}
-                  className="absolute top-0 right-0 w-10 h-10 bg-gray-800/80 border-2 border-gray-600 rounded-bl-lg flex items-center justify-center hover:bg-gray-700/80 text-white transition-colors cursor-pointer"
-                  aria-label="Minimize map"
+                  onClick={() => setIsMinimapOpen(true)}
+                  className="w-[11.55rem] lg:w-62 h-11 bg-gray-800/90 px-4 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
+                  aria-label="Open map"
                 >
-                  <img src="/svg/map-minus.svg" alt="Minimize" className="w-5 h-5 cursor-pointer" />
+                  <span className="text-white text-sm font-medium">Minimap</span>
+                  <Map className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Close Minimap</p>
+                <p>Open Minimap</p>
               </TooltipContent>
             </Tooltip>
-          </div>
-        ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setIsMinimapOpen(true)}
-                className="w-[11.55rem] lg:w-62 h-11 bg-gray-800/90 px-4 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
-                aria-label="Open map"
-              >
-                <span className="text-white text-sm font-medium">Minimap</span>
-                <Map className="w-5 h-5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Open Minimap</p>
-            </TooltipContent>
-          </Tooltip>
+          </OnboardingHighlight>
         )}
         </div>
       </OnboardingHighlight>

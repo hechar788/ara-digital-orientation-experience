@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import { type OnboardingInstructionLayout } from '@/components/tour/onboarding/OnboardingContext'
 import { useOnboarding } from '@/hooks/useOnboarding'
+import { useMinimapStore } from '@/hooks/useMinimapStore'
 import { SkipOnboardingPopup } from './SkipOnboardingPopup'
 import { cn } from '@/lib/utils'
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
@@ -17,7 +18,11 @@ const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { containe
   },
   'zoom-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[17.5rem] sm:top-[21rem] sm:right-4'
+    position: 'top-[17.5rem] sm:top-[21.15rem] sm:right-4'
+  },
+  'zoom-right-minimap-closed': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
+    position: 'top-[17.5rem] sm:top-[8.25rem] sm:right-4'
   },
   'minimap-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
@@ -82,6 +87,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   } = useOnboarding()
   const [isSkipPopupOpen, setIsSkipPopupOpen] = useState(false)
   const isTouchDevice = useIsTouchDevice()
+  const minimap = useMinimapStore()
 
   const displayText = useMemo(() => {
     if (!currentConfig) {
@@ -94,9 +100,20 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   }, [currentConfig, isTouchDevice])
 
   const defaultLayout = INSTRUCTION_LAYOUT_PRESETS['center-bottom']
-  const layoutConfig = currentConfig
-    ? INSTRUCTION_LAYOUT_PRESETS[currentConfig.layout] ?? defaultLayout
-    : defaultLayout
+
+  // Dynamically adjust layout for zoom step based on minimap state
+  const layoutConfig = useMemo(() => {
+    if (!currentConfig) return defaultLayout
+
+    let layout = currentConfig.layout
+
+    // Step 3 is the zoom controls step - adjust based on minimap open/closed state
+    if (currentStep === 3 && layout === 'zoom-right') {
+      layout = minimap.isOpen ? 'zoom-right' : 'zoom-right-minimap-closed'
+    }
+
+    return INSTRUCTION_LAYOUT_PRESETS[layout] ?? defaultLayout
+  }, [currentConfig, currentStep, minimap.isOpen, defaultLayout])
 
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
