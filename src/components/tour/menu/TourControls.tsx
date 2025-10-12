@@ -107,7 +107,7 @@ export const TourControls: React.FC<TourControlsProps> = ({
                     <img
                       src="/svg/flag.svg"
                       alt="Flag"
-                      className="flex-shrink-0 lg:w-8 lg:h-8 w-5 h-5"
+                      className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8"
                     />
                     <span className="text-xs lg:hidden whitespace-nowrap">Start Race</span>
                   </button>
