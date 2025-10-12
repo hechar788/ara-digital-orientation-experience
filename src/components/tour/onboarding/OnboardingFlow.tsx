@@ -22,15 +22,19 @@ const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { containe
   },
   'zoom-right-minimap-closed': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[17.5rem] sm:top-[8.25rem] sm:right-4'
+    position: 'top-[10rem] sm:top-[8.25rem] sm:right-4'
   },
   'minimap-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
     position: 'top-[17.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
   },
+  'minimap-right-minimap-closed': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
+    position: 'top-[10rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+  },
   'controls-bottom': {
     container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
-    position: 'bottom-20 sm:bottom-[5.5rem]'
+    position: 'bottom-20 lg:bottom-[5.5rem]'
   }
 }
 
@@ -101,7 +105,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
   const defaultLayout = INSTRUCTION_LAYOUT_PRESETS['center-bottom']
 
-  // Dynamically adjust layout for zoom step based on minimap state
+  // Dynamically adjust layout based on minimap state
   const layoutConfig = useMemo(() => {
     if (!currentConfig) return defaultLayout
 
@@ -110,6 +114,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     // Step 3 is the zoom controls step - adjust based on minimap open/closed state
     if (currentStep === 3 && layout === 'zoom-right') {
       layout = minimap.isOpen ? 'zoom-right' : 'zoom-right-minimap-closed'
+    }
+
+    // Steps 4 and 5 are minimap steps - adjust based on minimap open/closed state
+    if ((currentStep === 4 || currentStep === 5) && layout === 'minimap-right') {
+      layout = minimap.isOpen ? 'minimap-right' : 'minimap-right-minimap-closed'
     }
 
     return INSTRUCTION_LAYOUT_PRESETS[layout] ?? defaultLayout

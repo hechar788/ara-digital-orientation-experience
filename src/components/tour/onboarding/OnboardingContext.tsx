@@ -30,7 +30,7 @@ export type OnboardingTarget =
  */
 export type OnboardingInstructionLayout =
   | 'center-top' | 'center-bottom' | 'controls-bottom'
-  | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' 
+  | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' | 'minimap-right-minimap-closed' 
 
 /**
  * Highlight display variants for target elements
