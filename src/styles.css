@@ -158,8 +158,8 @@ code {
       display: none;
     }
   }
-
-  @media (max-height: 797px) {
+  /*Do greater than 350 width too to prevent scroll*/
+  @media (max-height: 750px) {
     .hide-logo-on-short-screen {
       display: none;
     }
