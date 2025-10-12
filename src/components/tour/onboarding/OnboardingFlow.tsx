@@ -17,7 +17,7 @@ const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { containe
   },
   'zoom-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[17.5rem] sm:right-4'
+    position: 'top-[17.5rem] sm:top-[21rem] sm:right-4'
   },
   'minimap-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
