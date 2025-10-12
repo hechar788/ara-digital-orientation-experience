@@ -7,7 +7,7 @@ import React, { createContext, useCallback, useMemo, useReducer } from 'react'
  * reducer transitions and targeted unit testing.
  */
 export type OnboardingStepId =
-  | 'navigation-arrows' | 'drag-camera' | 'zoom-controls' | 'minimap-overview'
+  | 'navigation-arrows' | 'drag-camera' | 'zoom-controls' | 'minimap-toggle' | 'minimap-popup'
   | 'fullscreen-toggle' | 'race-mode' | 'ai-assistant' | 'info-hub'
 
 /**
@@ -18,7 +18,7 @@ export type OnboardingStepId =
  * (e.g., for gesture-based instructions like drag-to-pan).
  */
 export type OnboardingTarget =
-  | 'arrows' | 'zoom' | 'minimap' | 'fullscreen'
+  | 'arrows' | 'zoom' | 'minimap' | 'minimap-toggle-button' | 'fullscreen'
   | 'race' | 'ai' | 'info' | null
 
 /**
@@ -30,7 +30,7 @@ export type OnboardingTarget =
  */
 export type OnboardingInstructionLayout =
   | 'center-top' | 'center-bottom' | 'controls-bottom'
-  | 'zoom-right' | 'minimap-right' 
+  | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' 
 
 /**
  * Highlight display variants for target elements
@@ -46,7 +46,7 @@ export type OnboardingHighlightVariant = 'background' | 'overlay' | 'none'
  * Defines the instruction text, highlighted element, instruction box layout,
  * and highlight treatment for each step in the onboarding flow.
  *
- * @property step - Step number (1-8)
+ * @property step - Step number (1-9)
  * @property id - Stable identifier for the step
  * @property target - UI element to highlight during this step
  * @property text - Instruction text to display on desktop devices
@@ -67,7 +67,7 @@ export interface OnboardingStepConfig {
 /**
  * Onboarding step configurations
  *
- * Array defining all 8 steps of the onboarding flow with their respective
+ * Array defining all 9 steps of the onboarding flow with their respective
  * targets, instruction text, instruction box positioning, and highlight rules.
  */
 export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
@@ -100,15 +100,24 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
   },
   {
     step: 4,
-    id: 'minimap-overview',
-    target: 'minimap',
-    text: 'Click the Minimap to open it in fullscreen and quickly jump to any locations you would like to visit.',
-    mobileText: 'Tap the Minimap to open it in fullscreen and quickly jump to any locations you would like to visit.',
+    id: 'minimap-toggle',
+    target: 'minimap-toggle-button',
+    text: 'Click the Minimap button to open it and view your location. Use the close button in the top right corner to collapse it when needed.',
+    mobileText: 'Tap the Minimap button to open it. Use the close button in the top right to collapse it.',
     layout: 'minimap-right',
     highlightVariant: 'background'
   },
   {
     step: 5,
+    id: 'minimap-popup',
+    target: 'minimap',
+    text: 'When open, click the minimap image to view the full campus map in fullscreen and quickly jump to locations.',
+    mobileText: 'When open, tap the minimap to view the full campus map in fullscreen and navigate to locations.',
+    layout: 'minimap-right',
+    highlightVariant: 'background'
+  },
+  {
+    step: 6,
     id: 'fullscreen-toggle',
     target: 'fullscreen',
     text: 'Use the full screen button to expand the tour to fit your device.',
@@ -116,7 +125,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     highlightVariant: 'overlay'
   },
   {
-    step: 6,
+    step: 7,
     id: 'race-mode',
     target: 'race',
     text: 'Click the Amazing Race button to start the Amazing Race.',
@@ -124,7 +133,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     highlightVariant: 'overlay'
   },
   {
-    step: 7,
+    step: 8,
     id: 'ai-assistant',
     target: 'ai',
     text: 'Click the Assistant button to open the AI Assistant and ask it any questions you may have.',
@@ -132,7 +141,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     highlightVariant: 'overlay'
   },
   {
-    step: 8,
+    step: 9,
     id: 'info-hub',
     target: 'info',
     text: 'Click the Information button to open the information screen or repeat this tutorial at any time.',
@@ -148,7 +157,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
  * the OnboardingFlow component to manage step progression and by
  * OnboardingHighlight components to determine visual highlighting.
  *
- * @property currentStep - Current step number (1-8)
+ * @property currentStep - Current step number (1-9)
  * @property currentStepId - Identifier for the current onboarding step
  * @property currentConfig - Configuration object for the active step
  * @property isActive - Whether onboarding is currently running

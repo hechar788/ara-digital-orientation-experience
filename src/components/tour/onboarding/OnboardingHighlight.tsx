@@ -71,7 +71,7 @@ export const OnboardingHighlight: React.FC<OnboardingHighlightProps> = ({
   return (
     <div
       className={cn(
-        'relative bg-yellow-400/30 p-2 rounded-lg',
+        'relative bg-yellow-500/60 p-2 rounded-lg',
         className
       )}
     >
