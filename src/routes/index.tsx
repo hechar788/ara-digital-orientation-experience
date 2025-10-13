@@ -45,6 +45,13 @@ function App() {
             isRaceMode={isRaceMode}
           />
 
+          {/* Zoom Slider */}
+          <PanoramicZoomSlider
+            currentFov={currentFov}
+            onZoomChange={setCurrentFov}
+            className="w-[11.55rem] lg:w-62 !py-1.5"
+          />
+
           {/* Race Locations Counter - Only in Race Mode */}
           {isRaceMode && (
             <RaceLocationCounter
@@ -53,13 +60,6 @@ function App() {
               className="w-[11.55rem] lg:w-62"
             />
           )}
-
-          {/* Zoom Slider */}
-          <PanoramicZoomSlider
-            currentFov={currentFov}
-            onZoomChange={setCurrentFov}
-            className="w-[11.55rem] lg:w-62 !py-1.5"
-          />
         </div>
 
         <PanoramicViewer
