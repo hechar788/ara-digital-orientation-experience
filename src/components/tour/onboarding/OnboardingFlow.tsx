@@ -18,19 +18,27 @@ const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { containe
   },
   'zoom-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[17.5rem] sm:top-[21.15rem] sm:right-4'
+    position: 'top-[16.75rem] sm:top-[21.15rem] sm:right-4'
   },
   'zoom-right-minimap-closed': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[10rem] sm:top-[8.25rem] sm:right-4'
+    position: 'top-[8.5rem] sm:top-[8.25rem] sm:right-4'
   },
   'minimap-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[17.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[15.7rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+  },
+  'minimap-right-step5': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
+    position: 'top-[16.65rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
   },
   'minimap-right-minimap-closed': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[10rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+  },
+  'minimap-right-minimap-closed-step5': {
+    container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
+    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
   },
   'controls-bottom': {
     container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
@@ -116,9 +124,14 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       layout = minimap.isOpen ? 'zoom-right' : 'zoom-right-minimap-closed'
     }
 
-    // Steps 4 and 5 are minimap steps - adjust based on minimap open/closed state
-    if ((currentStep === 4 || currentStep === 5) && layout === 'minimap-right') {
+    // Step 4 is minimap toggle step - adjust based on minimap open/closed state
+    if (currentStep === 4 && layout === 'minimap-right') {
       layout = minimap.isOpen ? 'minimap-right' : 'minimap-right-minimap-closed'
+    }
+
+    // Step 5 is minimap popup step - adjust based on minimap open/closed state
+    if (currentStep === 5 && layout === 'minimap-right') {
+      layout = minimap.isOpen ? 'minimap-right-step5' : 'minimap-right-minimap-closed-step5'
     }
 
     return INSTRUCTION_LAYOUT_PRESETS[layout] ?? defaultLayout
