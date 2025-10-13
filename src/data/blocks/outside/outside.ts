@@ -55,6 +55,7 @@ export const outsideArea: Area = {
       startingAngle: 272.5,
       directions: {
         left: { connection: 'outside-x-north-2' },
+        forwardRight: { connection: 'outside-g-mid-4' },
         back: { connection: 'outside-x-north-entrance' }
       }
     },
@@ -323,6 +324,7 @@ export const outsideArea: Area = {
       startingAngle: 183.5,
       directions: {
         forwardLeft: { connection: 'outside-g-mid-5' },
+        right: { connection: 'outside-x-north-1' },
         back: { connection: 'outside-g-mid-3' }
       }
     },
@@ -332,7 +334,7 @@ export const outsideArea: Area = {
       startingAngle: 187.5,
       directions: {
         forward: { connection: 'outside-tm-1' },
-        backRight: { connection: 'outside-g-mid-4' }
+        right: { connection: 'outside-g-mid-4' }
       }
     },
     {
