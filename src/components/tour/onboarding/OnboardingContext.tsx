@@ -30,7 +30,7 @@ export type OnboardingTarget =
  */
 export type OnboardingInstructionLayout =
   | 'center-top' | 'center-bottom' | 'controls-bottom'
-  | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' | 'minimap-right-minimap-closed' 
+  | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' | 'minimap-right-step5' | 'minimap-right-minimap-closed' | 'minimap-right-minimap-closed-step5' 
 
 /**
  * Highlight display variants for target elements
@@ -94,7 +94,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     id: 'zoom-controls',
     target: 'zoom',
     text: 'Use the zoom slider or scroll to zoom in and out of the tour.',
-    mobileText: 'Use the zoom slider or pinch to zoom in and out of the tour.',
+    mobileText: 'Use the zoom slider or pinch the screen to zoom in and out of the tour.',
     layout: 'zoom-right',
     highlightVariant: 'background'
   },
