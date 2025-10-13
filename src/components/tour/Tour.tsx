@@ -55,7 +55,7 @@ export const Tour: React.FC<TourProps> = ({
 }) => {
   const aiChat = usePopup()
   const info = usePopup()
-  const { isVisible: isOnboardingVisible, startOnboarding } = useOnboarding()
+  const { isVisible: isOnboardingVisible, startOnboarding, skipOnboarding } = useOnboarding()
 
   // Show info popup on first session (hard refresh)
   useEffect(() => {
@@ -66,6 +66,11 @@ export const Tour: React.FC<TourProps> = ({
     }
   }, [])
 
+  const handleStartRace = () => {
+    skipOnboarding()
+    onStartRace?.()
+  }
+
   return (
     <>
       <TourControls
@@ -73,7 +78,7 @@ export const Tour: React.FC<TourProps> = ({
         style={style}
         onAIChat={aiChat.toggle}
         onInfo={info.toggle}
-        onStartRace={onStartRace}
+        onStartRace={handleStartRace}
       />
 
       <AIChatPopup

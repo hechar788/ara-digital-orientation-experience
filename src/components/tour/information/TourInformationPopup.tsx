@@ -47,6 +47,9 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   const isLastSection = activeIndex === sections.length - 1
   const isDocumentsSection = activeSection.key === 'documents'
   const isIntroductionSection = activeSection.key === 'introduction'
+  const listHeading = activeSection.listHeading ?? ''
+  const listItems = activeSection.listItems ?? []
+  const hasList = listItems.length > 0
   const mediaContent = activeSection.renderMedia ? activeSection.renderMedia() : null
   const footerNote = activeSection.footerNote ?? ''
   const shouldRenderFooterNote = footerNote.trim().length > 0
@@ -128,6 +131,18 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                   </p>
                 ))}
               </div>
+              {hasList ? (
+                <div className="space-y-2">
+                  {listHeading ? (
+                    <p className="text-sm font-semibold leading-relaxed text-foreground sm:text-base">{listHeading}</p>
+                  ) : null}
+                  <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-foreground sm:text-base">
+                    {listItems.map(item => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               {shouldRenderFooterNote ? (
                 <p className={`text-sm text-foreground sm:text-base ${footnoteSpacingClass}`}>{footerNote}</p>
               ) : null}
