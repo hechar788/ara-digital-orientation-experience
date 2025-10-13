@@ -123,16 +123,20 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const updateHotspotDisplay = useCallback(() => {
     if (!hotspotsGroupRef.current) return
 
-    const scale = calculateHotspotScale(fov)
-    const hiddenLocationScale = scale * HIDDEN_LOCATION_SCALE_FACTOR
-
     hotspotsGroupRef.current.children.forEach((object) => {
       const hotspotType = object.userData?.type
 
       object.visible = true
-      object.scale.setScalar(
-        hotspotType === 'hiddenLocation' ? hiddenLocationScale : scale
-      )
+
+      if (hotspotType === 'hiddenLocation') {
+        // Hidden locations scale normally without minimum, and apply size factor
+        const hiddenLocationScale = calculateHotspotScale(fov, false) * HIDDEN_LOCATION_SCALE_FACTOR
+        object.scale.setScalar(hiddenLocationScale)
+      } else {
+        // Navigation hotspots (elevator/stairs/door) have minimum size
+        const navigationScale = calculateHotspotScale(fov, true)
+        object.scale.setScalar(navigationScale)
+      }
     })
   }, [fov])
 

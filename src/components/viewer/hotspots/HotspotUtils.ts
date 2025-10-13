@@ -448,17 +448,33 @@ export async function createHotspotGeometry(direction: string): Promise<{
 }
 
 /**
+ * Minimum scale factor for navigation hotspots
+ *
+ * Prevents navigation hotspots (elevator/stairs/door) from becoming too small
+ * when zoomed out, maintaining visibility and usability at all zoom levels.
+ */
+export const MIN_NAVIGATION_HOTSPOT_SCALE = 0.825
+
+/**
  * Calculate dynamic scale for hotspot based on camera zoom level
  *
  * Adjusts hotspot size based on field of view to maintain visibility
  * and readability at different zoom levels.
  *
  * @param fov - Current camera field of view in degrees
+ * @param applyMinimum - Whether to apply minimum scale (true for navigation hotspots, false for hidden locations)
  * @returns Scale factor for hotspot size
  */
-export function calculateHotspotScale(fov: number): number {
+export function calculateHotspotScale(fov: number, applyMinimum: boolean = true): number {
   // Scale between 0.5 and 1.5 based on FOV (10-120 degrees)
-  return (120 - fov) / 100 + 0.5
+  const scale = (120 - fov) / 100 + 0.5
+
+  // Apply minimum scale for navigation hotspots only
+  if (applyMinimum) {
+    return Math.max(scale, MIN_NAVIGATION_HOTSPOT_SCALE)
+  }
+
+  return scale
 }
 
 /**
