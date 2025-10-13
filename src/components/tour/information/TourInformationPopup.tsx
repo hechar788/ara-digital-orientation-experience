@@ -51,6 +51,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   const listItems = activeSection.listItems ?? []
   const hasList = listItems.length > 0
   const mediaContent = activeSection.renderMedia ? activeSection.renderMedia() : null
+  const customContent = activeSection.renderContent ? activeSection.renderContent() : null
   const footerNote = activeSection.footerNote ?? ''
   const shouldRenderFooterNote = footerNote.trim().length > 0
   const footnoteSpacingClass = isIntroductionSection
@@ -124,29 +125,33 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
             </nav>
             <div className="space-y-3 sm:space-y-3.5">
               <h3 className="text-base font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
-              <div className="space-y-2.5 sm:space-y-3">
-                {activeSection.paragraphs.map((paragraph: string) => (
-                  <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-              {hasList ? (
-                <div className="space-y-2">
-                  {listHeading ? (
-                    <p className="text-sm font-semibold leading-relaxed text-foreground sm:text-base">{listHeading}</p>
-                  ) : null}
-                  <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-foreground sm:text-base">
-                    {listItems.map(item => (
-                      <li key={item}>{item}</li>
+              {customContent ?? (
+                <>
+                  <div className="space-y-2.5 sm:space-y-3">
+                    {activeSection.paragraphs.map((paragraph: string) => (
+                      <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
+                        {paragraph}
+                      </p>
                     ))}
-                  </ul>
-                </div>
-              ) : null}
-              {shouldRenderFooterNote ? (
-                <p className={`text-sm text-foreground sm:text-base ${footnoteSpacingClass}`}>{footerNote}</p>
-              ) : null}
-              {mediaContent ? <div className={mediaWrapperClass}>{mediaContent}</div> : null}
+                  </div>
+                  {hasList ? (
+                    <div className="space-y-2">
+                      {listHeading ? (
+                        <p className="text-sm font-semibold leading-relaxed text-foreground sm:text-base">{listHeading}</p>
+                      ) : null}
+                      <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-foreground sm:text-base">
+                        {listItems.map(item => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {shouldRenderFooterNote ? (
+                    <p className={`text-sm text-foreground sm:text-base ${footnoteSpacingClass}`}>{footerNote}</p>
+                  ) : null}
+                  {mediaContent ? <div className={mediaWrapperClass}>{mediaContent}</div> : null}
+                </>
+              )}
             </div>
           </div>
           <div className="flex items-center justify-between border-t border-border bg-muted/20 px-6 py-3 sm:py-4">

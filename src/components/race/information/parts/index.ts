@@ -1,5 +1,6 @@
 import type { Information } from '@/types/information'
 import { partOneRaceSection } from './partOneSection'
+import { partTwoRaceSection } from './partTwoSection'
 
 /**
  * Ordered collection of race information sections rendered in the popup.
@@ -11,4 +12,4 @@ import { partOneRaceSection } from './partOneSection'
  * const sections = raceInformationSections
  * ```
  */
-export const raceInformationSections: Information[] = [partOneRaceSection]
+export const raceInformationSections: Information[] = [partOneRaceSection, partTwoRaceSection]
