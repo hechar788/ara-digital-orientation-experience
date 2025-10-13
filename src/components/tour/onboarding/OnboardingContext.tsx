@@ -9,6 +9,7 @@ import React, { createContext, useCallback, useMemo, useReducer } from 'react'
 export type OnboardingStepId =
   | 'navigation-arrows' | 'drag-camera' | 'zoom-controls' | 'minimap-toggle' | 'minimap-popup'
   | 'fullscreen-toggle' | 'race-mode' | 'ai-assistant' | 'info-hub'
+  | 'stairs-hotspot' | 'elevator-hotspot' | 'door-hotspot'
 
 /**
  * Target element types that can be highlighted during onboarding
@@ -29,7 +30,7 @@ export type OnboardingTarget =
  * than hard-coded ternaries.
  */
 export type OnboardingInstructionLayout =
-  | 'center-top' | 'center-bottom' | 'controls-bottom'
+  | 'center-top' | 'center-bottom' | 'center-center' | 'controls-bottom'
   | 'zoom-right' | 'zoom-right-minimap-closed' | 'minimap-right' | 'minimap-right-step5' | 'minimap-right-minimap-closed' | 'minimap-right-minimap-closed-step5' 
 
 /**
@@ -67,7 +68,7 @@ export interface OnboardingStepConfig {
 /**
  * Onboarding step configurations
  *
- * Array defining all 9 steps of the onboarding flow with their respective
+ * Array defining all 12 steps of the onboarding flow with their respective
  * targets, instruction text, instruction box positioning, and highlight rules.
  */
 export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
@@ -147,6 +148,33 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     text: 'Click the Information button to open the information screen or repeat this tutorial at any time.',
     layout: 'controls-bottom',
     highlightVariant: 'overlay'
+  },
+  {
+    step: 10,
+    id: 'stairs-hotspot',
+    target: null,
+    text: 'When available use stairs icons to choose whether to go up or down floors within buildings.',
+    mobileText: 'Tap stairs icons to move between floors in buildings.',
+    layout: 'center-center',
+    highlightVariant: 'none'
+  },
+  {
+    step: 11,
+    id: 'elevator-hotspot',
+    target: null,
+    text: 'Elevator icons allow you to select which floor you want to visit within multi-story buildings.',
+    mobileText: 'Use elevator icons to select floors in buildings.',
+    layout: 'center-center',
+    highlightVariant: 'none'
+  },
+  {
+    step: 12,
+    id: 'door-hotspot',
+    target: null,
+    text: 'Door icons indicate entrances and exits between different spaces.',
+    mobileText: 'Door icons show entrances and exits between spaces.',
+    layout: 'center-center',
+    highlightVariant: 'none'
   }
 ]
 
@@ -157,7 +185,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
  * the OnboardingFlow component to manage step progression and by
  * OnboardingHighlight components to determine visual highlighting.
  *
- * @property currentStep - Current step number (1-9)
+ * @property currentStep - Current step number (1-12)
  * @property currentStepId - Identifier for the current onboarding step
  * @property currentConfig - Configuration object for the active step
  * @property isActive - Whether onboarding is currently running

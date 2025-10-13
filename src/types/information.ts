@@ -10,6 +10,8 @@ import type { ReactNode } from 'react'
  * @property heading - Primary heading that introduces the section (`string`)
  * @property paragraphs - Ordered list of paragraph copy to render (`string[]`)
  * @property footerNote - Supporting note displayed after the paragraphs (`string`)
+ * @property listHeading - Optional heading displayed directly above the list items (`string`)
+ * @property listItems - Optional ordered list of bullet copy to render beneath the list heading (`string[]`)
  * @property renderMedia - Optional factory returning additional JSX (for example, an image component)
  */
 export interface Information {
@@ -18,5 +20,7 @@ export interface Information {
   heading: string
   paragraphs: string[]
   footerNote: string
+  listHeading?: string
+  listItems?: string[]
   renderMedia?: () => ReactNode
 }
