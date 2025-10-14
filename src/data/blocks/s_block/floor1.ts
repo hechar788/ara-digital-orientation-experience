@@ -37,10 +37,16 @@ export const sBlockFloor1Area: Area = {
         forward: { connection: 's-f1-mid-3' },
         back: { connection: 'n-f1-west-9' }
       },
-      buildingContext: {
-        wing: 'north',
-        facilities: ['connection to N Block', 'offices']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'S171',
+          roomType: 'office'
+        },
+        {
+          roomNumber: 'S170',
+          roomType: 'office'
+        }
+      ]
     },
     {
       id: 's-f1-mid-3',
@@ -50,10 +56,12 @@ export const sBlockFloor1Area: Area = {
         forward: { connection: 's-f1-south-2' },
         back: { connection: 's-f1-north-4' }
       },
-      buildingContext: {
-        wing: 'middle',
-        facilities: ['elevators', 'restrooms']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'S169',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 's-f1-south-2',
@@ -62,7 +70,17 @@ export const sBlockFloor1Area: Area = {
       directions: {
         forward: { connection: 's-f1-south-entrance' },
         back: { connection: 's-f1-mid-3' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S154',
+          roomType: 'office'
+        },
+        {
+          roomNumber: 'S156',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 's-f1-south-entrance',
@@ -71,10 +89,13 @@ export const sBlockFloor1Area: Area = {
       directions: {
         back: { connection: 's-f1-south-2' }
       },
-      buildingContext: {
-        wing: 'south',
-        facilities: ['main entrance', 'information desk', 'exit']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'S157',
+          roomType: 'classroom'
+        }
+      ]
+
     }
   ]
 }

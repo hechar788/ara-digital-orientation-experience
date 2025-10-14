@@ -76,10 +76,10 @@ export const nBlockFloor1Area: Area = {
       directions: {
         back: { connection: 'n-f1-east-south-3' }
       },
-      buildingContext: {
-        wing: 'east',
-        facilities: ['offices', 'conference rooms']
-      }
+      nearbyRooms: [{
+        roomNumber: 'N104',
+        roomType: 'classroom'
+      }]
     },
     {
       id: 'n-f1-east-5',
@@ -123,11 +123,7 @@ export const nBlockFloor1Area: Area = {
           position: { x: 2.25, y: -0.5, z: 4 },
           destination: 'outside-s-north-entrance'
         }
-      ],
-      buildingContext: {
-        wing: 'middle',
-        facilities: ['elevators', 'restrooms']
-      }
+      ]
     },
     {
       id: 'n-f1-west-8',
@@ -154,10 +150,12 @@ export const nBlockFloor1Area: Area = {
           destination: 'n-f1-sandys-office'
         }
       ],
-      buildingContext: {
-        wing: 'west',
-        facilities: ['classrooms', 'faculty offices']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'S153',
+          roomType: 'office'
+        }
+      ]
     }
   ]
 }

@@ -46,6 +46,12 @@ export const aBlockFloor2Area: Area = {
           direction: 'down',
           position: { x: 3.75, y: -1.15, z: -0.85 }
         }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'Pearson Vue Testing Centre',
+          roomType: 'facility'
+        }
       ]
     },
     {
@@ -84,7 +90,17 @@ export const aBlockFloor2Area: Area = {
       directions: {
         forward: { connection: 'a-f2-mid-4' },
         back: { connection: 'a-f2-north-2' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'Unkown',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'Unkown',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'a-f2-mid-4',
@@ -99,6 +115,16 @@ export const aBlockFloor2Area: Area = {
         {
           direction: 'down',
           position: { x: -9.5, y: -0.35, z: -0.25 }
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'Unkown',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'Unkown',
+          roomType: 'classroom'
         }
       ]
     },

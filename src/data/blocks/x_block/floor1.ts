@@ -100,6 +100,12 @@ export const xBlockFloor1Area: Area = {
           direction: 'up',
           position: { x: -5.25, y: -0.35, z: -7.5 }  // Stairs
         }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'Coffee Infusion',
+          roomType: 'facility'
+        }
       ]
     },
     {
@@ -149,7 +155,13 @@ export const xBlockFloor1Area: Area = {
           position: { x: -2, y: -0.15, z: 1.35 },
           destination: 'library-f1-entrance'
         }
-      ]
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'The Library',
+          roomType: 'facility'
+        }
+    ]
     },
     {
       id: 'x-f1-mid-6-aside',
@@ -163,6 +175,12 @@ export const xBlockFloor1Area: Area = {
         {
           direction: 'elevator',
           position: { x: -4, y: -1, z: 0 }  // Elevator
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'Security Services',
+          roomType: 'facility'
         }
       ]
     },
@@ -180,7 +198,13 @@ export const xBlockFloor1Area: Area = {
           direction: 'elevator',
           position: { x: -6, y: -0.35, z: -8 }  // Elevator
         }
-      ]
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'Information Desk',
+          roomType: 'facility'
+        }
+    ]
     },
     {
       id: 'x-f1-mid-8',
@@ -188,7 +212,17 @@ export const xBlockFloor1Area: Area = {
       directions: {
         forward: { connection: 'x-f1-west-9' },
         back: { connection: 'x-f1-mid-7' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'L103 - Student Support',
+          roomType: 'facility'
+        },
+        {
+          roomNumber: 'The Hub',
+          roomType: 'facility'
+        }
+      ]
     },
     {
       id: 'x-f1-west-9',
@@ -204,7 +238,17 @@ export const xBlockFloor1Area: Area = {
       directions: {
         forward: { connection: 'x-f1-west-11' },
         back: { connection: 'x-f1-west-9' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X110 - Student Finance',
+          roomType: 'facility'
+        },
+        {
+          roomNumber: 'X108 - Careers & Employment',
+          roomType: 'facility'
+        }
+      ]
     },
     {
       id: 'x-f1-west-11',
@@ -213,7 +257,13 @@ export const xBlockFloor1Area: Area = {
       directions: {
         back: { connection: 'x-f1-west-10' },
         forward: { connection: 'x-f1-west-12' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'Ara Connect',
+          roomType: 'facility'
+        }
+      ]
     },
     {
       id: 'x-f1-west-12',
@@ -224,10 +274,6 @@ export const xBlockFloor1Area: Area = {
         backLeft: { connection: 'x-f1-west-11' },
         up: 'x-f2-north-entry',
         door: 'outside-x-north-entrance'
-      },
-      buildingContext: {
-        wing: 'west',
-        facilities: ['classrooms', 'offices', 'restrooms']
       },
       hotspots: [
         {

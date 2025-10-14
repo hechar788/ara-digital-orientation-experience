@@ -60,7 +60,17 @@ export const xBlockFloor3Area: Area = {
         back: { connection: 'x-f3-west-2' },
         forward: { connection: 'x-f3-west-entry' },
         left: { connection: 'x-f3-west-1-aside' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X302',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X304',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f3-west-1-aside',
@@ -73,12 +83,22 @@ export const xBlockFloor3Area: Area = {
         {
           direction: 'door',
           position: { x: 5, y: -0.5, z: 0.4 },
-          destination: 'x-302-classroom'
+          destination: 'x-303-classroom'
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'X303',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X305',
+          roomType: 'classroom'
         }
       ]
     },
     {
-      id: 'x-302-classroom',
+      id: 'x-303-classroom',
       imageUrl: '/360_photos_compressed/x_block/floor_3/x302.webp',
       directions: {
         door: 'x-f3-west-1-aside'
@@ -134,7 +154,17 @@ export const xBlockFloor3Area: Area = {
       directions: {
         back: { connection: 'x-f3-east-7' },
         forward: { connection: 'x-f3-mid-5' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X306',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X308',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f3-east-7',
@@ -159,10 +189,12 @@ export const xBlockFloor3Area: Area = {
       directions: {
         back: { connection: 'x-f3-east-7' }
       },
-      buildingContext: {
-        wing: 'east',
-        facilities: ['classrooms', 'offices', 'study areas']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'X313',
+          roomType: 'classroom'
+        }
+      ]
     }
   ]
 }

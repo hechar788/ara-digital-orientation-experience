@@ -44,7 +44,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   onNavigate,
   onNavigateToPhoto,
   onFovChange,
-  initialFov = 75,
+  initialFov = 81,
   timerClassName = '',
   onRaceModeChange
 }) => {

@@ -90,7 +90,13 @@ export const sBlockFloor4Area: Area = {
       directions: {
         forward: { connection: 's-f4-corner-5' },
         back: { connection: 's-f4-mid-3' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S469',
+          roomType: 'office'
+        }
+      ]
     },
     {
       id: 's-f4-corner-5',
@@ -99,10 +105,6 @@ export const sBlockFloor4Area: Area = {
       directions: {
         forward: { connection: 's-f4-north-6' },
         left: { connection: 's-f4-mid-4' }
-      },
-      buildingContext: {
-        wing: 'corner',
-        facilities: ['corridor intersection']
       }
     },
     {
@@ -112,10 +114,6 @@ export const sBlockFloor4Area: Area = {
       directions: {
         forward: { connection: 's-f4-north-7' },
         back: { connection: 's-f4-corner-5' }
-      },
-      buildingContext: {
-        wing: 'north',
-        facilities: ['classrooms', 'offices']
       }
     },
     {
@@ -133,6 +131,16 @@ export const sBlockFloor4Area: Area = {
           position: { x: -2.5, y: -0.5, z: 2.5 },
           destination: 's-f4-inside-453'
         }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'S453',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'S460',
+          roomType: 'classroom'
+        }
       ]
     },
     {
@@ -148,6 +156,20 @@ export const sBlockFloor4Area: Area = {
           direction: 'door',
           position: { x: -1.1, y: -0.35, z: 3 },  // TODO: Set correct position for switch-4
           destination: 's-f4-switch-4'
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'S454',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'S455',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'S458',
+          roomType: 'classroom'
         }
       ]
     }

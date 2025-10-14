@@ -113,7 +113,7 @@ export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
         <Button
           className="min-w-16 tabular-nums h-8 text-white hover:bg-white/10 cursor-pointer"
           variant="ghost"
-          onClick={() => onZoomChange(75)}
+          onClick={() => onZoomChange(81)}
         >
           {getZoomPercentage()}%
         </Button>

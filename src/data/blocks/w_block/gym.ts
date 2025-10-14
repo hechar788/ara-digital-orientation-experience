@@ -133,6 +133,12 @@ export const wBlockGymFloor2Area: Area = {
           position: { x: -7, y: -0.5, z: -1.5 },
           destination: 'w-gym-entry'
         }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'W220 - The Zone',
+          roomType: 'facility'
+        }
       ]
     }
   ]

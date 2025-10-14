@@ -30,7 +30,7 @@ function App() {
     handleCameraChange
   } = useTourNavigation()
 
-  const [currentFov, setCurrentFov] = useState(75)
+  const [currentFov, setCurrentFov] = useState(81)
   const [isRaceMode, setIsRaceMode] = useState(false)
   const { hiddenLocationsCount } = useRaceStore()
 

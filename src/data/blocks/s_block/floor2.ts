@@ -59,7 +59,13 @@ export const sBlockFloor2Area: Area = {
       directions: {
         forward: { connection: 's-f2-mid-4' },
         back: { connection: 's-f2-mid-2' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S268',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 's-f2-mid-4',
@@ -67,7 +73,13 @@ export const sBlockFloor2Area: Area = {
       directions: {
         forward: { connection: 's-f2-south-5' },
         left: { connection: 's-f2-mid-3' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S267',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 's-f2-south-5',
@@ -75,7 +87,17 @@ export const sBlockFloor2Area: Area = {
       directions: {
         forward: { connection: 's-f2-south-6' },
         back: { connection: 's-f2-mid-4' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S265',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'S254',
+          roomType: 'facility'
+        }
+      ]
     },
     {
       id: 's-f2-south-6',
@@ -84,7 +106,13 @@ export const sBlockFloor2Area: Area = {
       directions: {
         forward: { connection: 's-f2-south-7' },
         back: { connection: 's-f2-south-5' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'S255',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 's-f2-south-7',
@@ -93,10 +121,20 @@ export const sBlockFloor2Area: Area = {
       directions: {
         back: { connection: 's-f2-south-6' }
       },
-      buildingContext: {
-        wing: 'south',
-        facilities: ['classrooms', 'offices', 'study areas']
-      }
+      nearbyRooms: [
+       {
+        roomNumber: 'S256',
+        roomType: 'classroom'
+       },
+       {
+        roomNumber: 'S264',
+        roomType: 'classroom'
+       },
+       {
+        roomNumber: 'S262',
+        roomType: 'classroom'
+       }
+      ]
     }
   ]
 }

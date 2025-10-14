@@ -86,7 +86,13 @@ export const wBlockFloor2Area: Area = {
       directions: {
         right: { connection: 'w-f2-3' },
         forward: { connection: 'w-f2-5' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'W209',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'w-f2-5',
@@ -95,7 +101,13 @@ export const wBlockFloor2Area: Area = {
       directions: {
         back: { connection: 'w-f2-4' },
         forward: { connection: 'w-f2-6' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'W210',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'w-f2-6',
@@ -104,7 +116,13 @@ export const wBlockFloor2Area: Area = {
       directions: {
         back: { connection: 'w-f2-5' },
         forward: { connection: 'w-f2-7' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'W211',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'w-f2-7',
@@ -112,7 +130,13 @@ export const wBlockFloor2Area: Area = {
       startingAngle: 190,
       directions: {
         back: { connection: 'w-f2-6' },
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'W212',
+          roomType: 'classroom'
+        }
+      ]
     }
   ]
 }

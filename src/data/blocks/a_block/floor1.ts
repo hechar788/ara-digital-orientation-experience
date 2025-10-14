@@ -114,7 +114,13 @@ export const aBlockFloor1Area: Area = {
           direction: 'up',
           position: { x: 2.75, y: -0.5, z: -2.5}
         }
-      ]
+      ],
+      nearbyRooms: [
+        {
+        roomNumber: 'A121 - Academic Records',
+        roomType: 'facility'
+        }
+    ]
     },
     {
       id: 'a-f1-mid-4',

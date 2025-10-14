@@ -85,7 +85,13 @@ export const xBlockFloor2Area: Area = {
       directions: {
         back: { connection: 'x-f2-west-3' },
         forward: { connection: 'x-f2-west-1' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X202',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f2-west-3',
@@ -103,7 +109,17 @@ export const xBlockFloor2Area: Area = {
       startingAngle: 180,
       directions: {
         back: { connection: 'x-f2-west-3' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X203',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X205',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f2-west-4',
@@ -112,7 +128,17 @@ export const xBlockFloor2Area: Area = {
       directions: {
         back: { connection: 'x-f2-west-5' },
         forward: { connection: 'x-f2-west-3' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X204',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X206',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f2-west-5',
@@ -130,7 +156,17 @@ export const xBlockFloor2Area: Area = {
       startingAngle: 180,
       directions: {
         back: { connection: 'x-f2-west-5' }
-      }
+      },
+      nearbyRooms: [
+        {
+          roomNumber: 'X205',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'X210',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f2-west-6',
@@ -140,10 +176,12 @@ export const xBlockFloor2Area: Area = {
         back: { connection: 'x-f2-mid-7' },
         forward: { connection: 'x-f2-west-5' }
       },
-      buildingContext: {
-        wing: 'west',
-        facilities: ['classrooms', 'offices', 'restrooms']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'X208',
+          roomType: 'classroom'
+        }
+      ]
     },
     {
       id: 'x-f2-mid-7',
@@ -226,6 +264,16 @@ export const xBlockFloor2Area: Area = {
           direction: 'door',
           position: { x: 7, y: -0.15, z: 0.7 },
           destination: 'library-f2-aside-1'
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'L202',
+          roomType: 'classroom'
+        },
+        {
+          roomNumber: 'L203',
+          roomType: 'classroom'
         }
       ]
     },

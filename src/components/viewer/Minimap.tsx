@@ -162,12 +162,12 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
                       </span>
                     </div>
                     <div className="flex flex-col items-start text-s text-black sm:hidden gap-1 mt-2">
-                      <span className="w-full text-left truncate">Current Area: {currentAreaName}</span>
+                      <span className="w-full text-left truncate">Current Photo: {currentPhotoId}</span>
                       <span className="w-full text-left">Areas Discovered: {areasDiscoveredLabel}</span>
                     </div>
                   </div>
                   <div className="hidden sm:flex flex-col gap-1 text-right text-s text-black">
-                    <span className="text-right">Current Area: {currentAreaName}</span>
+                    <span className="text-right">Current Photo: {currentPhotoId}</span>
                     <span className="text-right">Areas Discovered: {areasDiscoveredLabel}</span>
                   </div>
                 </div>

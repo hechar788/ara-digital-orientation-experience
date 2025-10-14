@@ -38,10 +38,24 @@ export const nBlockFloor2Area: Area = {
         back: { connection: 'x-f2-north-entry' },
         forward: { connection: 'n-f2-mid-3' }
       },
-      buildingContext: {
-        wing: 'east',
-        facilities: ['classrooms', 'offices']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'N216',
+          roomType: 'office'
+        },
+        {
+          roomNumber: 'N215',
+          roomType: 'office'
+        },
+        {
+          roomNumber: 'N214',
+          roomType: 'office'
+        },
+        {
+          roomNumber: 'N213',
+          roomType: 'office'
+        },
+      ]
     },
     {
       id: 'n-f2-mid-3',
@@ -51,10 +65,12 @@ export const nBlockFloor2Area: Area = {
         back: { connection: 'n-f2-east-4' },
         forward: { connection: 'n-f2-west-2' }
       },
-      buildingContext: {
-        wing: 'middle',
-        facilities: ['elevators', 'restrooms']
-      }
+      nearbyRooms: [
+        {
+          roomNumber: 'N226',
+          roomType: 'office'
+        }
+      ]
     },
     {
       id: 'n-f2-west-2',
@@ -72,10 +88,6 @@ export const nBlockFloor2Area: Area = {
       directions: {
         back: { connection: 'n-f2-west-2' },
         forward: { connection: 'n-f2-elevator-entrance' }
-      },
-      buildingContext: {
-        wing: 'west',
-        facilities: ['classrooms', 'faculty offices']
       }
     },
     {
@@ -96,11 +108,7 @@ export const nBlockFloor2Area: Area = {
           direction: 'elevator',
           position: { x: -1.5, y: -0.5, z: -1.5 }  // Central elevator access - right
         }
-      ],
-      buildingContext: {
-        wing: 'central',
-        facilities: ['elevators', 'wayfinding', 'accessible access']
-      }
+      ]
     }
   ]
 }
