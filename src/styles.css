@@ -164,4 +164,10 @@ code {
       display: none;
     }
   }
+
+  @media (max-height: 751px), (max-width: 397px) {
+    .hide-timer-info-on-short-screen {
+      display: none;
+    }
+  }
 }

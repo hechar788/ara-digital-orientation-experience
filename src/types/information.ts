@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
  * @property footerNote - Supporting note displayed after the paragraphs (`string`)
  * @property listHeading - Optional heading displayed directly above the list items (`string`)
  * @property listItems - Optional ordered list of bullet copy to render beneath the list heading (`string[]`)
+ * @property renderContent - Optional renderer returning custom JSX content to replace the default paragraph rendering
  * @property renderMedia - Optional factory returning additional JSX (for example, an image component)
  */
 export interface Information {
@@ -22,5 +23,6 @@ export interface Information {
   footerNote: string
   listHeading?: string
   listItems?: string[]
+  renderContent?: () => ReactNode
   renderMedia?: () => ReactNode
 }
