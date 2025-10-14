@@ -61,7 +61,7 @@ export const OnboardingHighlight: React.FC<OnboardingHighlightProps> = ({
   if (highlightVariant === 'overlay') {
     // For control buttons, use an overlay approach to show highlight on top
     return (
-      <div className={cn('relative h-full', className)}>
+      <div className={cn('relative h-full inline-block flex-shrink-0', className)}>
         {children}
         <div className="absolute inset-0 bg-yellow-400/40 pointer-events-none rounded-sm" />
       </div>
