@@ -8,6 +8,7 @@ dist-ssr
 .tanstack
 .output
 .vinxi
+.vercel
 package-lock.json
 
 # IDE/Editor files
