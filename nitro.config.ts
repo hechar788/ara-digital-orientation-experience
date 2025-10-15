@@ -5,6 +5,7 @@ export default defineNitroConfig({
 
   // Public assets are served via CDN from .vercel/output/static/
   // NOT bundled in serverless functions
+  // Note: 360_photos_original/ and 360_photos_group/ are already excluded via .gitignore
   publicAssets: [
     {
       baseURL: '/',
@@ -16,10 +17,10 @@ export default defineNitroConfig({
   // Vercel-specific configuration
   vercel: {
     config: {
-      // Exclude large assets from serverless function bundles
+      // Exclude all large static assets from serverless function bundles
       functions: {
         '**': {
-          excludeFiles: '{360_photos_compressed/**,360_photos_group/**,360_photos_original/**,ara_logos/**,campus_map/**,svg/**}'
+          excludeFiles: '{360_photos_compressed/**,ara_logos/**,campus_map/**,svg/**}'
         }
       }
     }
