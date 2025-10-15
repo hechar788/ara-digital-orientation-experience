@@ -19,7 +19,21 @@ import { nsBlockElevator } from './blocks/n_s_shared/elevator'
 import { xBlockElevator } from './blocks/x_block/elevator'
 import type { Photo, Area, Elevator } from '../types/tour'
 
-const getAllAreas = (): any[] => {
+/**
+ * Get all available areas and elevators in the tour system
+ *
+ * Collects and returns all area definitions from all building blocks
+ * and elevator systems. Used for iterating through all tour locations.
+ *
+ * @returns Array of all area definitions and elevators
+ *
+ * @example
+ * ```typescript
+ * const allAreas = getAllAreas()
+ * console.log(`Total areas: ${allAreas.length}`)
+ * ```
+ */
+export const getAllAreas = (): (Area | Elevator)[] => {
   return [
     ...aBlockAreas,
     ...xBlockAreas,
@@ -35,16 +49,15 @@ const getAllAreas = (): any[] => {
 }
 
 /**
- * Get all available areas in the tour system (private utility)
+ * Total count of all areas and elevators in the tour system
  *
- * Collects and returns all area definitions from all building blocks
- * and elevator systems. Used internally by public utility functions.
+ * Calculated at module load time by counting all area definitions
+ * and elevator systems.
  *
- * @private
- * @returns Array of all area definitions and elevators
+ * @returns Total number of areas and elevators
  */
 export const TOTAL_TOUR_AREAS = ((): number => {
-  const areas = getAllAreas();
+  const areas = getAllAreas()
   return areas.length
 })()
 
