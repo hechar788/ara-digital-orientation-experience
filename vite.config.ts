@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
+  // Disable copying public directory - Nitro will handle static assets
+  publicDir: false,
+
   plugins: [
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
