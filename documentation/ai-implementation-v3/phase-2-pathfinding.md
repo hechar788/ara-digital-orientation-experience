@@ -1,7 +1,7 @@
 # Phase 2: BFS Pathfinding Algorithm
 
-**Duration:** 45 minutes
-**Difficulty:** Medium
+**Duration:** 45 minutes  
+**Difficulty:** Medium  
 **Prerequisites:** Phase 1 complete (OpenAI setup)
 
 ---
@@ -10,160 +10,147 @@
 
 By the end of this phase, you will have:
 
-1.  Campus graph structure understood
-2.  `src/lib/pathfinding.ts` created with complete BFS implementation
-3.  Graph neighbor extraction working
-4.  Path reconstruction functional
-5.  Helper functions implemented
-6.  Unit tests written and passing
-7.  Performance validated (<10ms per path calculation)
+1. ✅ Understood the existing campus graph structure
+2. ✅ Implemented `src/lib/pathfinding.ts` with a documented BFS solution
+3. ✅ Added helper utilities for descriptions, timing, and validation
+4. ✅ Written automated tests covering common navigation scenarios
+5. ✅ Verified manual and performance checks for sub-10 ms responses
 
 ---
 
 ## Why Pathfinding First?
 
-**Strategic Decision:** We implement pathfinding BEFORE AI integration because:
+Implementing navigation before AI keeps the scope tight:
 
-1. **Independent Testing** - Can thoroughly test the algorithm without AI complexity
-2. **No Dependencies** - Pathfinding only needs your existing tour data
-3. **Fast Iteration** - Debug graph issues without waiting for OpenAI responses
-4. **Used by Phase 4** - AI server function will call this module
+- Independent module that can be exercised without OpenAI calls
+- Leverages a known, unweighted graph (perfect for BFS)
+- Provides the core primitive Phase 4 will consume
+- Enables fast iteration to validate campus data issues early
 
-**Architecture:**
+Architecture flow:
+
 ```
-Phase 2: Pathfinding (this phase) -> Standalone, testable algorithm
-                |
-Phase 4: AI + Pathfinding -> Integrate pathfinding into AI responses
+Phase 2 (this module) → Phase 4 (AI + navigation) → later chat UI phases
 ```
 
 ---
 
-## Step 2.1: Understand Your Campus Graph
+## Step 2.1: Understand the Campus Graph
 
 **Time:** 5 minutes
 
-### The Graph Already Exists!
+### Inspect Existing Data
 
-Your campus tour data is already structured as a graph. Let's understand it:
+1. Open `src/types/tour.ts` and locate the `Photo` interface:
+   ```typescript
+   export interface Photo {
+     id: string
+     directions: {
+       forward?: DirectionDefinition
+       back?: DirectionDefinition
+       left?: DirectionDefinition
+       right?: DirectionDefinition
+       up?: string | string[]
+       down?: string | string[]
+       elevator?: string | string[]
+       door?: string | string[]
+       floor1?: string
+       floor2?: string
+       floor3?: string
+       floor4?: string
+     }
+   }
+   ```
+2. Each photo is a node, and every connection is a directed edge with weight 1.
+3. Browse `src/data/blocks/a_block/floor1.ts` (and neighbours) to see real IDs.
 
-**From `src/types/tour.ts`:**
-```typescript
-interface Photo {
-  id: string                    // Node ID
-  directions: {
-    forward?: { connection: string }   // Edge to another node
-    back?: { connection: string }      // Edge to another node
-    left?: { connection: string }      // Edge to another node
-    right?: { connection: string }     // Edge to another node
-    up?: string | string[]             // Vertical edges
-    down?: string | string[]           // Vertical edges
-    door?: string | string[]           // Door edges
-    elevator?: string | string[]       // Elevator edges
-    floor1?: string                    // Floor selection
-    floor2?: string                    // Floor selection
-    // ... etc
-  }
-}
-```
+**Graph quick facts**
 
-**This is a graph where:**
-- **Nodes** = Photos (each 360-degree panoramic location)
-- **Edges** = Directional connections between photos
-- **Edge Weight** = 1 (all steps are equal - unweighted graph)
-- **Graph Type** = Directed (connections may be one-way)
+| Metric | Value | Impact |
+| --- | --- | --- |
+| Nodes | ~225 photos | BFS remains fast |
+| Edges | ~475 directed links | Dense enough for navigation |
+| Weighting | Unweighted | Shortest path guaranteed with BFS |
+| Components | Single connected | No special casing needed |
 
-### Example Graph Section
-
-```
-a-f1-north-entrance (Node)
-    -> forward -> a-f1-north-1 (Edge)
-    -> door -> outside-a-north-1 (Edge)
-
-a-f1-north-1 (Node)
-    -> forward -> a-f1-north-2 (Edge)
-    -> back -> a-f1-north-entrance (Edge)
-```
-
-### Graph Properties
-
-| Property | Value | Implication |
-|----------|-------|-------------|
-| **Nodes** | 225 photos | Medium-sized graph |
-| **Edges** | 476 directional connections | Moderately connected |
-| **Average Degree** | ~2.1 edges/node | Most rooms have two navigable options |
-| **Components** | 1 (mostly) | Fully connected |
-| **Weighted** | No (all edges = 1) | Use BFS, not Dijkstra |
-
-**Perfect for BFS!** Unweighted graphs with BFS = guaranteed shortest path.
-
- **Validation:** Review `src/data/blocks/a_block/floor1.ts` to see actual connection structure
+✅ **Validation:** Identify three sample photo IDs and their immediate neighbors in the data files.
 
 ---
 
-## Step 2.2: Create Pathfinding Module
+## Step 2.2: Implement the Pathfinding Module
 
 **Time:** 25 minutes
 
-### Create the File
+### Create the file
 
 ```bash
-# Create directory if needed
 mkdir -p src/lib
-
-# Create pathfinding file
 touch src/lib/pathfinding.ts
 ```
 
-**Windows:**
-```bash
-mkdir src\lib
-type nul > src\lib\pathfinding.ts
-```
+### Add the BFS implementation
 
-### Implement Complete Pathfinding Module
-
-Add this complete, production-ready code to `src/lib/pathfinding.ts`:
+Replace the file with the code below. It includes JSDoc for every export, deterministic BFS, helper utilities, and zero inline comments per project standards.
 
 ```typescript
-/**
- * Campus Navigation Pathfinding System
- *
- * Implements Breadth-First Search (BFS) for finding shortest paths between
- * locations in the VR campus tour. Treats the campus as an unweighted graph
- * where photos are nodes and directional connections are edges.
- *
- * Algorithm: Standard BFS with parent tracking for path reconstruction
- * Time Complexity: O(V + E) where V = photos, E = connections (~225 + ~476)
- * Space Complexity: O(V) for visited set and parent map
- * Expected Performance: <10ms for typical campus paths
- *
- * @fileoverview Core pathfinding logic for AI-guided navigation
- */
-
 import { findPhotoById } from '../data/blockUtils'
-import type { Photo, DirectionType } from '../types/tour'
+import type { DirectionDefinition, DirectionType, Photo } from '../types/tour'
+
+const HORIZONTAL_DIRECTIONS: DirectionType[] = [
+  'forward',
+  'forwardRight',
+  'right',
+  'backRight',
+  'back',
+  'backLeft',
+  'left',
+  'forwardLeft'
+]
+
+const MULTI_VALUE_DIRECTIONS: Array<'up' | 'down' | 'elevator' | 'door'> = [
+  'up',
+  'down',
+  'elevator',
+  'door'
+]
+
+const FLOOR_DIRECTIONS: Array<'floor1' | 'floor2' | 'floor3' | 'floor4'> = [
+  'floor1',
+  'floor2',
+  'floor3',
+  'floor4'
+]
+
+const DEFAULT_SECONDS_PER_STEP = 0.8
+
+const BUILDING_NAMES: Record<string, string> = {
+  a: 'A Block',
+  n: 'N Block',
+  s: 'S Block',
+  x: 'X Block',
+  w: 'W Block',
+  library: 'Library',
+  outside: 'Outside Campus'
+}
+
+function isDirectionDefinition(value: unknown): value is DirectionDefinition {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  return 'connection' in (value as Record<string, unknown>)
+}
 
 /**
- * Pathfinding result with route metadata
+ * Result returned by the BFS pathfinding routine.
  *
- * Contains the complete path from start to destination along with
- * useful metadata for UI display and navigation timing calculations.
+ * Captures the ordered list of locations the user should visit along with
+ * metadata the UI and AI layers use to render guidance.
  *
- * @property path - Ordered array of photo IDs from start to end (inclusive)
- * @property distance - Number of navigation steps (path.length - 1)
- * @property startId - Starting photo ID for validation
- * @property endId - Destination photo ID for validation
- *
- * @example
- * ```typescript
- * const result = findPath("a-f1-north-entrance", "library-f1-entrance")
- * // {
- * //   path: ["a-f1-north-entrance", "a-f1-north-1", "...", "library-f1-entrance"],
- * //   distance: result.path.length - 1,
- * //   startId: "a-f1-north-entrance",
- * //   endId: "library-f1-entrance"
- * // }
- * ```
+ * @property path - Ordered array of photo IDs from start to destination (inclusive)
+ * @property distance - Number of steps between the start and destination
+ * @property startId - Photo ID supplied as the path origin
+ * @property endId - Photo ID supplied as the path target
  */
 export interface PathfindingResult {
   path: string[]
@@ -173,31 +160,21 @@ export interface PathfindingResult {
 }
 
 /**
- * Find shortest path between two campus locations using BFS
+ * Compute the shortest path between two campus photos using BFS.
  *
- * Performs breadth-first search on the campus photo graph to find the
- * shortest navigable route. Returns null if no path exists between the
- * locations (e.g., disconnected buildings, invalid IDs).
+ * Walks the unweighted campus graph breadth-first, guaranteeing the first
+ * destination hit is the optimal route. Returns null when either endpoint
+ * does not exist or no route is possible.
  *
- * The algorithm guarantees the shortest path in an unweighted graph:
- * 1. Initialize queue with start location
- * 2. Explore neighbors level-by-level (BFS guarantee)
- * 3. Track parent relationships for path reconstruction
- * 4. Return first path found (BFS guarantees shortest)
- *
- * @param startPhotoId - Starting location photo ID
- * @param endPhotoId - Destination location photo ID
- * @returns Pathfinding result with complete route, or null if no path exists
+ * @param startPhotoId - Existing photo ID where the visitor currently stands
+ * @param endPhotoId - Existing photo ID the visitor wants to reach
+ * @returns A populated pathfinding result or null when no route is available
  *
  * @example
  * ```typescript
- * // Find path from A Block to Library
- * const result = findPath("a-f1-north-entrance", "library-f1-entrance")
+ * const result = findPath('a-f1-north-entrance', 'library-f1-entrance')
  * if (result) {
- *   console.log(`Route: ${result.distance} steps`)
- *   console.log(`Path: ${result.path.join(' -> ')}`)
- * } else {
- *   console.log('No path found')
+ *   console.log(result.path)
  * }
  * ```
  */
@@ -205,7 +182,6 @@ export function findPath(
   startPhotoId: string,
   endPhotoId: string
 ): PathfindingResult | null {
-  // Edge case: already at destination
   if (startPhotoId === endPhotoId) {
     return {
       path: [startPhotoId],
@@ -215,320 +191,227 @@ export function findPath(
     }
   }
 
-  // Validate that both photos exist in the tour data
   const startPhoto = findPhotoById(startPhotoId)
   const endPhoto = findPhotoById(endPhotoId)
 
-  if (!startPhoto) {
-    console.error('[Pathfinding] Start photo not found:', startPhotoId)
+  if (!startPhoto || !endPhoto) {
     return null
   }
 
-  if (!endPhoto) {
-    console.error('[Pathfinding] End photo not found:', endPhotoId)
-    return null
-  }
-
-  // BFS initialization
   const queue: string[] = [startPhotoId]
-  const visited = new Set<string>([startPhotoId])
-  const parent = new Map<string, string>() // For path reconstruction
+  const visited = new Set(queue)
+  const parent = new Map<string, string>()
 
-  // BFS main loop - explore level by level
   while (queue.length > 0) {
-    const currentId = queue.shift()! // Dequeue (FIFO for BFS)
+    const currentId = queue.shift()
+    if (!currentId) {
+      continue
+    }
 
-    // Check if we've reached the destination
     if (currentId === endPhotoId) {
-      // Success! Reconstruct and return the path
       const path = reconstructPath(parent, startPhotoId, endPhotoId)
+      if (path.length === 0) {
+        return null
+      }
+
       return {
         path,
-        distance: path.length - 1, // Number of steps between photos
+        distance: path.length - 1,
         startId: startPhotoId,
         endId: endPhotoId
       }
     }
 
-    // Get current photo to explore its neighbors
     const currentPhoto = findPhotoById(currentId)
     if (!currentPhoto) {
-      console.warn('[Pathfinding] Photo disappeared during search:', currentId)
       continue
     }
 
-    // Explore all neighbors (adjacent nodes)
-    const neighbors = getAllNeighbors(currentPhoto)
-
-    for (const neighborId of neighbors) {
-      // Skip if already visited (avoid cycles)
-      if (!visited.has(neighborId)) {
-        visited.add(neighborId)
-        parent.set(neighborId, currentId) // Track how we got here
-        queue.push(neighborId) // Enqueue for exploration
+    const neighbors = getNeighborIds(currentPhoto)
+    for (const neighbor of neighbors) {
+      if (visited.has(neighbor)) {
+        continue
       }
+
+      visited.add(neighbor)
+      parent.set(neighbor, currentId)
+      queue.push(neighbor)
     }
   }
 
-  // Queue exhausted without finding destination - no path exists
-  console.warn('[Pathfinding] No path found between:', {
-    start: startPhotoId,
-    end: endPhotoId,
-    visited: visited.size
-  })
   return null
 }
 
-/**
- * Extract all neighboring photo IDs from a photo's connections
- *
- * Collects reachable photo IDs from all directional connections including:
- * - Horizontal movement: forward, back, left, right, diagonals (8-directional)
- * - Vertical movement: up, down (stairs)
- * - Special connections: elevator, door
- * - Floor selection: floor1, floor2, floor3, floor4 (elevator interiors)
- *
- * Handles both single connections (string) and multiple connections (string[])
- * for special directions like doors and elevators.
- *
- * @param photo - Photo to extract neighbors from
- * @returns Array of unique neighbor photo IDs (no duplicates)
- *
- * @example
- * ```typescript
- * const photo = findPhotoById("a-f1-north-entrance")
- * const neighbors = getAllNeighbors(photo)
- * // Returns: ["a-f1-north-1", "outside-a-north-1"]
- * ```
- */
-function getAllNeighbors(photo: Photo): string[] {
-  const neighbors: string[] = []
+function getNeighborIds(photo: Photo): string[] {
+  const directConnections = HORIZONTAL_DIRECTIONS
+    .map((direction) => photo.directions[direction])
+    .filter(isDirectionDefinition)
+    .map((definition) => definition.connection)
 
-  // Horizontal directions (8-directional movement)
-  // These use DirectionDefinition objects with a 'connection' property
-  const horizontalDirs: DirectionType[] = [
-    'forward',
-    'forwardRight',
-    'right',
-    'backRight',
-    'back',
-    'backLeft',
-    'left',
-    'forwardLeft'
-  ]
-
-  for (const dir of horizontalDirs) {
-    const dirDef = photo.directions[dir]
-    // Check if it's a DirectionDefinition object with connection
-    if (dirDef && typeof dirDef === 'object' && 'connection' in dirDef) {
-      neighbors.push(dirDef.connection)
+  const multiConnections = MULTI_VALUE_DIRECTIONS.flatMap((direction) => {
+    const entry = photo.directions[direction]
+    if (!entry) {
+      return []
     }
-  }
 
-  // Vertical and special directions (can be string or string[])
-  const specialDirs: Array<'up' | 'down' | 'elevator' | 'door'> = [
-    'up',
-    'down',
-    'elevator',
-    'door'
-  ]
+    return Array.isArray(entry) ? entry : [entry]
+  })
 
-  for (const dir of specialDirs) {
-    const connection = photo.directions[dir]
-    if (connection) {
-      if (Array.isArray(connection)) {
-        // Multiple connections (e.g., multiple doors)
-        neighbors.push(...connection)
-      } else {
-        // Single connection
-        neighbors.push(connection)
-      }
+  const floorConnections = FLOOR_DIRECTIONS.flatMap((direction) => {
+    const entry = photo.directions[direction]
+    if (!entry) {
+      return []
     }
-  }
 
-  // Floor selection buttons (elevator interiors only)
-  const floorDirs: Array<'floor1' | 'floor2' | 'floor3' | 'floor4'> = [
-    'floor1',
-    'floor2',
-    'floor3',
-    'floor4'
-  ]
+    return [entry]
+  })
 
-  for (const dir of floorDirs) {
-    const connection = photo.directions[dir]
-    if (connection) {
-      neighbors.push(connection)
-    }
-  }
-
-  // Remove duplicates (in case any connection appears multiple times)
-  return [...new Set(neighbors)]
+  return Array.from(new Set([...directConnections, ...multiConnections, ...floorConnections]))
 }
 
-/**
- * Reconstruct path from BFS parent map
- *
- * Traces backwards from destination to start using parent pointers,
- * then reverses to create forward path array. This is the standard
- * BFS path reconstruction technique.
- *
- * How it works:
- * 1. Start at destination
- * 2. Follow parent pointers back to start
- * 3. Reverse the path to get start-to-end order
- *
- * @param parent - Map of child -> parent photo ID relationships from BFS
- * @param start - Starting photo ID
- * @param end - Destination photo ID
- * @returns Ordered array of photo IDs from start to end (inclusive)
- *
- * @example
- * ```typescript
- * // After BFS, parent map might be:
- * // {
- * //   "a-f1-north-1": "a-f1-north-entrance",
- * //   "a-f1-north-2": "a-f1-north-1",
- * //   "a-f1-mid-4": "a-f1-north-2",
- * //   "a-f1-mid-5": "a-f1-mid-4"
- * // }
- * const path = reconstructPath(parent, "a-f1-north-entrance", "a-f1-mid-5")
- * // Returns: ["a-f1-north-entrance", "a-f1-north-1", "a-f1-north-2", "a-f1-mid-4", "a-f1-mid-5"]
- * ```
- */
 function reconstructPath(
   parent: Map<string, string>,
-  start: string,
-  end: string
+  startId: string,
+  endId: string
 ): string[] {
-  const path: string[] = []
-  let current = end
+  const path: string[] = [endId]
+  let current = endId
 
-  // Trace backwards from end to start
-  while (current !== start) {
-    path.unshift(current) // Add to front of array
+  while (current !== startId) {
     const next = parent.get(current)
-
     if (!next) {
-      // This shouldn't happen if BFS succeeded, but handle gracefully
-      console.error('[Pathfinding] Path reconstruction failed at:', current)
-      console.error('[Pathfinding] Parent map:', Object.fromEntries(parent))
-      break
+      return []
     }
 
     current = next
+    path.unshift(current)
   }
-
-  // Add start to the beginning
-  path.unshift(start)
 
   return path
 }
 
+function formatLocationSegment(photoId: string, photo: Photo | null): string {
+  const tokens = photoId.split('-')
+  const buildingToken = tokens[0]
+  const floorToken = tokens[1]
+  const buildingLabel = buildingToken ? BUILDING_NAMES[buildingToken] ?? buildingToken.toUpperCase() : null
+  const floorLabel = floorToken ? floorToken.toUpperCase() : null
+  const label = [buildingLabel, floorLabel].filter(Boolean).join(' ')
+  const wing = photo?.buildingContext?.wing
+
+  if (label && wing) {
+    return `${label} (${wing})`
+  }
+
+  if (label) {
+    return label
+  }
+
+  return photo?.id ?? photoId
+}
+
 /**
- * Get human-readable route description
+ * Produce a friendly sentence summarising the route.
  *
- * Generates a text summary of the route for display in chat messages.
- * Extracts building names from photo IDs and formats a friendly description.
+ * Intended for AI chat responses and UI breadcrumbs so visitors understand
+ * how many steps are required and which areas they will traverse.
  *
- * @param result - Pathfinding result with path information
- * @returns Human-readable route description string
+ * @param result - Valid pathfinding result returned from `findPath`
+ * @returns Human-readable string describing the route distance and endpoints
  *
  * @example
  * ```typescript
- * const result = findPath("a-f1-north-entrance", "library-f1-entrance")
  * const description = getRouteDescription(result)
- * // Returns: "Route found: 13 steps from A F1 to LIBRARY F1"
+ * // "Route found: 3 steps from A Block F1 to Library F1."
  * ```
  */
 export function getRouteDescription(result: PathfindingResult): string {
   const startPhoto = findPhotoById(result.startId)
   const endPhoto = findPhotoById(result.endId)
-
-  // Extract building/floor from photo ID (e.g., "a-f1-north-entrance" -> "A F1")
-  const startName = startPhoto?.id.split('-').slice(0, 2).join(' ').toUpperCase() || 'start'
-  const endName = endPhoto?.id.split('-').slice(0, 2).join(' ').toUpperCase() || 'destination'
+  const startLabel = formatLocationSegment(result.startId, startPhoto)
+  const endLabel = formatLocationSegment(result.endId, endPhoto)
 
   if (result.distance === 0) {
-    return "You're already at that location!"
+    return `You are already at ${endLabel}.`
   }
 
-  if (result.distance === 1) {
-    return `Route found: 1 step from ${startName} to ${endName}`
-  }
-
-  return `Route found: ${result.distance} steps from ${startName} to ${endName}`
+  const stepLabel = result.distance === 1 ? '1 step' : `${result.distance} steps`
+  return `Route found: ${stepLabel} from ${startLabel} to ${endLabel}.`
 }
 
 /**
- * Calculate estimated navigation time
+ * Estimate traversal time for the calculated route.
  *
- * Estimates how long the sequential navigation will take based on
- * path distance and navigation speed setting.
+ * Assumes an average walking speed through indoor corridors and returns both
+ * the raw seconds value and a formatted label for display.
  *
- * @param result - Pathfinding result with distance
- * @param speedMs - Milliseconds per step (default 800ms)
- * @returns Estimated time in seconds
+ * @param result - Valid pathfinding result returned from `findPath`
+ * @param secondsPerStep - Average number of seconds per navigation step
+ * @returns Object containing raw seconds and a formatted label
  *
  * @example
  * ```typescript
- * const result = findPath("a-f1-north-entrance", "library-f1-entrance")
- * const time = getEstimatedTime(result, 800)
- * // Returns: 5.6 (seconds)
+ * const { seconds, formatted } = getEstimatedTravelTime(result)
+ * // seconds = 10.4, formatted = "10.4s"
  * ```
  */
-export function getEstimatedTime(
+export function getEstimatedTravelTime(
   result: PathfindingResult,
-  speedMs: number = 800
-): number {
-  return (result.distance * speedMs) / 1000
+  secondsPerStep: number = DEFAULT_SECONDS_PER_STEP
+): { seconds: number; formatted: string } {
+  const seconds = Math.max(0, result.distance * secondsPerStep)
+  const formatted =
+    seconds < 60
+      ? `${seconds.toFixed(1)}s`
+      : `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`
+
+  return { seconds, formatted }
 }
 
 /**
- * Validate pathfinding result
+ * Verify that a pathfinding result is structurally sound.
  *
- * Checks that a pathfinding result is valid and consistent.
- * Useful for testing and debugging.
+ * Ensures the start and end IDs align, every intermediate photo exists,
+ * and each hop follows a valid edge in the campus graph.
  *
  * @param result - Pathfinding result to validate
- * @returns True if valid, false otherwise
+ * @returns Boolean indicating whether the route is valid
+ *
+ * @example
+ * ```typescript
+ * if (!validatePath(result)) {
+ *   throw new Error('Path is invalid')
+ * }
+ * ```
  */
 export function validatePath(result: PathfindingResult): boolean {
-  // Check basic properties
-  if (!result.path || result.path.length === 0) {
-    console.error('[Validation] Path is empty')
+  if (!result.path.length) {
     return false
   }
 
-  // Check distance matches path length
-  if (result.distance !== result.path.length - 1) {
-    console.error('[Validation] Distance mismatch:', {
-      distance: result.distance,
-      pathLength: result.path.length
-    })
-    return false
-  }
-
-  // Check start and end IDs
   if (result.path[0] !== result.startId) {
-    console.error('[Validation] Path start mismatch:', {
-      expected: result.startId,
-      actual: result.path[0]
-    })
     return false
   }
 
   if (result.path[result.path.length - 1] !== result.endId) {
-    console.error('[Validation] Path end mismatch:', {
-      expected: result.endId,
-      actual: result.path[result.path.length - 1]
-    })
     return false
   }
 
-  // Check all photos in path exist
   for (const photoId of result.path) {
     if (!findPhotoById(photoId)) {
-      console.error('[Validation] Photo in path not found:', photoId)
+      return false
+    }
+  }
+
+  for (let index = 0; index < result.path.length - 1; index += 1) {
+    const currentPhoto = findPhotoById(result.path[index])
+    const nextId = result.path[index + 1]
+    if (!currentPhoto) {
+      return false
+    }
+
+    const neighbors = getNeighborIds(currentPhoto)
+    if (!neighbors.includes(nextId)) {
       return false
     }
   }
@@ -537,506 +420,238 @@ export function validatePath(result: PathfindingResult): boolean {
 }
 ```
 
- **Validation:** File saved with no TypeScript errors
+✅ **Validation:** `npm run build` passes type-checking without errors.
 
 ---
 
-## Step 2.3: Create Unit Tests
+## Step 2.3: Write Unit Tests
 
 **Time:** 10 minutes
 
-### Create Test Directory
+### Create the test file
 
 ```bash
 mkdir -p src/lib/__tests__
 touch src/lib/__tests__/pathfinding.test.ts
 ```
 
-**Windows:**
-```bash
-mkdir src\lib\__tests__
-type nul > src\lib\__tests__\pathfinding.test.ts
-```
+### Add coverage for core behaviours
 
-### Write Comprehensive Tests
-
-Add this to `src/lib/__tests__/pathfinding.test.ts`:
+Copy the following tests. They assert adjacency, multi-step routes, cross-building navigation, validation, descriptions, and performance.
 
 ```typescript
-import { describe, test, expect } from 'vitest'
-import { findPath, getRouteDescription, validatePath } from '../pathfinding'
+import { performance } from 'node:perf_hooks'
+import { describe, expect, test } from 'vitest'
+import {
+  findPath,
+  getEstimatedTravelTime,
+  getRouteDescription,
+  validatePath
+} from '../pathfinding'
 
-describe('BFS Pathfinding Algorithm', () => {
-  describe('Basic Functionality', () => {
-    test('finds path between adjacent photos', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-north-1')
-
-      expect(result).not.toBeNull()
-      expect(result!.path).toHaveLength(2)
-      expect(result!.distance).toBe(1)
-      expect(result!.path[0]).toBe('a-f1-north-entrance')
-      expect(result!.path[1]).toBe('a-f1-north-1')
-    })
-
-    test('handles same start and end location', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-north-entrance')
-
-      expect(result).not.toBeNull()
-      expect(result!.path).toEqual(['a-f1-north-entrance'])
-      expect(result!.distance).toBe(0)
-    })
-
-    test('returns null for invalid start photo', () => {
-      const result = findPath('invalid-photo-id', 'a-f1-north-entrance')
-      expect(result).toBeNull()
-    })
-
-    test('returns null for invalid end photo', () => {
-      const result = findPath('a-f1-north-entrance', 'invalid-photo-id')
-      expect(result).toBeNull()
-    })
+describe('pathfinding', () => {
+  test('finds path between adjacent photos', () => {
+    const result = findPath('a-f1-north-entrance', 'a-f1-north-1')
+    expect(result).not.toBeNull()
+    expect(result!.distance).toBe(1)
+    expect(validatePath(result!)).toBe(true)
   })
 
-  describe('Multi-Step Paths', () => {
-    test('finds path across multiple photos', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-mid-5')
-
-      expect(result).not.toBeNull()
-      expect(result!.distance).toBeGreaterThan(1)
-      expect(result!.path[0]).toBe('a-f1-north-entrance')
-      expect(result!.path[result!.path.length - 1]).toBe('a-f1-mid-5')
-    })
-
-    test('finds path across different buildings', () => {
-      const result = findPath('a-f1-north-entrance', 'library-f1-entrance')
-
-      expect(result).not.toBeNull()
-      expect(result!.path[0]).toBe('a-f1-north-entrance')
-      expect(result!.path[result!.path.length - 1]).toBe('library-f1-entrance')
-    })
+  test('returns single-node path when already at destination', () => {
+    const result = findPath('a-f1-north-entrance', 'a-f1-north-entrance')
+    expect(result).not.toBeNull()
+    expect(result!.path).toEqual(['a-f1-north-entrance'])
+    expect(result!.distance).toBe(0)
+    expect(getRouteDescription(result!)).toMatch(/already at/i)
   })
 
-  describe('Vertical Navigation', () => {
-    test('finds path using stairs (up direction)', () => {
-      const result = findPath('library-f1-entrance', 'library-f2-entrance')
-
-      expect(result).not.toBeNull()
-      expect(result!.path[0]).toBe('library-f1-entrance')
-      expect(result!.path[result!.path.length - 1]).toBe('library-f2-entrance')
-    })
-
-    test('finds path through multiple floors', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f2-mid-4')
-
-      expect(result).not.toBeNull()
-      expect(result!.distance).toBeGreaterThan(1)
-    })
+  test('returns null for invalid start or end photos', () => {
+    expect(findPath('invalid-photo', 'a-f1-north-entrance')).toBeNull()
+    expect(findPath('a-f1-north-entrance', 'invalid-photo')).toBeNull()
   })
 
-  describe('Path Validation', () => {
-    test('validates correct pathfinding result', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-north-1')
-
-      expect(result).not.toBeNull()
-      expect(validatePath(result!)).toBe(true)
-    })
-
-    test('all photos in path should exist', () => {
-      const result = findPath('a-f1-north-entrance', 'library-f1-entrance')
-
-      expect(result).not.toBeNull()
-
-      // Verify each photo in path exists
-      for (const photoId of result!.path) {
-        expect(photoId).toBeTruthy()
-        expect(typeof photoId).toBe('string')
-      }
-    })
+  test('navigates across multiple photos', () => {
+    const result = findPath('a-f1-north-entrance', 'a-f1-mid-5')
+    expect(result).not.toBeNull()
+    expect(result!.distance).toBeGreaterThan(1)
+    expect(result!.path[0]).toBe('a-f1-north-entrance')
+    expect(result!.path[result!.path.length - 1]).toBe('a-f1-mid-5')
+    expect(validatePath(result!)).toBe(true)
   })
 
-  describe('Route Description', () => {
-    test('generates description for single step', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-north-1')
-
-      expect(result).not.toBeNull()
-      const description = getRouteDescription(result!)
-      expect(description).toContain('1 step')
-    })
-
-    test('generates description for multiple steps', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-mid-5')
-
-      expect(result).not.toBeNull()
-      const description = getRouteDescription(result!)
-      expect(description).toContain('steps')
-      expect(description).toMatch(/\d+ steps/)
-    })
-
-    test('generates description for same location', () => {
-      const result = findPath('a-f1-north-entrance', 'a-f1-north-entrance')
-
-      expect(result).not.toBeNull()
-      const description = getRouteDescription(result!)
-      expect(description).toContain('already at')
-    })
+  test('navigates between buildings', () => {
+    const result = findPath('a-f1-north-entrance', 'library-f1-entrance')
+    expect(result).not.toBeNull()
+    expect(result!.path[0]).toBe('a-f1-north-entrance')
+    expect(result!.path[result!.path.length - 1]).toBe('library-f1-entrance')
+    expect(getRouteDescription(result!)).toMatch(/Route found:/)
   })
 
-  describe('Performance', () => {
-    test('finds path in under 50ms', () => {
-      const start = performance.now()
+  test('handles vertical transitions', () => {
+    const result = findPath('library-f1-entrance', 'library-f2-entrance')
+    expect(result).not.toBeNull()
+    expect(result!.distance).toBeGreaterThanOrEqual(1)
+    expect(validatePath(result!)).toBe(true)
+  })
 
-      const result = findPath('a-f1-north-entrance', 'library-f1-entrance')
+  test('estimates travel time based on path distance', () => {
+    const result = findPath('a-f1-north-entrance', 'a-f1-north-1')
+    expect(result).not.toBeNull()
+    const { seconds, formatted } = getEstimatedTravelTime(result!)
+    expect(seconds).toBeCloseTo(0.8, 1)
+    expect(formatted).toMatch(/s$/)
+  })
 
-      const elapsed = performance.now() - start
+  test('completes long routes quickly', () => {
+    const started = performance.now()
+    const result = findPath('a-f1-north-entrance', 'w-gym-entry')
+    const elapsed = performance.now() - started
 
-      expect(result).not.toBeNull()
-      expect(elapsed).toBeLessThan(50) // Should be <10ms, but allow buffer
-    })
-
-    test('handles long paths efficiently', () => {
-      const start = performance.now()
-
-      // Find a long path across campus
-      const result = findPath('a-f1-north-entrance', 'w-gym-entry')
-
-      const elapsed = performance.now() - start
-
-      expect(result).not.toBeNull()
-      expect(elapsed).toBeLessThan(50)
-    })
+    expect(result).not.toBeNull()
+    expect(elapsed).toBeLessThan(50)
+    expect(validatePath(result!)).toBe(true)
   })
 })
 ```
 
-### Run Tests
+### Run the targeted suite
 
 ```bash
-npm run test pathfinding
+npm run test -- pathfinding
 ```
 
-**Expected Output:**
-```
-============================================================
-PATHFINDING ALGORITHM MANUAL TEST
-============================================================
+✅ **Validation:** All tests in `pathfinding.test.ts` pass, taking <200 ms.
 
-Test 1: Adjacent Photos
-----------------------------------------
-[OK] Path found!
-   Distance: 1 step
-   Path: a-f1-north-entrance -> a-f1-north-1
-   Description: Route found: 1 step from A F1 to A F1
+---
 
-Test 2: Cross-Building Navigation
-----------------------------------------
-[OK] Path found!
-   Distance: 13 steps
-   Description: Route found: 13 steps from A F1 to LIBRARY F1
-   Estimated time: 10.4s at normal speed
-   Path:
-      1. a-f1-north-entrance
-      2. a-f1-north-1
-      3. a-f1-north-2
-      4. a-f2-north-stairs-entrance
-      5. a-f2-north-1
-      6. a-f2-north-2
-      7. a-f2-mid-3
-      8. a-f2-mid-4
-      9. x-f1-east-2
-     10. x-f1-east-3
-     11. x-f1-east-4
-     12. x-f1-mid-5
-     13. x-f1-mid-6
-     14. library-f1-entrance
+## Step 2.4: Manual Smoke Test (Optional but Recommended)
 
-Test 3: Multi-Floor Navigation
-----------------------------------------
-[OK] Path found!
-   Distance: 1 step
-   Description: Route found: 1 step from LIBRARY F1 to LIBRARY F2
-   Path: library-f1-entrance -> library-f2-entrance
+**Time:** 5 minutes
 
-Test 4: Same Location
-----------------------------------------
-[OK] Handled correctly!
-   Distance: 0 steps
-   Description: You're already at that location!
-
-Test 5: Invalid Photo ID
-----------------------------------------
-[OK] Correctly returned null!
-
-Test 6: Performance Benchmark
-----------------------------------------
-Time: <50ms
-[OK] Good performance (<50ms)
+Create a temporary script at project root (`test-pathfinding.ts`) to visualise the route.
 
 ```typescript
-import { findPath, getRouteDescription, getEstimatedTime } from './src/lib/pathfinding'
+import {
+  findPath,
+  getEstimatedTravelTime,
+  getRouteDescription
+} from './src/lib/pathfinding'
 
-console.log('='.repeat(60))
-console.log('PATHFINDING ALGORITHM MANUAL TEST')
-console.log('='.repeat(60))
-console.log('')
+function logResult(startId: string, endId: string) {
+  const result = findPath(startId, endId)
 
-// Test 1: Adjacent photos
-console.log('Test 1: Adjacent Photos')
-console.log('-'.repeat(40))
-const test1 = findPath('a-f1-north-entrance', 'a-f1-north-1')
-if (test1) {
-  console.log('[OK] Path found!')
-  console.log(`   Distance: ${test1.distance} step`)
-  console.log(`   Path: ${test1.path.join(' -> ')}`)
-  console.log(`   Description: ${getRouteDescription(test1)}`)
-} else {
-  console.log('[WARN] No path found')
-}
-console.log('')
+  if (!result) {
+    console.log(`No route found between ${startId} and ${endId}.`)
+    return
+  }
 
-// Test 2: Cross-building navigation
-console.log('Test 2: Cross-Building Navigation')
-console.log('-'.repeat(40))
-const test2 = findPath('a-f1-north-entrance', 'library-f1-entrance')
-if (test2) {
-  console.log('[OK] Path found!')
-  console.log(`   Distance: ${test2.distance} steps`)
-  console.log(`   Description: ${getRouteDescription(test2)}`)
-  console.log(`   Estimated time: ${getEstimatedTime(test2)}s at normal speed`)
-  console.log('   Path:')
-  test2.path.forEach((photoId, index) => {
-    console.log(`      ${index + 1}. ${photoId}`)
+  const estimate = getEstimatedTravelTime(result)
+
+  console.log('='.repeat(60))
+  console.log(`Start: ${result.startId}`)
+  console.log(`End:   ${result.endId}`)
+  console.log(getRouteDescription(result))
+  console.log(`Estimated travel time: ${estimate.formatted}`)
+  console.log('Path:')
+  result.path.forEach((photoId, index) => {
+    console.log(`  ${index + 1}. ${photoId}`)
   })
-} else {
-  console.log('[WARN] No path found')
+  console.log('='.repeat(60))
+  console.log('')
 }
-console.log('')
 
-// Test 3: Multi-floor navigation
-console.log('Test 3: Multi-Floor Navigation')
-console.log('-'.repeat(40))
-const test3 = findPath('library-f1-entrance', 'library-f2-entrance')
-if (test3) {
-  console.log('[OK] Path found!')
-  console.log(`   Distance: ${test3.distance} steps`)
-  console.log(`   Description: ${getRouteDescription(test3)}`)
-  console.log(`   Path: ${test3.path.join(' -> ')}`)
-} else {
-  console.log('[WARN] No path found')
-}
-console.log('')
-
-// Test 4: Same location
-console.log('Test 4: Same Location')
-console.log('-'.repeat(40))
-const test4 = findPath('a-f1-north-entrance', 'a-f1-north-entrance')
-if (test4) {
-  console.log('[OK] Handled correctly!')
-  console.log(`   Distance: ${test4.distance} steps`)
-  console.log(`   Description: ${getRouteDescription(test4)}`)
-} else {
-  console.log('[WARN] Should return path with 0 distance')
-}
-console.log('')
-
-// Test 5: Invalid photo
-console.log('Test 5: Invalid Photo ID')
-console.log('-'.repeat(40))
-const test5 = findPath('a-f1-north-entrance', 'nonexistent-photo')
-if (test5) {
-  console.log('[WARN] Should return null for invalid photo')
-} else {
-  console.log('[OK] Correctly returned null!')
-}
-console.log('')
-
-console.log('='.repeat(60))
-console.log('PATHFINDING TESTS COMPLETE')
+logResult('a-f1-north-entrance', 'a-f1-north-1')
+logResult('a-f1-north-entrance', 'library-f1-entrance')
+logResult('library-f1-entrance', 'library-f2-entrance')
 ```
 
-### Run Manual Test
+Run it:
 
 ```bash
 npx tsx test-pathfinding.ts
 ```
 
-**Expected Output:**
+Sample output:
+
 ```
 ============================================================
-PATHFINDING ALGORITHM MANUAL TEST
+Start: a-f1-north-entrance
+End:   library-f1-entrance
+Route found: 14 steps from A Block F1 to Library F1.
+Estimated travel time: 11.2s
+Path:
+  1. a-f1-north-entrance
+  2. a-f1-north-1
+  ...
+ 14. library-f1-entrance
 ============================================================
+```
 
-Test 1: Adjacent Photos
-----------------------------------------
-[OK] Path found!
-   Distance: 1 step
-   Path: a-f1-north-entrance -> a-f1-north-1
-   Description: Route found: 1 step from A F1 to A F1
+Cleanup when finished:
 
-Test 2: Cross-Building Navigation
-----------------------------------------
-[OK] Path found!
-   Distance: 13 steps
-   Description: Route found: 13 steps from A F1 to LIBRARY F1
-   Estimated time: 10.4s at normal speed
-   Path:
-      1. a-f1-north-entrance
-      2. a-f1-north-1
-      3. a-f1-north-2
-      4. a-f2-north-stairs-entrance
-      5. a-f2-north-1
-      6. a-f2-north-2
-      7. a-f2-mid-3
-      8. a-f2-mid-4
-      9. x-f1-east-2
-     10. x-f1-east-3
-     11. x-f1-east-4
-     12. x-f1-mid-5
-     13. x-f1-mid-6
-     14. library-f1-entrance
-
-Test 3: Multi-Floor Navigation
-----------------------------------------
-[OK] Path found!
-   Distance: 1 step
-   Description: Route found: 1 step from LIBRARY F1 to LIBRARY F2
-   Path: library-f1-entrance -> library-f2-entrance
-
-Test 4: Same Location
-----------------------------------------
-[OK] Handled correctly!
-   Distance: 0 steps
-   Description: You're already at that location!
-
-Test 5: Invalid Photo ID
-----------------------------------------
-[OK] Correctly returned null!
-
-Test 6: Performance Benchmark
-----------------------------------------
-Time: <50ms
-[OK] Good performance (<50ms)
-
-============================================================
-PATHFINDING TESTS COMPLETE
-============================================================
 ```bash
 rm test-pathfinding.ts
 ```
 
- **Validation:** All manual tests passing with excellent performance
+✅ **Validation:** Output lists consistent routes and reasonable time estimates.
 
 ---
 
-## Phase 2 Complete!
+## Step 2.5: Performance Check
+
+**Time:** 2 minutes
+
+- Use the performance test above or wrap `findPath` calls with `console.time`.
+- On a cold run, expect <10 ms; subsequent runs should be even faster due to module caching.
+- If results exceed 50 ms, inspect `getNeighborIds` for unexpected allocations.
+
+✅ **Validation:** Logged execution time remains below 10 ms for typical routes.
+
+---
+
+## Phase 2 Complete! 🎉
 
 ### Checklist Review
 
-- [x] 2.1 - Campus graph structure understood
-- [x] 2.2 - `src/lib/pathfinding.ts` created with BFS implementation
-- [x] 2.3 - Unit tests written and passing (15 tests)
-- [x] 2.4 - Manual testing completed successfully
-- [x] 2.5 - Performance validated (<10ms per path)
+- [x] Campus graph structure reviewed and understood
+- [x] `src/lib/pathfinding.ts` implemented with documented BFS helpers
+- [x] Automated tests created and passing
+- [x] Manual smoke test verified real routes
+- [x] Performance confirmed under 10 ms
 
 ### What You Accomplished
 
- **Working BFS pathfinding algorithm**
- **Graph neighbor extraction from tour data**
- **Path reconstruction from parent map**
- **Helper functions for descriptions and timing**
- **Comprehensive test coverage (15 unit tests)**
- **Performance benchmark (<10ms typical)**
- **Production-ready code with full documentation**
+- Delivered a production-ready BFS navigation engine with robust helpers
+- Added route descriptions and travel time estimates to support AI messaging
+- Ensured correctness with validation logic and Vitest coverage
+- Confirmed the campus data supports multi-building and multi-floor travel
 
-### Files Created
+### Files Touched
 
 ```
-src/
- lib/
-    pathfinding.ts (NEW - 450 lines)
-    __tests__/
-        pathfinding.test.ts (NEW - 200 lines)
+src/lib/pathfinding.ts
+src/lib/__tests__/pathfinding.test.ts
 ```
-
-### Key Takeaways
-
-**Algorithm Choice:** BFS is perfect for:
--  Unweighted graphs (all edges equal)
--  Shortest path guarantee
--  Simple implementation
--  Excellent performance
-
-**Performance:** Your campus graph is small enough that BFS is blazing fast:
-- 225 nodes (photos)
-- 476 directional edges (connections)
-- <10ms typical pathfinding time
-- No need for A* or Dijkstra
-
-**Testing:** Comprehensive test suite covers:
--  Basic adjacency
--  Multi-step paths
--  Cross-building navigation
--  Vertical navigation (stairs/elevators)
--  Edge cases (same location, invalid IDs)
--  Performance benchmarks
 
 ---
 
 ## Troubleshooting
 
-### Tests Failing: "Photo not found"
+**Tests failing with “photo not found”**  
+Ensure you copied valid IDs from `src/data/blocks/**`. Typos are the most common culprit.
 
-**Cause:** Photo ID doesn't exist in tour data
+**`validatePath` returning false**  
+Check for one-way edges. Some photos require adding the reverse connection to the data files.
 
-**Solution:**
-1. Check photo ID spelling in test
-2. Verify photo exists in `src/data/blocks/`
-3. Use actual photo IDs from your campus data
+**Performance over 50 ms**  
+Run `console.log(getNeighborIds(photo))` inside `findPath` to spot unusually large adjacency lists or cycles introduced by bad data.
 
-### Performance >50ms
-
-**Cause:** Inefficient neighbor extraction or large graph
-
-**Solution:**
-1. Check `getAllNeighbors()` isn't doing expensive operations
-2. Verify no infinite loops in graph
-3. Profile with `console.time()` around `findPath()`
-
-### Path Not Found Between Valid Locations
-
-**Cause:** Photos are in disconnected graph components
-
-**Solution:**
-1. Verify connection exists in tour data
-2. Check both photos are in same building cluster
-3. Add missing connections in photo direction definitions
-
-### TypeScript Errors
-
-**Common Issue:** Import paths incorrect
-
-**Solution:**
-```typescript
-// Correct:
-import { findPhotoById } from '../data/blockUtils'
-import type { Photo, DirectionType } from '../types/tour'
-
-// Check your path aliases in tsconfig.json
-```
+**TypeScript import errors**  
+Confirm `findPhotoById` is exported from `src/data/blockUtils.ts` and your relative import path is `../data/blockUtils`.
 
 ---
 
 ## Next Steps
 
-**Proceed to Phase 3:** [Phase 3 - Basic AI Server Function](./phase-3-basic-ai.md)
+Proceed to [Phase 3 – Basic AI Server Function](./phase-3-basic-ai.md) to wire this module into the OpenAI function call pipeline.
 
-You'll implement:
-- OpenAI server function with function calling
-- Campus location database
-- Navigation intent detection
-- Error handling and response formatting
-
-**Estimated time:** 20 minutes
-
----
-
-**Your pathfinding is rock solid! Now let's connect it to AI in Phase 3.**
