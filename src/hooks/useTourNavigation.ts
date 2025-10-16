@@ -16,7 +16,7 @@ import { DIRECTION_ANGLES } from '../types/tour'
  * they are reset to when starting/restarting The Amazing Race.
  */
 // export const TOUR_START_PHOTO_ID = 'a-f1-north-entrance'
-export const TOUR_START_PHOTO_ID = 'w-f1-main-1'
+export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
 
 
 /**
