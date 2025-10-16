@@ -106,6 +106,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       : (startingAngle !== undefined ? startingAngle : initialLon),
     lat: initialLat
   })
+  const isDraggingRef = useRef(false)
 
 
   // Scene setup - runs once on mount
@@ -162,9 +163,10 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
       const onPointerDown = (event: PointerEvent | TouchEvent) => {
         // Only handle if the event target is the mount element or canvas
         if (event.target !== mount && event.target !== renderer.domElement) return
-        
+
         event.preventDefault()
         isMouseDown = true
+        isDraggingRef.current = false // Reset drag flag on pointer down
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
         onPointerDownPointerX = clientX
@@ -172,7 +174,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         onPointerDownLon = cameraControlRef.current.lon
         onPointerDownLat = cameraControlRef.current.lat
         mount.style.cursor = 'grabbing'
-        
+
         // Add document listeners only when dragging starts
         document.addEventListener('pointermove', onPointerMove)
         document.addEventListener('touchmove', onPointerMove, { passive: false })
@@ -182,11 +184,21 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
 
       const onPointerMove = (event: PointerEvent | TouchEvent) => {
         if (!isMouseDown) return
-        
+
         event.preventDefault()
         const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
         const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY
-        
+
+        // Calculate movement distance to detect dragging
+        const deltaX = Math.abs(clientX - onPointerDownPointerX)
+        const deltaY = Math.abs(clientY - onPointerDownPointerY)
+        const dragThreshold = 5 // pixels - small movements don't count as drag
+
+        // If moved more than threshold, mark as dragging
+        if (deltaX > dragThreshold || deltaY > dragThreshold) {
+          isDraggingRef.current = true
+        }
+
         cameraControlRef.current.lon = (onPointerDownPointerX - clientX) * dragSensitivity + onPointerDownLon
         cameraControlRef.current.lat = (clientY - onPointerDownPointerY) * dragSensitivity + onPointerDownLat
         cameraControlRef.current.lat = Math.max(-25, Math.min(85, cameraControlRef.current.lat))
@@ -201,7 +213,13 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
         }
         isMouseDown = false
         mount.style.cursor = 'grab'
-        
+
+        // Keep isDraggingRef.current set for a brief moment so click handlers can check it
+        // Reset it after a short delay to allow click events to process
+        setTimeout(() => {
+          isDraggingRef.current = false
+        }, 50)
+
         // Remove document listeners when dragging ends
         document.removeEventListener('pointermove', onPointerMove)
         document.removeEventListener('touchmove', onPointerMove)
@@ -515,6 +533,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           isRaceMode={isRaceMode}
           foundHiddenLocations={race.foundHiddenLocations}
           onHiddenLocationFound={race.addHiddenLocation}
+          isDraggingRef={isDraggingRef}
         />
       )}
 
@@ -525,6 +544,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           sceneRef={sceneDataRef as React.RefObject<NonNullable<typeof sceneDataRef.current>>}
           cameraControlRef={cameraControlRef}
           onNavigate={onNavigate as (direction: 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft') => void}
+          isDraggingRef={isDraggingRef}
         />
       )}
 

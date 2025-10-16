@@ -28,6 +28,7 @@ import {
  * @property sceneRef - Reference to Three.js scene objects
  * @property cameraControlRef - Reference to camera control state (lon/lat)
  * @property onNavigate - Callback for horizontal navigation (8 directions)
+ * @property isDraggingRef - Reference to track if user is dragging (prevents accidental clicks)
  */
 interface DirectionalArrows3DProps {
   currentPhoto: Photo | null
@@ -40,6 +41,7 @@ interface DirectionalArrows3DProps {
   }>
   cameraControlRef: React.RefObject<{ lon: number; lat: number }>
   onNavigate: (direction: 'forward' | 'forwardRight' | 'right' | 'backRight' | 'back' | 'backLeft' | 'left' | 'forwardLeft') => void
+  isDraggingRef: React.RefObject<boolean>
 }
 
 /**
@@ -75,7 +77,8 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
   currentPhoto,
   sceneRef,
   cameraControlRef,
-  onNavigate
+  onNavigate,
+  isDraggingRef
 }) => {
   const arrowsGroupRef = useRef<THREE.Group | null>(null)
   const [hoveredArrow, setHoveredArrow] = useState<THREE.Mesh | null>(null)
@@ -338,6 +341,9 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
   const handleCanvasClick = useCallback((event: MouseEvent | TouchEvent) => {
     if (!sceneRef.current || !arrowsGroupRef.current) return
 
+    // Prevent navigation if user was dragging (bad UX to trigger on drag end)
+    if (isDraggingRef.current) return
+
     const { camera, renderer } = sceneRef.current
     const canvas = renderer.domElement
     const rect = canvas.getBoundingClientRect()
@@ -372,7 +378,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
         onNavigate(arrow.userData.direction)
       }
     }
-  }, [sceneRef, onNavigate])
+  }, [sceneRef, onNavigate, isDraggingRef])
 
   /**
    * Set up canvas event listeners
