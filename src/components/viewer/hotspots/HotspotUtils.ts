@@ -643,8 +643,8 @@ export async function createDirectionalArrow(
   // Load arrow texture
   const arrowTexture = await createSVGTexture('/svg/arrow-navigation.svg')
 
-  // Create sprite plane - made thicker/wider
-  const geometry = new THREE.PlaneGeometry(1.8, 2.0)
+  // Create sprite plane - made thicker/wider and a little taller
+  const geometry = new THREE.PlaneGeometry(2.25, 2.5)
 
   // Blue solid material
   const material = new THREE.MeshBasicMaterial({

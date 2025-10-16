@@ -37,6 +37,7 @@ import { getHiddenLocationsForPhoto } from '@/data/hidden_locations/hiddenLocati
  * @property isRaceMode - Whether race mode is currently active
  * @property foundHiddenLocations - Set of already-found hidden location IDs
  * @property onHiddenLocationFound - Callback when a hidden location is discovered
+ * @property isDraggingRef - Reference to track if user is dragging (prevents accidental clicks)
  */
 interface PanoramicHotspotsProps {
   currentPhoto: Photo | null
@@ -53,6 +54,7 @@ interface PanoramicHotspotsProps {
   isRaceMode?: boolean
   foundHiddenLocations?: Set<string>
   onHiddenLocationFound?: (id: string, name: string, description: string) => void
+  isDraggingRef: React.RefObject<boolean>
 }
 
 /**
@@ -98,18 +100,13 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   onNavigateToPhoto,
   isRaceMode = false,
   foundHiddenLocations = new Set(),
-  onHiddenLocationFound
+  onHiddenLocationFound,
+  isDraggingRef
 }) => {
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const hotspots = currentPhoto?.hotspots || []
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
   const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
-  const pointerDownRef = useRef<{ x: number, y: number, active: boolean }>({
-    x: 0,
-    y: 0,
-    active: false
-  })
-  const DRAG_CLICK_THRESHOLD_PX = 8
 
   // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
   const hiddenLocationsForPhoto = useMemo(() => {
@@ -140,28 +137,6 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     })
   }, [fov])
 
-  /**
-   * Track pointer down position to differentiate drag vs. click interactions
-   */
-  const handleCanvasPointerDown = useCallback((event: PointerEvent | TouchEvent) => {
-    let clientX: number
-    let clientY: number
-
-    if ('touches' in event) {
-      if (event.touches.length === 0) return
-      clientX = event.touches[0].clientX
-      clientY = event.touches[0].clientY
-    } else {
-      clientX = event.clientX
-      clientY = event.clientY
-    }
-
-    pointerDownRef.current = {
-      x: clientX,
-      y: clientY,
-      active: true
-    }
-  }, [])
 
   /**
    * Create and position hotspot meshes in the scene
@@ -386,6 +361,9 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const handleCanvasClick = useCallback((event: MouseEvent | TouchEvent) => {
     if (!sceneRef.current || !hotspotsGroupRef.current) return
 
+    // Prevent navigation if user was dragging (bad UX to trigger on drag end)
+    if (isDraggingRef.current) return
+
     const { camera, renderer } = sceneRef.current
     const canvas = renderer.domElement
 
@@ -403,17 +381,6 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
       clientY = event.clientY
     } else {
       return
-    }
-
-    const pointerInfo = pointerDownRef.current
-    if (pointerInfo.active) {
-      const dx = clientX - pointerInfo.x
-      const dy = clientY - pointerInfo.y
-      if ((dx * dx + dy * dy) > (DRAG_CLICK_THRESHOLD_PX * DRAG_CLICK_THRESHOLD_PX)) {
-        pointerDownRef.current.active = false
-        return
-      }
-      pointerDownRef.current.active = false
     }
 
     // Convert to normalized device coordinates
@@ -505,7 +472,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         }
       }
     }
-  }, [sceneRef])
+  }, [sceneRef, isDraggingRef])
 
   /**
    * Set up canvas event listeners for click detection
@@ -518,18 +485,14 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     // Add event listeners for both mouse and touch
     canvas.addEventListener('click', handleCanvasClick)
     canvas.addEventListener('touchend', handleCanvasClick)
-    canvas.addEventListener('pointerdown', handleCanvasPointerDown)
-    canvas.addEventListener('touchstart', handleCanvasPointerDown)
     canvas.addEventListener('mousemove', handleCanvasMouseMove)
 
     return () => {
       canvas.removeEventListener('click', handleCanvasClick)
       canvas.removeEventListener('touchend', handleCanvasClick)
-      canvas.removeEventListener('pointerdown', handleCanvasPointerDown)
-      canvas.removeEventListener('touchstart', handleCanvasPointerDown)
       canvas.removeEventListener('mousemove', handleCanvasMouseMove)
     }
-  }, [handleCanvasClick, handleCanvasMouseMove, handleCanvasPointerDown, sceneRef])
+  }, [handleCanvasClick, handleCanvasMouseMove, sceneRef])
 
   /**
    * Handle confirmation of navigation

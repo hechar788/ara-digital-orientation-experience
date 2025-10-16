@@ -6,8 +6,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
-  // Enable public directory for development, Nitro handles production static assets
-  publicDir: 'public',
+  // Enable public directory for development only, Nitro handles production static assets
+  // Setting to false for Vercel builds prevents the 250 MB serverless function limit
+  // VERCEL env var is automatically set by Vercel during builds
+  publicDir: process.env.VERCEL ? false : 'public',
 
   plugins: [
     // this is the plugin that enables path aliases
