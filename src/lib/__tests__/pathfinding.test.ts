@@ -1,3 +1,5 @@
+// npm run test -- pathfinding
+
 import { performance } from 'node:perf_hooks'
 import { describe, expect, test } from 'vitest'
 import {
