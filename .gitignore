@@ -3,7 +3,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
 .nitro
 .tanstack
 .output
@@ -23,3 +22,7 @@ AGENTS.md
 # 360 Photos - uncompressed originals
 public/360_photos_original/
 public/360_photos_group/
+
+# ENV files
+.env*.local
+.env
