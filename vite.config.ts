@@ -5,26 +5,28 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const isVitest = process.env.VITEST === 'true'
+export default defineConfig(({ command }) => {
+  const isServe = command === 'serve'
+  const isVitest = process.env.VITEST === 'true'
+  const isVercelBuild = Boolean(process.env.VERCEL) && !isServe
 
-const config = defineConfig({
-  publicDir: process.env.VERCEL ? false : 'public',
-  plugins: [
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json']
-    }),
-    tanstackStart({
-      srcDirectory: 'src'
-    }),
-    !isVitest &&
-      nitro({
-        config: {
-          preset: 'vercel'
-        }
+  return {
+    publicDir: isVercelBuild ? false : 'public',
+    plugins: [
+      viteTsConfigPaths({
+        projects: ['./tsconfig.json']
       }),
-    react(),
-    tailwindcss()
-  ].filter(Boolean)
+      tanstackStart({
+        srcDirectory: 'src'
+      }),
+      !isVitest &&
+        nitro({
+          config: {
+            preset: 'vercel'
+          }
+        }),
+      react(),
+      tailwindcss()
+    ].filter(Boolean)
+  }
 })
-
-export default config
