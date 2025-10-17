@@ -294,13 +294,15 @@ if (!LOCATIONS_VECTOR_STORE_ID) {
  *
  * @example
  * ```typescript
- * const VALID_LOCATION_IDS = new Set<string>([
+ * const LOCATION_IDS = [
  *   'a-f1-north-entrance', // A Block main entrance
  *   'a-f1-north-3-side', // A121 - Academic Records
  *   'x-f1-east-4', // Coffee Infusion
  *   'x-f1-mid-6-library', // The Library
  *   // ...add the remainder of your curated locations here
- * ])
+ * ] as const
+ *
+ * const VALID_LOCATION_IDS = new Set<string>(LOCATION_IDS)
  * ```
  */
 const LOCATION_IDS = [
@@ -524,31 +526,30 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
         },
         ...messages.map(message => ({
           role: message.role,
-          content: message.content
+          content: message.content,
+          type: 'message'
         }))
       ],
       tools: [
-        {
-          type: 'file_search'
-        },
+        { type: 'file_search' },
         {
           type: 'function',
-          function: {
-            name: 'navigate_to',
-            description:
-              'Automatically navigate the user\'s viewport to a specific campus location. Only call this when the user confirms they want to be navigated there (e.g., "yes", "sure", "take me there").',
-            parameters: {
-              type: 'object',
-              properties: {
-                photoId: {
-                  type: 'string',
-                  enum: Array.from(VALID_LOCATION_IDS),
-                  description: 'The photo ID to navigate to'
-                }
-              },
-              required: ['photoId']
-            }
-          }
+          name: 'navigate_to',
+          description:
+            'Automatically navigate the user\'s viewport to a specific campus location. Only call this when the user confirms they want to be navigated there (e.g., "yes", "sure", "take me there").',
+          parameters: {
+            type: 'object',
+            properties: {
+              photoId: {
+                type: 'string',
+                enum: LOCATION_IDS,
+                description: 'The photo ID to navigate to'
+              }
+            },
+            required: ['photoId'],
+            additionalProperties: false
+          },
+          strict: true
         }
       ],
       tool_resources: {

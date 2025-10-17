@@ -1,0 +1,778 @@
+[
+  {
+    "id": "a-f1-north-3-side",
+    "metadata": {
+      "areaId": "a-block-floor-1-main",
+      "areaName": "A Block",
+      "buildingBlock": "a",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "A121 - Academic Records"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "academic records office",
+        "student records",
+        "enrolment desk",
+        "transcripts office",
+        "records counter",
+        "registration records"
+      ]
+    },
+    "text": "A121 - Academic Records is visible from photo a-f1-north-3-side. It sits in A Block (building A), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "a-f2-north-stairs-entrance",
+    "metadata": {
+      "areaId": "a-block-floor-2-main",
+      "areaName": "A Block",
+      "buildingBlock": "a",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "Pearson Vue Testing Centre"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "testing centre",
+        "exam centre",
+        "pearson vue lab",
+        "certification testing",
+        "testing room",
+        "assessment centre"
+      ]
+    },
+    "text": "Pearson Vue Testing Centre is visible from photo a-f2-north-stairs-entrance. It sits in A Block (building A), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "n-f1-east-south-4",
+    "metadata": {
+      "areaId": "n-block-floor-1-main",
+      "areaName": "N Block",
+      "buildingBlock": "n",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "N104"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "N104 is visible from photo n-f1-east-south-4. It sits in N Block (building N), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "n-f1-west-9",
+    "metadata": {
+      "areaId": "n-block-floor-1-main",
+      "areaName": "N Block",
+      "buildingBlock": "n",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "S153"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": []
+    },
+    "text": "S153 is visible from photo n-f1-west-9. It sits in N Block (building N), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "n-f2-east-4",
+    "metadata": {
+      "areaId": "n-block-floor-2-main",
+      "areaName": "N Block",
+      "buildingBlock": "n",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "N216",
+        "N215",
+        "N214",
+        "N213"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": []
+    },
+    "text": "N216 is visible from photo n-f2-east-4. It sits in N Block (building N), floor 2. Other rooms in view: N215, N214, N213. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "n-f2-mid-3",
+    "metadata": {
+      "areaId": "n-block-floor-2-main",
+      "areaName": "N Block",
+      "buildingBlock": "n",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "N226"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": []
+    },
+    "text": "N226 is visible from photo n-f2-mid-3. It sits in N Block (building N), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f1-mid-3",
+    "metadata": {
+      "areaId": "s-block-floor-1-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "S169"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S169 is visible from photo s-f1-mid-3. It sits in S Block (building S), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f1-north-4",
+    "metadata": {
+      "areaId": "s-block-floor-1-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "S171",
+        "S170"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": []
+    },
+    "text": "S171 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f1-south-2",
+    "metadata": {
+      "areaId": "s-block-floor-1-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "S154",
+        "S156"
+      ],
+      "roomTypes": [
+        "office",
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S154 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1. Other rooms in view: S156. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f1-south-entrance",
+    "metadata": {
+      "areaId": "s-block-floor-1-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "S157"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S157 is visible from photo s-f1-south-entrance. It sits in S Block (building S), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f2-mid-3",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S268"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S268 is visible from photo s-f2-mid-3. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f2-mid-4",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S267"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f2-south-5",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S265",
+        "S254"
+      ],
+      "roomTypes": [
+        "classroom",
+        "facility"
+      ],
+      "synonyms": []
+    },
+    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2. Other rooms in view: S254. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f2-south-6",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S255"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S255 is visible from photo s-f2-south-6. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f2-south-7",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S256",
+        "S264",
+        "S262"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2. Other rooms in view: S264, S262. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f4-mid-4",
+    "metadata": {
+      "areaId": "s-block-floor-4-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 4,
+      "roomNumbers": [
+        "S469"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": []
+    },
+    "text": "S469 is visible from photo s-f4-mid-4. It sits in S Block (building S), floor 4. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f4-north-7",
+    "metadata": {
+      "areaId": "s-block-floor-4-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 4,
+      "roomNumbers": [
+        "S453",
+        "S460"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4. Other rooms in view: S460. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "s-f4-north-8",
+    "metadata": {
+      "areaId": "s-block-floor-4-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 4,
+      "roomNumbers": [
+        "S454",
+        "S455",
+        "S458"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4. Other rooms in view: S455, S458. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "w-f2-4",
+    "metadata": {
+      "areaId": "w-block-floor-2-main",
+      "areaName": "W Block",
+      "buildingBlock": "w",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "W209"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "W209 is visible from photo w-f2-4. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "w-f2-5",
+    "metadata": {
+      "areaId": "w-block-floor-2-main",
+      "areaName": "W Block",
+      "buildingBlock": "w",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "W210"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "W210 is visible from photo w-f2-5. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "w-f2-6",
+    "metadata": {
+      "areaId": "w-block-floor-2-main",
+      "areaName": "W Block",
+      "buildingBlock": "w",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "W211"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "W211 is visible from photo w-f2-6. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "w-f2-7",
+    "metadata": {
+      "areaId": "w-block-floor-2-main",
+      "areaName": "W Block",
+      "buildingBlock": "w",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "W212"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "W212 is visible from photo w-f2-7. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "w-gym-overlook-1",
+    "metadata": {
+      "areaId": "w-block-gym-floor-2",
+      "areaName": "The Recreation Centre",
+      "buildingBlock": "w",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "W220 - The Zone"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "the zone",
+        "recreation centre",
+        "campus gym",
+        "fitness zone",
+        "student fitness",
+        "exercise space",
+        "gym lounge"
+      ]
+    },
+    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. It sits in The Recreation Centre (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-east-4",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Coffee Infusion"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "campus cafe",
+        "coffee shop",
+        "coffee infusion cafe",
+        "coffee bar",
+        "student cafe",
+        "grab a coffee"
+      ]
+    },
+    "text": "Coffee Infusion is visible from photo x-f1-east-4. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-mid-6-aside",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Security Services"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "campus security",
+        "security office",
+        "security desk",
+        "safety services",
+        "security helpdesk",
+        "security station"
+      ]
+    },
+    "text": "Security Services is visible from photo x-f1-mid-6-aside. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-mid-6-library",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "The Library"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "library",
+        "main library",
+        "campus library",
+        "books",
+        "study library",
+        "learning commons"
+      ]
+    },
+    "text": "The Library is visible from photo x-f1-mid-6-library. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-mid-7",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Information Desk"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "info desk",
+        "help desk",
+        "information counter",
+        "student help desk",
+        "front desk",
+        "welcome desk"
+      ]
+    },
+    "text": "Information Desk is visible from photo x-f1-mid-7. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-mid-8",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "L103 - Student Support",
+        "The Hub"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "student support",
+        "support services",
+        "student hub",
+        "the hub",
+        "student help centre",
+        "student wellbeing",
+        "tautoko space"
+      ]
+    },
+    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. Other rooms in view: The Hub. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-west-10",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "X110 - Student Finance",
+        "X108 - Careers & Employment"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "student finance",
+        "fees office",
+        "financial support",
+        "careers office",
+        "careers and employment",
+        "job centre",
+        "employment support",
+        "career advice"
+      ]
+    },
+    "text": "X110 - Student Finance is visible from photo x-f1-west-10. It sits in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f1-west-11",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Ara Connect"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "ara connect",
+        "student it help",
+        "tech support",
+        "device help",
+        "computer helpdesk",
+        "connect centre"
+      ]
+    },
+    "text": "Ara Connect is visible from photo x-f1-west-11. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-north-9-aside",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "L202",
+        "L203"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in X Block (building X), floor 2. Other rooms in view: L203. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-west-2",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "X202"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X202 is visible from photo x-f2-west-2. It sits in X Block (building X), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-west-3-aside",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "X203",
+        "X205"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2. Other rooms in view: X205. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-west-4",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "X204",
+        "X206"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2. Other rooms in view: X206. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-west-5-aside",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "X205",
+        "X210"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2. Other rooms in view: X210. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f2-west-6",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "X208"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X208 is visible from photo x-f2-west-6. It sits in X Block (building X), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f3-east-6",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
+        "X306",
+        "X308"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3. Other rooms in view: X308. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f3-east-8",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
+        "X313"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X313 is visible from photo x-f3-east-8. It sits in X Block (building X), floor 3. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f3-west-1",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
+        "X302",
+        "X304"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3. Other rooms in view: X304. Add conversational synonyms to metadata before uploading to improve recall."
+  },
+  {
+    "id": "x-f3-west-1-aside",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
+        "X303",
+        "X305"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3. Other rooms in view: X305. Add conversational synonyms to metadata before uploading to improve recall."
+  }
+]
