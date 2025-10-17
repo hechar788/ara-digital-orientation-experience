@@ -1,19 +1,51 @@
-import React, { useRef, useEffect, useState } from 'react'
-import { Send, X } from 'lucide-react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
+import { Send, X, MapPin, AlertCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import type { ChatMessage as ServerChatMessage } from '@/lib/ai'
+import { getChatResponse } from '@/lib/ai-client'
 
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
-
+/**
+ * Props for the AIChatPopup component
+ *
+ * @property isOpen - Whether the popup is currently visible
+ * @property onClose - Callback invoked when the popup should be dismissed
+ * @property currentPhotoId - The ID of the location currently displayed in the viewer
+ * @property onNavigate - Handler that jumps the viewer to the supplied destination photo
+ */
 interface AIChatPopupProps {
   isOpen: boolean
   onClose: () => void
+  currentPhotoId: string
+  onNavigate?: (photoId: string) => void
 }
 
-function Messages({ messages, isLoading }: { messages: Array<Message>; isLoading: boolean }) {
+/**
+ * Represents a single chat message rendered in the popup
+ *
+ * @property id - Stable identifier for list rendering
+ * @property role - Origin of the message (`user` or `assistant`)
+ * @property content - Text content displayed to the user
+ * @property timestamp - Creation time of the message
+ * @property navigationData - Navigation metadata when the AI triggers viewport movement
+ */
+interface ChatMessageDisplay {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+  navigationData?: {
+    photoId: string
+    error?: string
+  }
+}
+
+function Messages({
+  messages,
+  isLoading
+}: {
+  messages: Array<ChatMessageDisplay>
+  isLoading: boolean
+}) {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -76,40 +108,166 @@ function Messages({ messages, isLoading }: { messages: Array<Message>; isLoading
   )
 }
 
-export const AIChatPopup: React.FC<AIChatPopupProps> = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState<Message[]>([])
+function generateMessageId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+/**
+ * AI chat popup that connects the UI to the campus navigation server function
+ *
+ * Displays the ongoing conversation, handles user input, and forwards requests
+ * to the `getChatResponse` server function. When the AI returns a navigation
+ * command, the component forwards it to the provided `onNavigate` handler so
+ * the panoramic viewer can move to the requested destination.
+ *
+ * @param isOpen - Whether the dialog is currently visible
+ * @param onClose - Callback to close the popup
+ * @param currentPhotoId - Current location photo identifier for the user
+ * @param onNavigate - Handler invoked when the AI requests automatic navigation
+ * @returns React component representing the AI chat popup
+ */
+export const AIChatPopup: React.FC<AIChatPopupProps> = ({
+  isOpen,
+  onClose,
+  currentPhotoId,
+  onNavigate
+}) => {
+  const [messages, setMessages] = useState<ChatMessageDisplay[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const conversationForServer: ServerChatMessage[] = useMemo(() => {
+    return messages.map(message => ({
+      role: message.role,
+      content: message.content
+    }))
+  }, [messages])
+
+  const appendAssistantMessage = (
+    content: string,
+    navigationData?: ChatMessageDisplay['navigationData']
+  ) => {
+    setMessages(prev => [
+      ...prev,
+      {
+        id: generateMessageId(),
+        role: 'assistant',
+        content,
+        timestamp: new Date(),
+        navigationData
+      }
+    ])
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim() || isLoading) return
+    const trimmed = input.trim()
+    if (!trimmed || isLoading) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input.trim()
+    if (!currentPhotoId) {
+      appendAssistantMessage(
+        'I need to know where you currently are before I can help. Please try again once the viewer finishes loading.',
+        { error: 'Missing current location.' }
+      )
+      setInput('')
+      return
     }
 
-    setMessages(prev => [...prev, userMessage])
+    const userMessage: ChatMessageDisplay = {
+      id: generateMessageId(),
+      role: 'user',
+      content: trimmed,
+      timestamp: new Date()
+    }
+
+    const updatedMessages = [...messages, userMessage]
+
+    setMessages(updatedMessages)
     setInput('')
     setIsLoading(true)
+    setErrorMessage(null)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `I understand you're asking about: "${userMessage.content}". As an AI assistant for the panoramic viewer, I can help you with navigation, controls, and understanding the immersive experience. What would you like to know more about?`
+    try {
+      const result = await getChatResponse({
+        messages: [...conversationForServer, { role: 'user', content: trimmed }],
+        currentLocation: currentPhotoId
+      })
+
+      if (result.error) {
+        appendAssistantMessage(
+          result.error,
+          { error: 'The AI service reported an error.' }
+        )
+        setErrorMessage(result.error)
+        return
       }
-      setMessages(prev => [...prev, aiMessage])
+
+      const messageText =
+        result.message ??
+        (result.functionCall
+          ? `Starting navigation to ${result.functionCall.arguments.photoId}.`
+          : 'I’m here if you need directions around campus!')
+
+      let navigationData: ChatMessageDisplay['navigationData'] | undefined
+
+      if (result.functionCall) {
+        const destination = result.functionCall.arguments.photoId
+        if (onNavigate) {
+          onNavigate(destination)
+          navigationData = { photoId: destination }
+        } else {
+          navigationData = {
+            photoId: destination,
+            error: 'Navigation handler is unavailable.'
+          }
+        }
+      }
+
+      appendAssistantMessage(messageText, navigationData)
+    } catch (error) {
+      console.error('[AI Chat Popup] Failed to fetch AI response', error)
+      const fallbackMessage =
+        'Sorry, I ran into a problem trying to contact the campus AI. Please try again in a moment.'
+      appendAssistantMessage(fallbackMessage, { error: 'Network or service error.' })
+      setErrorMessage('Unable to reach the AI service. Check your connection and try again.')
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
+
+  useEffect(() => {
+    if (!isOpen || messages.length > 0) {
+      return
+    }
+
+    setMessages([
+      {
+        id: generateMessageId(),
+        role: 'assistant',
+        content: 'Hi there! I can help you find facilities across campus. Ask me where you’d like to go.',
+        timestamp: new Date()
+      }
+    ])
+  }, [isOpen, messages.length])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setErrorMessage(null)
+    }
+  }, [isOpen])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
   }
+
+  const latestAssistantNavigation = messages
+    .slice()
+    .reverse()
+    .find(message => message.role === 'assistant' && message.navigationData)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -130,6 +288,28 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({ isOpen, onClose }) => 
         </DialogHeader>
 
         <Messages messages={messages} isLoading={isLoading} />
+
+        {latestAssistantNavigation && latestAssistantNavigation.navigationData && (
+          <div className="px-4 py-2 border-t border-gray-200 bg-blue-50 text-xs text-blue-800 flex items-center gap-2">
+            <MapPin className="w-4 h-4 flex-shrink-0" />
+            {latestAssistantNavigation.navigationData.error ? (
+              <span>
+                Tried to navigate to <strong>{latestAssistantNavigation.navigationData.photoId}</strong>, but encountered an issue: {latestAssistantNavigation.navigationData.error}
+              </span>
+            ) : (
+              <span>
+                Navigating to <strong>{latestAssistantNavigation.navigationData.photoId}</strong>.
+              </span>
+            )}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="px-4 py-2 border-t border-red-200 bg-red-50 text-xs text-red-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         <div className="p-4 border-t border-gray-200">
           <form onSubmit={handleSubmit}>
@@ -156,7 +336,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({ isOpen, onClose }) => 
               />
               <button
                 type="submit"
-                disabled={!input.trim() || isLoading}
+                disabled={!input.trim() || isLoading || !currentPhotoId}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-blue-500 hover:text-blue-400 disabled:text-gray-400 transition-colors focus:outline-none"
               >
                 <Send className="w-4 h-4" />

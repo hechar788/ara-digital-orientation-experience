@@ -1,22 +1,7 @@
 'use server'
 
 import OpenAI, { APIError } from 'openai'
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-
-if (!OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is not set. Add it to your environment before using getChatResponse().')
-}
-
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY
-})
-
-const LOCATIONS_VECTOR_STORE_ID = process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID
-
-if (!LOCATIONS_VECTOR_STORE_ID) {
-  throw new Error('OPENAI_LOCATIONS_VECTOR_STORE_ID is not set. Add it to your environment before using getChatResponse().')
-}
+import type { ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses'
 
 const LOCATION_IDS = [
   'a-f1-north-3-side',
@@ -62,7 +47,34 @@ const LOCATION_IDS = [
 ] as const
 
 const VALID_LOCATION_ID_SET = new Set<string>(LOCATION_IDS)
-type GeneratedResponse = Awaited<ReturnType<typeof openai.responses.create>>
+let cachedClient: OpenAI | null = null
+type GeneratedResponse = Awaited<ReturnType<OpenAI['responses']['create']>>
+
+function getOpenAIClient(): OpenAI {
+  if (!cachedClient) {
+    const apiKey = process.env.OPENAI_API_KEY
+
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY is not set. Add it to your environment before using getChatResponse().')
+    }
+
+    cachedClient = new OpenAI({
+      apiKey
+    })
+  }
+
+  return cachedClient
+}
+
+function getVectorStoreId(): string {
+  const vectorStoreId = process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID
+
+  if (!vectorStoreId) {
+    throw new Error('OPENAI_LOCATIONS_VECTOR_STORE_ID is not set. Add it to your environment before using getChatResponse().')
+  }
+
+  return vectorStoreId
+}
 
 /**
  * Describes a chat message exchanged with the AI assistant
@@ -300,41 +312,22 @@ function handleKnownApiErrors(error: unknown): ChatResponse | null {
   return null
 }
 
-/**
- * Generates a campus navigation response using the OpenAI Responses API
- *
- * Includes vector store search for campus locations and tool calling for viewer
- * navigation instructions. Performs validation to keep context size in check and
- * returns structured errors when the request cannot be fulfilled.
- *
- * @param messages - Conversation history between the user and assistant
- * @param currentLocation - Current campus photo identifier supplied by the caller
- * @returns A ChatResponse with assistant text and optional navigation command
- *
- * @example
- * ```typescript
- * const result = await getChatResponse(
- *   [{ role: 'user', content: 'Where is the library?' }],
- *   'x-f1-mid-7'
- * )
- * ```
- */
-export async function getChatResponse(messages: ChatMessage[], currentLocation: string): Promise<ChatResponse> {
-  'use server'
+type GetChatResponseInput = {
+  messages: ChatMessage[]
+  currentLocation: string
+}
+
+export async function executeChat({ messages, currentLocation }: GetChatResponseInput): Promise<ChatResponse> {
+  console.info('[AI] getChatResponse invoked', {
+    messageCount: messages?.length ?? 0,
+    currentLocation
+  })
 
   if (!currentLocation) {
     return {
       message: null,
       functionCall: null,
       error: 'Current location is required for navigation.'
-    }
-  }
-
-  if (!VALID_LOCATION_ID_SET.has(currentLocation)) {
-    return {
-      message: null,
-      functionCall: null,
-      error: `Unknown current location: ${currentLocation}`
     }
   }
 
@@ -348,7 +341,15 @@ export async function getChatResponse(messages: ChatMessage[], currentLocation: 
   }
 
   try {
-    const response = await openai.responses.create({
+    const client = getOpenAIClient()
+    const vectorStoreId = getVectorStoreId()
+
+    console.info('[AI] Preparing OpenAI request', {
+      vectorStoreId,
+      messageCount: messages.length
+    })
+
+    const response = (await client.responses.create({
       model: 'gpt-4o-mini',
       input: [
         {
@@ -359,20 +360,26 @@ export async function getChatResponse(messages: ChatMessage[], currentLocation: 
         ...normaliseMessageInput(messages)
       ],
       tools: [
-        { type: 'file_search' as const },
+        {
+          type: 'file_search',
+          vector_store_ids: [vectorStoreId]
+        },
         NAVIGATION_TOOL
       ],
-      tool_resources: {
-        file_search: {
-          vector_store_ids: [LOCATIONS_VECTOR_STORE_ID]
-        }
-      },
       temperature: 0.7,
       max_output_tokens: 200
-    })
+    } satisfies ResponseCreateParamsNonStreaming)) as GeneratedResponse
 
-    const message = parseResponseText(response.output) ?? (response.output_text?.trim() || null)
+    const message =
+      response.output_text?.trim() ??
+      parseResponseText(response.output) ??
+      null
     const functionCall = parseFunctionCall(response.output)
+
+    console.info('[AI] OpenAI response summary', {
+      hasMessage: !!message,
+      hasFunctionCall: !!functionCall
+    })
 
     return {
       message,

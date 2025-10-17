@@ -1,6 +1,6 @@
 # Phase 5: Chat UI Component
 
-**Status**: =á Not Started
+**Status**: =ï¿½ Not Started
 **Prerequisites**: Phase 3 (Basic AI), Phase 4 (AI + Pathfinding)
 **Estimated Time**: 3-4 hours
 **Difficulty**: Medium
@@ -255,7 +255,7 @@ export function AICampusChat({ currentPhotoId, onNavigate, onClose }: AICampusCh
       })
 
       // Call AI server function
-      const response = await getChatResponse(serverMessages, currentPhotoId)
+      const response = await getChatResponse({ messages: serverMessages, currentLocation: currentPhotoId })
 
       // Handle error response
       if (response.error) {
@@ -574,7 +574,7 @@ Messages can include navigation information:
 
 **Displays:**
 - Route distance (number of steps)
-- Route description (From A ’ B ’ C)
+- Route description (From A ï¿½ B ï¿½ C)
 - Error messages if path calculation fails
 
 ### 5.5 Responsive Design
@@ -603,13 +603,13 @@ To match your campus branding, update these classes:
 
 ```typescript
 // Header background
-className="bg-blue-600 text-white"  ’  "bg-purple-600 text-white"
+className="bg-blue-600 text-white"  ï¿½  "bg-purple-600 text-white"
 
 // User message bubble
-className="bg-blue-600 text-white"  ’  "bg-purple-600 text-white"
+className="bg-blue-600 text-white"  ï¿½  "bg-purple-600 text-white"
 
 // Send button
-className="bg-blue-600 hover:bg-blue-700"  ’  "bg-purple-600 hover:bg-purple-700"
+className="bg-blue-600 hover:bg-blue-700"  ï¿½  "bg-purple-600 hover:bg-purple-700"
 ```
 
 ### Sizing Options
@@ -617,16 +617,16 @@ className="bg-blue-600 hover:bg-blue-700"  ’  "bg-purple-600 hover:bg-purple-700
 **Larger Chat:**
 ```typescript
 // Change width
-className="w-96"  ’  "w-[500px]"
+className="w-96"  ï¿½  "w-[500px]"
 
 // Change height
-className="max-h-[600px]"  ’  "max-h-[700px]"
+className="max-h-[600px]"  ï¿½  "max-h-[700px]"
 ```
 
 **Smaller Chat (Mobile-First):**
 ```typescript
 // Full-width on mobile, fixed on desktop
-className="w-96 max-w-[calc(100vw-2rem)]"  ’  "w-full sm:w-96"
+className="w-96 max-w-[calc(100vw-2rem)]"  ï¿½  "w-full sm:w-96"
 ```
 
 ---
@@ -1195,4 +1195,4 @@ Before moving to Phase 6, verify:
 
 ---
 
-**Phase 5 Status**: Ready for implementation =€
+**Phase 5 Status**: Ready for implementation =ï¿½

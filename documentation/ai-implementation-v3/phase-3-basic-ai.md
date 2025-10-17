@@ -119,22 +119,7 @@ Open `src/lib/ai.ts` and add the following code:
 ```typescript
 'use server'
 
-import OpenAI from 'openai'
-
-/**
- * OpenAI client instance
- *
- * Initialized with API key from environment variables.
- * The 'use server' directive ensures this never runs in the browser,
- * keeping the API key secure.
- */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-})
-
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is not set. Add it to your .env.local before using getChatResponse().')
-}
+import OpenAI, { APIError } from 'openai'
 
 /**
  * Chat message type for conversation history
@@ -189,7 +174,10 @@ export interface FunctionCall {
   name: string
   arguments: {
     photoId: string
-  }
+  })
+
+export function getChatResponse(input: GetChatResponseInput): Promise<ChatResponse> {
+  return getChatResponseServerFn({ data: input })
 }
 
 /**
@@ -349,6 +337,49 @@ const LOCATION_IDS = [
 ] as const
 
 const VALID_LOCATION_IDS = new Set<string>(LOCATION_IDS)
+
+let cachedClient: OpenAI | null = null
+
+/**
+ * Lazily initialize OpenAI client for server usage
+ *
+ * Instantiates the SDK only when the server function runs, preventing build-time
+ * environment checks from executing in the browser bundle.
+ *
+ * @returns Singleton OpenAI client
+ */
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY
+
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is not set. Add it to your .env.local before using getChatResponse().')
+  }
+
+  if (!cachedClient) {
+    cachedClient = new OpenAI({
+      apiKey
+    })
+  }
+
+  return cachedClient
+}
+
+/**
+ * Resolve vector store identifier from environment variables
+ *
+ * Reads the ID lazily so dev builds do not throw before env files load.
+ *
+ * @returns Vector store ID used for campus locations
+ */
+function getVectorStoreId(): string {
+  const vectorStoreId = process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID
+
+  if (!vectorStoreId) {
+    throw new Error('OPENAI_LOCATIONS_VECTOR_STORE_ID is not set. Add it to your .env.local before using getChatResponse().')
+  }
+
+  return vectorStoreId
+}
 ```
 
 Add `OPENAI_LOCATIONS_VECTOR_STORE_ID=vs_xxx` to `.env.local`, using the ID shown for the "locations" store inside your OpenAI project console. Keep the value private—treat it the same way as your API key.
@@ -397,14 +428,14 @@ Add this to `src/lib/ai.ts`:
  *
  * @example
  * ```typescript
- * const result = await getChatResponse(
- *   [
+ * const result = await getChatResponse({
+ *   messages: [
  *     { role: 'user', content: 'Where is the library?' },
  *     { role: 'assistant', content: 'The library is southwest...' },
  *     { role: 'user', content: 'Yes please' }
  *   ],
- *   'a-f1-north-entrance'
- * )
+ *   currentLocation: 'a-f1-north-entrance'
+ * })
  *
  * // Returns:
  * // {
@@ -416,29 +447,21 @@ Add this to `src/lib/ai.ts`:
  * // }
  * ```
  */
-export async function getChatResponse(
-  messages: ChatMessage[],
-  currentLocation: string
-): Promise<ChatResponse> {
-  'use server'
+const getChatResponseServerFn = createServerFn({ method: 'POST' })
+  .inputValidator((payload: GetChatResponseInput) => payload)
+  .handler(async ({ data }) => {
+    const { messages, currentLocation } = data
 
-  if (!currentLocation) {
-    return {
+    if (!currentLocation) {
+      return {
       message: null,
       functionCall: null,
       error: 'Current location is required for navigation context.'
     }
   }
 
-  if (!VALID_LOCATION_IDS.has(currentLocation)) {
-    return {
-      message: null,
-      functionCall: null,
-      error: `Unknown current location: ${currentLocation}`
-    }
-  }
 
-  try {
+    try {
     // ============================================
     // STEP 1: Input Validation
     // ============================================
@@ -476,7 +499,10 @@ export async function getChatResponse(
     // STEP 2: Call OpenAI with Tool Calling
     // ============================================
 
-    const response = await openai.responses.create({
+    const client = getOpenAIClient()
+    const vectorStoreId = getVectorStoreId()
+
+    const response = await client.responses.create({
       model: 'gpt-4o-mini',
       input: [
         {
@@ -531,7 +557,7 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
         }))
       ],
       tools: [
-        { type: 'file_search' },
+        { type: 'file_search', vector_store_ids: [vectorStoreId] },
         {
           type: 'function',
           name: 'navigate_to',
@@ -552,11 +578,6 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
           strict: true
         }
       ],
-      tool_resources: {
-        file_search: {
-          vector_store_ids: [LOCATIONS_VECTOR_STORE_ID]
-        }
-      },
       temperature: 0.7, // Balanced creativity vs consistency
       max_output_tokens: 200 // Keep responses concise
     })
@@ -615,14 +636,14 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
       message: messageContent,
       functionCall
     }
-  } catch (error: any) {
+    } catch (error: any) {
     // ============================================
     // ERROR HANDLING
     // ============================================
 
     console.error('[AI Server Function] Error:', error)
 
-    if (error instanceof OpenAI.APIError) {
+    if (error instanceof APIError) {
       if (error.status === 429) {
         return {
           message: null,
