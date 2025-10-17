@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { TourControls } from './menu/TourControls'
-import { AIChatPopup } from './chat/AIChatPopup'
 import { TourInformationPopup } from './information/TourInformationPopup'
+import { PlaceholderAIChat } from './chat/PlaceholderAIChat'
 import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePopup } from '@/hooks/usePopup'
 import { useOnboarding } from '@/hooks/useOnboarding'
@@ -29,14 +29,14 @@ interface TourProps {
 /**
  * Tour mode container component
  *
- * Manages all tour-specific UI features and state including AI chat assistant,
+ * Manages all tour-specific UI features and state including the placeholder AI chat,
  * information popup, and tour controls. Uses the usePopup hook for consistent
  * popup state management across all tour dialogs.
  *
  * Features:
  * - AI Chat Assistant popup for user guidance
  * - Information popup (shown automatically on first session)
- * - Tour control panel with fullscreen, race start, AI chat, and info buttons
+ * - Tour control panel with fullscreen, race start, AI chat placeholder, and info buttons
  * - Clean separation of tour concerns from other modes
  *
  * @param className - CSS classes for the tour controls positioning
@@ -90,18 +90,10 @@ export const Tour: React.FC<TourProps> = ({
         onInfo={info.toggle}
         onStartRace={handleStartRace}
       />
-
-      <AIChatPopup
+      <PlaceholderAIChat
         isOpen={aiChat.isOpen}
         onClose={aiChat.close}
         currentPhotoId={currentPhotoId}
-        onNavigate={destination => {
-          if (onNavigateToPhoto) {
-            onNavigateToPhoto(destination)
-          } else {
-            console.warn('[Tour] Navigation callback missing while AI attempted to navigate to', destination)
-          }
-        }}
       />
 
       <TourInformationPopup

@@ -32,7 +32,7 @@ export interface UsePopupReturn {
  * const info = usePopup(true) // starts open
  *
  * <button onClick={aiChat.open}>Open Chat</button>
- * <AIChatPopup isOpen={aiChat.isOpen} onClose={aiChat.close} />
+ * <PlaceholderAIChat isOpen={aiChat.isOpen} onClose={aiChat.close} />
  * ```
  */
 export const usePopup = (initialState = false): UsePopupReturn => {
