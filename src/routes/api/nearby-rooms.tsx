@@ -19,7 +19,8 @@
  *     buildingBlock: "w",
  *     floorLevel: 1,
  *     roomNumber: "W111",
- *     roomType: "classroom"
+ *     roomType: "classroom",
+ *     synonyms: []
  *   },
  *   ...
  * ]
@@ -41,6 +42,7 @@ import { getAllAreas } from '../../data/blockUtils'
  * @property floorLevel - Floor level where photo is located
  * @property roomNumber - Room number or identifier
  * @property roomType - Type of room (classroom, lab, office, facility, restroom)
+ * @property synonyms - Synonym labels for search enrichment
  */
 interface RoomEntry extends NearbyRoom {
   photoId: string
@@ -48,6 +50,7 @@ interface RoomEntry extends NearbyRoom {
   areaName: string
   buildingBlock: string
   floorLevel: number
+  synonyms: string[]
 }
 
 /**
@@ -92,7 +95,8 @@ function collateNearbyRooms(): RoomEntry[] {
               buildingBlock: item.buildingBlock,
               floorLevel: item.floorLevel,
               roomNumber: room.roomNumber,
-              roomType: room.roomType
+              roomType: room.roomType,
+              synonyms: []
             })
           }
         }
