@@ -1,6 +1,6 @@
 # Phase 6: Sequential Route Navigation
 
-**Status**: =á Not Started
+**Status**: â˜ Not Started
 **Prerequisites**: Phase 4 (AI + Pathfinding), Phase 5 (Chat UI)
 **Estimated Time**: 3-4 hours
 **Difficulty**: Medium-Hard
@@ -10,8 +10,8 @@
 This phase enhances navigation from direct jumping (Phase 5) to sequential step-by-step camera movement along the calculated route. Instead of instantly teleporting to the destination, users will see each location along the path, creating a more immersive and less disorienting experience.
 
 **What Changes:**
-- **Phase 5 Behavior**: User asks for library ’ Camera jumps instantly to library
-- **Phase 6 Behavior**: User asks for library ’ Camera smoothly transitions: A Block Entrance ’ A Block Hallway ’ Library Entrance (step-by-step with delays)
+- **Phase 5 Behavior**: User asks for library â†’ Camera jumps instantly to library
+- **Phase 6 Behavior**: User asks for library â†’ Camera smoothly transitions: A Block Entrance â†’ A Block Hallway â†’ Library Entrance (step-by-step with delays)
 
 **Key Features:**
 - Automatic step-by-step navigation along path array
@@ -36,11 +36,11 @@ This phase enhances navigation from direct jumping (Phase 5) to sequential step-
 
 ```
 User: "Take me to the library"
-  “
+  â†’
 AI returns: path = ['a-f1-north', 'a-f1-hallway', 'library-entrance']
-  “
-onNavigate('library-entrance')   Jumps directly to end
-  “
+  â†’
+onNavigate('library-entrance')  â†’ Jumps directly to end
+  â†’
 User sees: Library (instantly, no context)
 ```
 
@@ -48,21 +48,21 @@ User sees: Library (instantly, no context)
 
 ```
 User: "Take me to the library"
-  “
+  â†’
 AI returns: path = ['a-f1-north', 'a-f1-hallway', 'library-entrance']
-  “
+  â†’
 navigateAlongPath(path)
-  “
+  â†’
 Progress: "Step 1 of 3 - A Block North Entrance"
 Wait 2 seconds
-  “
+  â†’
 onNavigate('a-f1-hallway')
-  “
+  â†’
 Progress: "Step 2 of 3 - A Block Hallway"
 Wait 2 seconds
-  “
+  â†’
 onNavigate('library-entrance')
-  “
+  â†’
 Progress: "Step 3 of 3 - Library Entrance"
 Complete! 
 ```
@@ -368,7 +368,7 @@ Create a component to display navigation progress overlay.
 'use client'
 
 import { X, SkipForward } from 'lucide-react'
-import { tourData } from '../lib/tourData'
+import { findPhotoById as lookupPhoto } from '@/data/blockUtils'
 
 /**
  * Props for the RouteProgress component
@@ -393,8 +393,8 @@ export interface RouteProgressProps {
  * @param photoId - The photo ID to search for
  * @returns Photo object or null if not found
  */
-function findPhotoById(photoId: string) {
-  return tourData.photos.find(p => p.id === photoId) || null
+function resolvePhoto(photoId: string) {
+  return lookupPhoto(photoId)
 }
 
 /**
@@ -425,7 +425,7 @@ export function RouteProgress({
   onCancel
 }: RouteProgressProps) {
 
-  const currentPhoto = findPhotoById(currentPhotoId)
+  const currentPhoto = resolvePhoto(currentPhotoId)
   const progressPercent = ((currentStep / totalSteps) * 100).toFixed(0)
 
   return (
@@ -1175,7 +1175,7 @@ Before moving to Phase 7, verify:
 ### Progress UI
 - [ ] RouteProgress component displays correctly
 - [ ] Current step counter shows "Step X of Y"
-- [ ] Location name displays from tourData
+- [ ] Location name displays from campus photos directory
 - [ ] Progress bar animates smoothly
 - [ ] Percentage updates correctly
 - [ ] Skip button appears (except on last step)
@@ -1223,4 +1223,4 @@ Before moving to Phase 7, verify:
 
 ---
 
-**Phase 6 Status**: Ready for implementation =€
+**Phase 6 Status**: Ready for implementation =â†’
