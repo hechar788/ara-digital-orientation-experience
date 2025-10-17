@@ -15,11 +15,15 @@ import { useOnboarding } from '@/hooks/useOnboarding'
  * @property className - Optional CSS class names for the controls container
  * @property style - Optional inline styles for the controls
  * @property onStartRace - Callback triggered when user initiates race mode
+ * @property currentPhotoId - Currently displayed photo identifier in the panoramic viewer
+ * @property onNavigateToPhoto - Handler used by the AI chat to jump directly to a destination photo
  */
 interface TourProps {
   className?: string
   style?: React.CSSProperties
   onStartRace?: () => void
+  currentPhotoId: string
+  onNavigateToPhoto?: (photoId: string) => void
 }
 
 /**
@@ -38,6 +42,8 @@ interface TourProps {
  * @param className - CSS classes for the tour controls positioning
  * @param style - Inline styles for the tour controls
  * @param onStartRace - Handler for switching to race mode
+ * @param currentPhotoId - Currently displayed photo identifier used by the AI assistant
+ * @param onNavigateToPhoto - Handler invoked when the AI chat requests navigation
  * @returns React component containing all tour mode UI elements
  *
  * @example
@@ -45,13 +51,17 @@ interface TourProps {
  * <Tour
  *   className="fixed bottom-4 left-1/2 -translate-x-1/2"
  *   onStartRace={() => setMode('race')}
+ *   currentPhotoId={currentPhotoId}
+ *   onNavigateToPhoto={jumpToPhoto}
  * />
  * ```
  */
 export const Tour: React.FC<TourProps> = ({
   className = '',
   style,
-  onStartRace
+  onStartRace,
+  currentPhotoId,
+  onNavigateToPhoto
 }) => {
   const aiChat = usePopup()
   const info = usePopup()
@@ -84,6 +94,14 @@ export const Tour: React.FC<TourProps> = ({
       <AIChatPopup
         isOpen={aiChat.isOpen}
         onClose={aiChat.close}
+        currentPhotoId={currentPhotoId}
+        onNavigate={destination => {
+          if (onNavigateToPhoto) {
+            onNavigateToPhoto(destination)
+          } else {
+            console.warn('[Tour] Navigation callback missing while AI attempted to navigate to', destination)
+          }
+        }}
       />
 
       <TourInformationPopup

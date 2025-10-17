@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiNearbyRoomsRouteImport } from './routes/api/nearby-rooms'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const ApiNearbyRoomsRoute = ApiNearbyRoomsRouteImport.update({
   path: '/api/nearby-rooms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/nearby-rooms': typeof ApiNearbyRoomsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/nearby-rooms': typeof ApiNearbyRoomsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/chat': typeof ApiChatRoute
   '/api/nearby-rooms': typeof ApiNearbyRoomsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/nearby-rooms'
+  fullPaths: '/' | '/api/chat' | '/api/nearby-rooms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/nearby-rooms'
-  id: '__root__' | '/' | '/api/nearby-rooms'
+  to: '/' | '/api/chat' | '/api/nearby-rooms'
+  id: '__root__' | '/' | '/api/chat' | '/api/nearby-rooms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiChatRoute: typeof ApiChatRoute
   ApiNearbyRoomsRoute: typeof ApiNearbyRoomsRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNearbyRoomsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiChatRoute: ApiChatRoute,
   ApiNearbyRoomsRoute: ApiNearbyRoomsRoute,
 }
 export const routeTree = rootRouteImport

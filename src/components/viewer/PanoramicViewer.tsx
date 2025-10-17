@@ -572,6 +572,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
             race.reset()
             onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
           }}
+          currentPhotoId={currentPhoto?.id ?? ''}
+          onNavigateToPhoto={onNavigateToPhoto}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 # VR Campus Tour: How Image Navigation Works
 
-## What We Built
+## Whats Built
 
 Imagine Google Street View, but for walking through a university campus. We created a system that lets users explore buildings by "jumping" between 360-degree photos. When you're looking at one photo, you can click buttons to move forward, backward, turn left or right, and even go up or down stairs - just like walking through the real building.
 

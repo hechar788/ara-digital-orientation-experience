@@ -12,7 +12,7 @@ By the end of this phase, you will have:
 
 1.  `src/lib/ai.ts` created with OpenAI integration
 2.  TypeScript interfaces defined for type safety
-3.  Campus location database populated
+3.  Locations vector store connected
 4.  System prompt crafted for navigation assistance
 5.  OpenAI Responses API tool-calling configured
 6.  Error handling implemented
@@ -119,22 +119,7 @@ Open `src/lib/ai.ts` and add the following code:
 ```typescript
 'use server'
 
-import OpenAI from 'openai'
-
-/**
- * OpenAI client instance
- *
- * Initialized with API key from environment variables.
- * The 'use server' directive ensures this never runs in the browser,
- * keeping the API key secure.
- */
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-})
-
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY is not set. Add it to your .env.local before using getChatResponse().')
-}
+import OpenAI, { APIError } from 'openai'
 
 /**
  * Chat message type for conversation history
@@ -189,7 +174,10 @@ export interface FunctionCall {
   name: string
   arguments: {
     photoId: string
-  }
+  })
+
+export function getChatResponse(input: GetChatResponseInput): Promise<ChatResponse> {
+  return getChatResponseServerFn({ data: input })
 }
 
 /**
@@ -254,157 +242,157 @@ export interface ChatResponse {
 
 ---
 
-## Step 3.4: Create Campus Location Database
+## Step 3.4: Connect Campus Location Vector Store
 
 **Time:** 5 minutes
 
-### Add Location Definitions
+### Configure the Vector Store Binding
 
-Add this to `src/lib/ai.ts` after the interfaces:
+Add this right after the environment variable check in `src/lib/ai.ts`:
 
 ```typescript
 /**
- * Campus Location Definitions
+ * OpenAI vector store containing campus locations
  *
- * Maps photo IDs to human-friendly location names and synonyms.
- * Used by AI to understand which photo ID corresponds to user requests.
- *
- * Structure:
- * - Key: Photo ID (exact match from tour data)
- * - Value: Array of names/synonyms users might say
- *
- * The AI uses this to:
- * 1. Understand user intent ("library" -> "library-f1-entrance")
- * 2. Provide context in responses
- * 3. Validate navigation targets (enum in tool schema)
- *
- * Add more locations as needed by finding photo IDs in src/data/blocks/
- */
-const CAMPUS_LOCATIONS = {
-  // A Block - Main Academic Building
-  'a-f1-north-entrance': [
-    'A Block',
-    'Main Entrance',
-    'Academic Building A',
-    'Block A',
-    'A Building',
-    'Main Building',
-    'Reception'
-  ],
-
-  // Library - Main Library Entrance
-  'library-f1-entrance': [
-    'Library',
-    'Main Library',
-    'The Library',
-    'Books',
-    'Study Area',
-    'Reading Room',
-    'Library Entrance',
-    'Library Main Entrance'
-  ],
-
-  // W Block - Gymnasium
-  'w-gym-entry': [
-    'Gym',
-    'Gymnasium',
-    'Sports Hall',
-    'W Block Gym',
-    'Recreation Center',
-    'Fitness Center',
-    'Workout Area',
-    'Sports Center'
-  ],
-
-  // Student Lounge
-  'lounge-main': [
-    'Student Lounge',
-    'Common Area',
-    'Lounge',
-    'Hangout',
-    'Social Space',
-    'Break Room',
-    'Common Room',
-    'Student Area'
-  ],
-
-  // N Block - Faculty Office (Sandy)
-  'n-sandy-office': [
-    'Professor Sandy Office',
-    "Sandy's Office",
-    'Sandy Office',
-    'Faculty Office',
-    'Sandy',
-    'Professor Sandy',
-    'Instructor Office'
-  ],
-
-  // Add more key locations as needed
-  // To find photo IDs:
-  // 1. Look in src/data/blocks/<building>/<floor>.ts
-  // 2. Find the 'id' property of photos
-  // 3. Add synonyms that users might say
-} as const
-
-/**
- * Generate location knowledge string for AI system prompt
- *
- * Converts CAMPUS_LOCATIONS map into human-readable format for AI context.
- * This helps the AI understand:
- * - What locations exist
- * - What photo ID to use for each location
- * - What synonyms users might use
- *
- * @returns Formatted string describing all campus locations
+ * Points to the "locations" vector store inside the OpenAI project
+ * configured for this app. The ID lives in `.env.local` so it never
+ * leaves your local environment or deployment secrets.
  *
  * @example
  * ```typescript
- * const knowledge = generateLocationKnowledge()
- * // Returns:
- * // "- a-f1-north-entrance: A Block, Main Entrance, Academic Building A
- * //  - library-f1-entrance: Library, Main Library, Books, Study Area
- * //  ..."
+ * // .env.local
+ * OPENAI_LOCATIONS_VECTOR_STORE_ID=vs_123456789
  * ```
  */
-function generateLocationKnowledge(): string {
-  return Object.entries(CAMPUS_LOCATIONS)
-    .map(([photoId, synonyms]) => `- ${photoId}: ${synonyms.join(', ')}`)
-    .join('\n')
+const LOCATIONS_VECTOR_STORE_ID = process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID
+
+if (!LOCATIONS_VECTOR_STORE_ID) {
+  throw new Error(
+    'OPENAI_LOCATIONS_VECTOR_STORE_ID is not set. Add it to your .env.local before using getChatResponse().'
+  )
+}
+
+/**
+ * Allowlist of photo IDs that the navigation tool can target
+ *
+ * The vector store now holds rich descriptions, but we still need a
+ * lightweight set of valid targets to keep tool calls safe. Populate
+ * this with every `photoId` you ingest into the "locations" vector store.
+ * Exporting the data from `/api/nearby-rooms` is the quickest way to stay in sync.
+ *
+ * @example
+ * ```typescript
+ * const LOCATION_IDS = [
+ *   'a-f1-north-entrance', // A Block main entrance
+ *   'a-f1-north-3-side', // A121 - Academic Records
+ *   'x-f1-east-4', // Coffee Infusion
+ *   'x-f1-mid-6-library', // The Library
+ *   // ...add the remainder of your curated locations here
+ * ] as const
+ *
+ * const VALID_LOCATION_IDS = new Set<string>(LOCATION_IDS)
+ * ```
+ */
+const LOCATION_IDS = [
+  'a-f1-north-3-side',
+  'a-f2-north-stairs-entrance',
+  'n-f1-east-south-4',
+  'n-f1-west-9',
+  'n-f2-east-4',
+  'n-f2-mid-3',
+  's-f1-mid-3',
+  's-f1-north-4',
+  's-f1-south-2',
+  's-f1-south-entrance',
+  's-f2-mid-3',
+  's-f2-mid-4',
+  's-f2-south-5',
+  's-f2-south-6',
+  's-f2-south-7',
+  's-f4-mid-4',
+  's-f4-north-7',
+  's-f4-north-8',
+  'w-f2-4',
+  'w-f2-5',
+  'w-f2-6',
+  'w-f2-7',
+  'w-gym-overlook-1',
+  'x-f1-east-4',
+  'x-f1-mid-6-aside',
+  'x-f1-mid-6-library',
+  'x-f1-mid-7',
+  'x-f1-mid-8',
+  'x-f1-west-10',
+  'x-f1-west-11',
+  'x-f2-north-9-aside',
+  'x-f2-west-2',
+  'x-f2-west-3-aside',
+  'x-f2-west-4',
+  'x-f2-west-5-aside',
+  'x-f2-west-6',
+  'x-f3-east-6',
+  'x-f3-east-8',
+  'x-f3-west-1',
+  'x-f3-west-1-aside'
+] as const
+
+const VALID_LOCATION_IDS = new Set<string>(LOCATION_IDS)
+
+let cachedClient: OpenAI | null = null
+
+/**
+ * Lazily initialize OpenAI client for server usage
+ *
+ * Instantiates the SDK only when the server function runs, preventing build-time
+ * environment checks from executing in the browser bundle.
+ *
+ * @returns Singleton OpenAI client
+ */
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY
+
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is not set. Add it to your .env.local before using getChatResponse().')
+  }
+
+  if (!cachedClient) {
+    cachedClient = new OpenAI({
+      apiKey
+    })
+  }
+
+  return cachedClient
+}
+
+/**
+ * Resolve vector store identifier from environment variables
+ *
+ * Reads the ID lazily so dev builds do not throw before env files load.
+ *
+ * @returns Vector store ID used for campus locations
+ */
+function getVectorStoreId(): string {
+  const vectorStoreId = process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID
+
+  if (!vectorStoreId) {
+    throw new Error('OPENAI_LOCATIONS_VECTOR_STORE_ID is not set. Add it to your .env.local before using getChatResponse().')
+  }
+
+  return vectorStoreId
 }
 ```
 
-### How to Add More Locations
+Add `OPENAI_LOCATIONS_VECTOR_STORE_ID=vs_xxx` to `.env.local`, using the ID shown for the "locations" store inside your OpenAI project console. Keep the value private—treat it the same way as your API key.
 
-**Finding Photo IDs:**
+The `/api/nearby-rooms` export includes multiple rooms per photo; collapse them down to the unique `photoId` values (the 40 identifiers above) when updating the allowlist. When you upload the underlying records to the "locations" vector store, include natural language titles and synonyms—e.g., `Books`, `Main Library`, `The Library`—inside each document. That embedded context teaches the model to associate those phrases with the canonical `photoId` (`x-f1-mid-6-library` for the library scene) even though the allowlist itself only contains the photo identifiers.
 
-1. Open `src/data/blocks/<building>/<floor>.ts`
-2. Look for photo objects with `id` property
-3. Add the most important/commonly-requested locations
+### Why a Vector Store?
 
-**Example from your data:**
-```typescript
-// From src/data/blocks/library/floor1.ts
-{
-  id: 'library-f1-entrance',  // -> Use this as key
-  imageUrl: '/360_photos_compressed/library/library_floor1_entrance.webp',
-  // ...
-}
-```
+- **Smaller system prompt** – location details live outside the prompt, reducing token usage
+- **Better recall** – embeddings capture synonyms and misspellings automatically
+- **Single source of truth** – reuse the `/api/nearby-rooms` export when seeding the vector store
 
-**Then add to CAMPUS_LOCATIONS:**
-```typescript
-'library-f1-entrance': [
-  'Library',              // Primary name
-  'Main Library',         // Alternate name
-  'Books',                // What user might say
-  'Study Area',           // What user might say
-  // ... more synonyms
-]
-```
-
- **Validation:** Location database populated with key campus areas
-
-> ⚠️ Keep the list focused. Every entry is streamed into the system prompt, so adding dozens of locations will inflate token usage and can cause shorter or truncated replies. Prefer high-traffic destinations now and move long tails to a later phase if needed.
+> ⚠️ Keep the allowlist synchronized with the vector store. If the AI returns a photo ID that isn't listed here, the tool call will be ignored. Running `/api/nearby-rooms` and copying the `photoId` values keeps everything current.
 
 ---
 
@@ -428,7 +416,7 @@ Add this to `src/lib/ai.ts`:
  *
  * Flow:
  * 1. Validate input messages
- * 2. Construct system prompt with location knowledge
+ * 2. Construct system prompt and attach the locations vector store
  * 3. Call OpenAI Responses API with tool calling enabled
  * 4. Parse response (text + optional tool call)
  * 5. Return structured response to client
@@ -440,14 +428,14 @@ Add this to `src/lib/ai.ts`:
  *
  * @example
  * ```typescript
- * const result = await getChatResponse(
- *   [
+ * const result = await getChatResponse({
+ *   messages: [
  *     { role: 'user', content: 'Where is the library?' },
  *     { role: 'assistant', content: 'The library is southwest...' },
  *     { role: 'user', content: 'Yes please' }
  *   ],
- *   'a-f1-north-entrance'
- * )
+ *   currentLocation: 'a-f1-north-entrance'
+ * })
  *
  * // Returns:
  * // {
@@ -459,29 +447,21 @@ Add this to `src/lib/ai.ts`:
  * // }
  * ```
  */
-export async function getChatResponse(
-  messages: ChatMessage[],
-  currentLocation: string
-): Promise<ChatResponse> {
-  'use server'
+const getChatResponseServerFn = createServerFn({ method: 'POST' })
+  .inputValidator((payload: GetChatResponseInput) => payload)
+  .handler(async ({ data }) => {
+    const { messages, currentLocation } = data
 
-  if (!currentLocation) {
-    return {
+    if (!currentLocation) {
+      return {
       message: null,
       functionCall: null,
       error: 'Current location is required for navigation context.'
     }
   }
 
-  if (!CAMPUS_LOCATIONS[currentLocation]) {
-    return {
-      message: null,
-      functionCall: null,
-      error: `Unknown current location: ${currentLocation}`
-    }
-  }
 
-  try {
+    try {
     // ============================================
     // STEP 1: Input Validation
     // ============================================
@@ -519,7 +499,10 @@ export async function getChatResponse(
     // STEP 2: Call OpenAI with Tool Calling
     // ============================================
 
-    const response = await openai.responses.create({
+    const client = getOpenAIClient()
+    const vectorStoreId = getVectorStoreId()
+
+    const response = await client.responses.create({
       model: 'gpt-4o-mini',
       input: [
         {
@@ -528,8 +511,8 @@ export async function getChatResponse(
 
 **Current User Location:** ${currentLocation}
 
-**Available Campus Locations:**
-${generateLocationKnowledge()}
+**Knowledge Source:**
+Use the "locations" vector store (accessed through the file_search tool) to interpret campus destinations, synonyms, and building context. Rely on the retrieved information instead of memorising locations. If you cannot find a match in the store, apologise and explain that the location is not yet available.
 
 **Your Role:**
 When users ask about finding a location or getting directions:
@@ -542,7 +525,7 @@ When users ask about finding a location or getting directions:
 - Use clear, simple language
 - Don't be overly verbose - keep responses concise
 - Respond naturally to greetings and casual conversation
-- If users ask about a location not in the list, politely say you can only help with the listed locations
+- If users ask about a location that is missing from the vector store, politely explain it is not available yet
 
 **Example Conversations:**
 
@@ -563,33 +546,36 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
 
 **Important:**
 - Only call the navigate_to tool when the user confirms they want navigation
+- Use the vector store results to double-check that the destination exists before navigating
 - Don't call it just because they ask where something is
 - Wait for their confirmation first`
         },
         ...messages.map(message => ({
           role: message.role,
-          content: message.content
+          content: message.content,
+          type: 'message'
         }))
       ],
       tools: [
+        { type: 'file_search', vector_store_ids: [vectorStoreId] },
         {
           type: 'function',
-          function: {
-            name: 'navigate_to',
-            description:
-              'Automatically navigate the user\'s viewport to a specific campus location. Only call this when the user confirms they want to be navigated there (e.g., "yes", "sure", "take me there").',
-            parameters: {
-              type: 'object',
-              properties: {
-                photoId: {
-                  type: 'string',
-                  enum: Object.keys(CAMPUS_LOCATIONS),
-                  description: 'The photo ID to navigate to'
-                }
-              },
-              required: ['photoId']
-            }
-          }
+          name: 'navigate_to',
+          description:
+            'Automatically navigate the user\'s viewport to a specific campus location. Only call this when the user confirms they want to be navigated there (e.g., "yes", "sure", "take me there").',
+          parameters: {
+            type: 'object',
+            properties: {
+              photoId: {
+                type: 'string',
+                enum: LOCATION_IDS,
+                description: 'The photo ID to navigate to'
+              }
+            },
+            required: ['photoId'],
+            additionalProperties: false
+          },
+          strict: true
         }
       ],
       temperature: 0.7, // Balanced creativity vs consistency
@@ -620,7 +606,7 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
           const parsed = typeof rawArgs === 'string' ? JSON.parse(rawArgs) : rawArgs
           const photoId = typeof parsed.photoId === 'string' ? parsed.photoId : undefined
 
-          if (photoId && Object.prototype.hasOwnProperty.call(CAMPUS_LOCATIONS, photoId)) {
+          if (photoId && VALID_LOCATION_IDS.has(photoId)) {
             functionCall = {
               name: item.function.name,
               arguments: { photoId }
@@ -650,14 +636,14 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
       message: messageContent,
       functionCall
     }
-  } catch (error: any) {
+    } catch (error: any) {
     // ============================================
     // ERROR HANDLING
     // ============================================
 
     console.error('[AI Server Function] Error:', error)
 
-    if (error instanceof OpenAI.APIError) {
+    if (error instanceof APIError) {
       if (error.status === 429) {
         return {
           message: null,
@@ -701,17 +687,19 @@ You: [Call navigate_to tool with photoId: "w-gym-entry"]
 }
 ```
 
-> These guards highlight two critical failure modes early: missing API credentials and callers that report a photo ID outside the supported catalog. Failing fast keeps Phase 4's pathfinding work from inheriting ambiguous errors.
+> These guards highlight two critical failure modes early: missing API credentials and callers that report a photo ID outside the validated allowlist. Failing fast keeps Phase 4's pathfinding work from inheriting ambiguous errors.
 
 ### System Prompt Breakdown
 
 **What makes this prompt effective:**
 
 1. **Clear Role Definition** - "campus navigation assistant"
-2. **Location Context** - Current location + available destinations
+2. **Vector Store Context** - file_search pulls in the latest campus locations on demand
 3. **Behavioral Instructions** - When to provide directions vs navigate
 4. **Conversation Examples** - Shows desired interaction pattern
 5. **Explicit Constraints** - Only navigate on confirmation
+
+> The `file_search` tool is scoped to `LOCATIONS_VECTOR_STORE_ID`, so the AI pulls fresh location context from the "locations" store without inflating the system prompt.
 
 **The Two-Step Flow:**
 ```
@@ -924,7 +912,7 @@ rm test-ai-basic.ts
 - [x] 3.1 - Server function concept understood
 - [x] 3.2 - `src/lib/ai.ts` file created
 - [x] 3.3 - TypeScript interfaces defined
-- [x] 3.4 - Campus location database populated
+- [x] 3.4 - Locations vector store connected
 - [x] 3.5 - System prompt crafted
 - [x] 3.6 - Basic AI tested successfully
 
@@ -932,7 +920,7 @@ rm test-ai-basic.ts
 
  **Working OpenAI server function**
  **Type-safe interfaces for messages and responses**
- **Campus location knowledge embedded**
+ **Locations vector store wired into the AI flow**
  **Tool calling configured for navigation**
  **Comprehensive error handling**
  **Two-step navigation flow (directions -> confirmation -> navigate)**
@@ -998,12 +986,12 @@ npm run dev
 
 ### Tool Called with Wrong photoId
 
-**Cause:** Photo ID not in CAMPUS_LOCATIONS enum
+**Cause:** Photo ID missing from the VALID_LOCATION_IDS allowlist
 
 **Solution:**
-1. Check photo ID exists in tour data
-2. Add to CAMPUS_LOCATIONS with synonyms
-3. Restart dev server
+1. Confirm the destination exists in the "locations" vector store
+2. Add the photoId to VALID_LOCATION_IDS so the tool schema stays in sync
+3. Restart the dev server to reload environment variables
 
 ### Responses Too Verbose
 
