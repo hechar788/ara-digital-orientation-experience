@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { Send, X, MapPin, AlertCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import type { ChatMessage as ServerChatMessage } from '@/lib/ai'
+import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
 
 /**
@@ -139,13 +139,10 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  const conversationForServer: ServerChatMessage[] = useMemo(() => {
-    return messages.map(message => ({
-      role: message.role,
-      content: message.content
-    }))
-  }, [messages])
+  const [conversationState, setConversationState] = useState<ConversationState>({
+    summary: null,
+    messages: []
+  })
 
   const appendAssistantMessage = (
     content: string,
@@ -184,38 +181,39 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       timestamp: new Date()
     }
 
-    const updatedMessages = [...messages, userMessage]
-
-    setMessages(updatedMessages)
+    setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
     setErrorMessage(null)
 
     try {
       const result = await getChatResponse({
-        messages: [...conversationForServer, { role: 'user', content: trimmed }],
+        state: conversationState,
+        nextMessage: { role: 'user', content: trimmed },
         currentLocation: currentPhotoId
       })
 
-      if (result.error) {
+      setConversationState(result.state)
+
+      if (result.response.error) {
         appendAssistantMessage(
-          result.error,
+          result.response.error,
           { error: 'The AI service reported an error.' }
         )
-        setErrorMessage(result.error)
+        setErrorMessage(result.response.error)
         return
       }
 
       const messageText =
-        result.message ??
-        (result.functionCall
-          ? `Starting navigation to ${result.functionCall.arguments.photoId}.`
+        result.response.message ??
+        (result.response.functionCall
+          ? `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
           : 'I’m here if you need directions around campus!')
 
       let navigationData: ChatMessageDisplay['navigationData'] | undefined
 
-      if (result.functionCall) {
-        const destination = result.functionCall.arguments.photoId
+      if (result.response.functionCall) {
+        const destination = result.response.functionCall.arguments.photoId
         if (onNavigate) {
           onNavigate(destination)
           navigationData = { photoId: destination }
