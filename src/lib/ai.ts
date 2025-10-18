@@ -48,6 +48,20 @@ const LOCATION_IDS = [
 ] as const
 
 const VALID_LOCATION_ID_SET = new Set<string>(LOCATION_IDS)
+
+const LOCATION_KEYWORD_OVERRIDES = [
+  {
+    photoId: 'x-f1-east-4',
+    keywords: ['coffee infusion', 'caf', 'cafe', 'café', 'coffee shop', 'coffee bar', 'coffee barista']
+  },
+  {
+    photoId: 'inside-student-lounge',
+    keywords: ['student lounge', 'student hub', 'student social space', 'student commons', 'student hangout']
+  }
+] as const satisfies Array<{
+  photoId: (typeof LOCATION_IDS)[number]
+  keywords: string[]
+}>
 let cachedClient: OpenAI | null = null
 type GeneratedResponse = Awaited<ReturnType<OpenAI['responses']['create']>>
 
@@ -152,7 +166,7 @@ const NAVIGATION_TOOL = {
   type: 'function' as const,
   name: 'navigate_to',
   description:
-    'Automatically move the campus viewer to a specific location after the user confirms. Confirmations include phrases like "yes", "sure", or "please take me there".',
+    'Automatically move the campus viewer to a specific location after the user confirms. Confirmations include phrases like "yes", "sure", or "please take me there". Use the photoId from the vector store record that matches the user request.',
   parameters: {
     type: 'object',
     properties: {
@@ -172,6 +186,9 @@ const AFFIRMATION_REMINDER = [
   '- Only call the navigate_to tool when the user confirms they want navigation',
   '- Use the vector store results to double-check that the destination exists before navigating',
   '- Do not call navigate_to if the user merely asks for information without confirming',
+  '- When a user explicitly provides a photoId (for example, photoId: "x-f1-east-4"), call navigate_to with that exact identifier as long as it appears in the allowlist',
+  '- When you identify the correct record in the vector store, use that document’s id as the navigate_to photoId. Do not substitute a different allowlisted id',
+  '- Example: For Coffee Infusion, call navigate_to with photoId: "x-f1-east-4" once the user confirms'
 ].join('\n')
 
 const EXAMPLE_CONVERSATIONS = [
@@ -180,6 +197,12 @@ const EXAMPLE_CONVERSATIONS = [
   '',
   'User: "yes please"',
   'You: [Call navigate_to function with photoId: "x-f1-mid-6-library"]',
+  '',
+  'User: "I can\'t find the cafe."',
+  'You: "The café, Coffee Infusion, is inside X Block on the first floor. Would you like me to take you there automatically?"',
+  '',
+  'User: "yes please"',
+  'You: [Call navigate_to function with photoId: "x-f1-east-4"]',
   '',
   'User: "hi"',
   'You: "Hello! I can help you find locations around Ara Institute. What would you like to find?"',
@@ -196,6 +219,7 @@ function buildSystemPrompt(currentLocation: string): string {
     '',
     'Knowledge source:',
     'Use the "locations" vector store via the file_search tool to interpret destinations, synonyms, and building context. If you cannot find a match, apologise and explain that the location is not yet available.',
+    '- When you cite a vector store result, use that document’s `id` as the photoId if the user confirms navigation.',
     '',
     'Your role:',
     '1. Provide concise, friendly directions from the current location.',
@@ -257,6 +281,52 @@ function normaliseMessageInput(messages: ChatMessage[]) {
     content: message.content,
     type: 'message' as const
   }))
+}
+
+function findOverrideFromText(text: string | null): string | null {
+  if (!text) {
+    return null
+  }
+  const normalised = text.toLowerCase()
+  for (const mapping of LOCATION_KEYWORD_OVERRIDES) {
+    if (mapping.keywords.some(keyword => normalised.includes(keyword))) {
+      return mapping.photoId
+    }
+  }
+  return null
+}
+
+function findLatestUserMessage(messages: ChatMessage[]): string | null {
+  for (let index = messages.length - 1; index >= 0; index--) {
+    const message = messages[index]
+    if (message.role === 'user') {
+      return message.content
+    }
+  }
+  return null
+}
+
+function applyKeywordOverrides(
+  originalCall: FunctionCall | null,
+  assistantMessage: string | null,
+  messages: ChatMessage[]
+): FunctionCall | null {
+  if (!originalCall) {
+    return null
+  }
+  const sources: Array<string | null> = [assistantMessage, findLatestUserMessage(messages)]
+  for (const source of sources) {
+    const overridePhotoId = findOverrideFromText(source)
+    if (overridePhotoId && overridePhotoId !== originalCall.arguments.photoId && VALID_LOCATION_ID_SET.has(overridePhotoId)) {
+      return {
+        name: 'navigate_to',
+        arguments: {
+          photoId: overridePhotoId
+        }
+      }
+    }
+  }
+  return originalCall
 }
 
 function validateMessages(messages: ChatMessage[]): string | null {
@@ -351,7 +421,7 @@ export async function executeChat({ messages, currentLocation }: GetChatResponse
     })
 
     const response = (await client.responses.create({
-      model: 'gpt-5-mini',
+      model: 'gpt-4o-mini',
       input: [
         {
           role: 'system',
@@ -367,7 +437,7 @@ export async function executeChat({ messages, currentLocation }: GetChatResponse
         },
         NAVIGATION_TOOL
       ],
-      temperature: 0.7,
+      temperature: 0.2,
       max_output_tokens: 200
     } satisfies ResponseCreateParamsNonStreaming)) as GeneratedResponse
 
@@ -377,14 +447,16 @@ export async function executeChat({ messages, currentLocation }: GetChatResponse
       null
     const functionCall = parseFunctionCall(response.output)
 
+    const adjustedFunctionCall = applyKeywordOverrides(functionCall, message, messages)
+
     console.info('[AI] OpenAI response summary', {
       hasMessage: !!message,
-      hasFunctionCall: !!functionCall
+      hasFunctionCall: !!adjustedFunctionCall
     })
 
     return {
       message,
-      functionCall
+      functionCall: adjustedFunctionCall
     }
   } catch (error) {
     console.error('[AI] Response generation failed', error)
