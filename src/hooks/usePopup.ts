@@ -28,11 +28,13 @@ export interface UsePopupReturn {
  *
  * @example
  * ```typescript
+ * import { AIChatPopup } from '@/components/tour/chat/AIChatPopup'
+ *
  * const aiChat = usePopup()
  * const info = usePopup(true) // starts open
  *
  * <button onClick={aiChat.open}>Open Chat</button>
- * <PlaceholderAIChat isOpen={aiChat.isOpen} onClose={aiChat.close} />
+ * <AIChatPopup isOpen={aiChat.isOpen} onClose={aiChat.close} currentPhotoId="x-f1-mid-6-library" />
  * ```
  */
 export const usePopup = (initialState = false): UsePopupReturn => {

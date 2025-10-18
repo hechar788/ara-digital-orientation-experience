@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PanoramicViewer } from '../components/viewer/PanoramicViewer'
 import { PanoramicZoomSlider } from '../components/viewer/PanoramicZoomSlider'
 import { Minimap } from '../components/viewer/Minimap'
@@ -10,10 +10,14 @@ import { useRaceStore } from '../hooks/useRaceStore'
 import { RaceLocationCounter } from '../components/race/RaceLocationCounter'
 import { TOTAL_HIDDEN_LOCATIONS } from '../data/hidden_locations/hiddenLocations'
 import type { DirectionType } from '../types/tour'
+import { useIsTouchDevice } from '../hooks/useIsTouchDevice'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
+
+const DESKTOP_DEFAULT_FOV = 76
+const TOUCH_DEFAULT_FOV = 87
 
 function App() {
   const {
@@ -30,9 +34,29 @@ function App() {
     handleCameraChange
   } = useTourNavigation()
 
-  const [currentFov, setCurrentFov] = useState(81)
+  const isTouchDevice = useIsTouchDevice()
+  const targetDefaultFov = isTouchDevice ? TOUCH_DEFAULT_FOV : DESKTOP_DEFAULT_FOV
+  const [defaultFov, setDefaultFov] = useState(targetDefaultFov)
+  const [currentFov, setCurrentFov] = useState(targetDefaultFov)
+  const previousDefaultFovRef = useRef(targetDefaultFov)
   const [isRaceMode, setIsRaceMode] = useState(false)
   const { hiddenLocationsCount } = useRaceStore()
+
+  useEffect(() => {
+    const nextDefault = targetDefaultFov
+    const previousDefault = previousDefaultFovRef.current
+    if (nextDefault === previousDefault) {
+      return
+    }
+
+    setDefaultFov(nextDefault)
+    setCurrentFov(prev => {
+      const wasUsingPreviousDefault = Math.abs(prev - previousDefault) < 0.5
+      return wasUsingPreviousDefault ? nextDefault : prev
+    })
+
+    previousDefaultFovRef.current = nextDefault
+  }, [targetDefaultFov])
 
   return (
     <OnboardingProvider>
@@ -50,6 +74,7 @@ function App() {
             currentFov={currentFov}
             onZoomChange={setCurrentFov}
             className="w-[11.55rem] lg:w-62 !py-1.5"
+            defaultFov={defaultFov}
           />
 
           {/* Race Locations Counter - Only in Race Mode */}
