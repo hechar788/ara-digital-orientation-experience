@@ -20,11 +20,13 @@ import { cn } from '@/lib/utils'
  * @property currentFov - Current field of view value (10-120)
  * @property onZoomChange - Callback when zoom value changes
  * @property className - Optional CSS classes
+ * @property defaultFov - Default field of view applied when the reset button is pressed
  */
 interface PanoramicZoomSliderProps {
   currentFov: number
   onZoomChange: (fov: number) => void
   className?: string
+  defaultFov: number
 }
 
 /**
@@ -50,10 +52,12 @@ interface PanoramicZoomSliderProps {
 export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
   currentFov,
   onZoomChange,
-  className
+  className,
+  defaultFov
 }) => {
   const minFov = 10
   const maxFov = 120
+  const clampedDefaultFov = Math.min(Math.max(defaultFov, minFov), maxFov)
 
   const handleZoomIn = () => {
     const newFov = Math.max(minFov, currentFov - 10)
@@ -113,7 +117,7 @@ export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
         <Button
           className="min-w-16 tabular-nums h-8 text-white hover:bg-white/10 cursor-pointer"
           variant="ghost"
-          onClick={() => onZoomChange(81)}
+          onClick={() => onZoomChange(clampedDefaultFov)}
         >
           {getZoomPercentage()}%
         </Button>
