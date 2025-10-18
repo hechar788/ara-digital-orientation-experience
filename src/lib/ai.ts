@@ -27,6 +27,7 @@ const LOCATION_IDS = [
   'w-f2-6',
   'w-f2-7',
   'w-gym-overlook-1',
+  'inside-student-lounge',
   'x-f1-east-4',
   'x-f1-mid-6-aside',
   'x-f1-mid-6-library',
@@ -170,7 +171,7 @@ const NAVIGATION_TOOL = {
 const AFFIRMATION_REMINDER = [
   '- Only call the navigate_to tool when the user confirms they want navigation',
   '- Use the vector store results to double-check that the destination exists before navigating',
-  '- Do not call navigate_to if the user merely asks for information without confirming'
+  '- Do not call navigate_to if the user merely asks for information without confirming',
 ].join('\n')
 
 const EXAMPLE_CONVERSATIONS = [
@@ -350,7 +351,7 @@ export async function executeChat({ messages, currentLocation }: GetChatResponse
     })
 
     const response = (await client.responses.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini',
       input: [
         {
           role: 'system',

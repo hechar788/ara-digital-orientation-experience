@@ -317,6 +317,7 @@ const LOCATION_IDS = [
   'w-f2-6',
   'w-f2-7',
   'w-gym-overlook-1',
+  'inside-student-lounge',
   'x-f1-east-4',
   'x-f1-mid-6-aside',
   'x-f1-mid-6-library',
@@ -384,7 +385,7 @@ function getVectorStoreId(): string {
 
 Add `OPENAI_LOCATIONS_VECTOR_STORE_ID=vs_xxx` to `.env.local`, using the ID shown for the "locations" store inside your OpenAI project console. Keep the value private—treat it the same way as your API key.
 
-The `/api/nearby-rooms` export includes multiple rooms per photo; collapse them down to the unique `photoId` values (the 40 identifiers above) when updating the allowlist. When you upload the underlying records to the "locations" vector store, include natural language titles and synonyms—e.g., `Books`, `Main Library`, `The Library`—inside each document. That embedded context teaches the model to associate those phrases with the canonical `photoId` (`x-f1-mid-6-library` for the library scene) even though the allowlist itself only contains the photo identifiers.
+The `/api/nearby-rooms` export includes multiple rooms per photo; collapse them down to the unique `photoId` values (the identifiers above) when updating the allowlist. When you upload the underlying records to the "locations" vector store, include natural language titles and synonyms—e.g., `Books`, `Main Library`, `The Library`—inside each document. That embedded context teaches the model to associate those phrases with the canonical `photoId` (`x-f1-mid-6-library` for the library scene) even though the allowlist itself only contains the photo identifiers.
 
 ### Why a Vector Store?
 

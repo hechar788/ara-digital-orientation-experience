@@ -21,7 +21,7 @@
         "registration records"
       ]
     },
-    "text": "A121 - Academic Records is visible from photo a-f1-north-3-side. It sits in A Block (building A), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "A121 - Academic Records is visible from photo a-f1-north-3-side. It sits in A Block (building A), floor 1."
   },
   {
     "id": "a-f2-north-stairs-entrance",
@@ -45,7 +45,7 @@
         "assessment centre"
       ]
     },
-    "text": "Pearson Vue Testing Centre is visible from photo a-f2-north-stairs-entrance. It sits in A Block (building A), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "Pearson Vue Testing Centre is visible from photo a-f2-north-stairs-entrance. It sits in A Block (building A), floor 2."
   },
   {
     "id": "n-f1-east-south-4",
@@ -62,7 +62,7 @@
       ],
       "synonyms": []
     },
-    "text": "N104 is visible from photo n-f1-east-south-4. It sits in N Block (building N), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "N104 is visible from photo n-f1-east-south-4. It sits in N Block (building N), floor 1."
   },
   {
     "id": "n-f1-west-9",
@@ -79,7 +79,7 @@
       ],
       "synonyms": []
     },
-    "text": "S153 is visible from photo n-f1-west-9. It sits in N Block (building N), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S153 is visible from photo n-f1-west-9. It sits in N Block (building N), floor 1."
   },
   {
     "id": "n-f2-east-4",
@@ -99,7 +99,7 @@
       ],
       "synonyms": []
     },
-    "text": "N216 is visible from photo n-f2-east-4. It sits in N Block (building N), floor 2. Other rooms in view: N215, N214, N213. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "N216 is visible from photo n-f2-east-4. It sits in N Block (building N), floor 2. Other rooms in view: N215, N214, N213."
   },
   {
     "id": "n-f2-mid-3",
@@ -116,7 +116,7 @@
       ],
       "synonyms": []
     },
-    "text": "N226 is visible from photo n-f2-mid-3. It sits in N Block (building N), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "N226 is visible from photo n-f2-mid-3. It sits in N Block (building N), floor 2."
   },
   {
     "id": "s-f1-mid-3",
@@ -133,7 +133,7 @@
       ],
       "synonyms": []
     },
-    "text": "S169 is visible from photo s-f1-mid-3. It sits in S Block (building S), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S169 is visible from photo s-f1-mid-3. It sits in S Block (building S), floor 1."
   },
   {
     "id": "s-f1-north-4",
@@ -151,7 +151,7 @@
       ],
       "synonyms": []
     },
-    "text": "S171 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S171 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170."
   },
   {
     "id": "s-f1-south-2",
@@ -170,7 +170,7 @@
       ],
       "synonyms": []
     },
-    "text": "S154 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1. Other rooms in view: S156. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S154 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1. Other rooms in view: S156."
   },
   {
     "id": "s-f1-south-entrance",
@@ -187,7 +187,7 @@
       ],
       "synonyms": []
     },
-    "text": "S157 is visible from photo s-f1-south-entrance. It sits in S Block (building S), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S157 is visible from photo s-f1-south-entrance. It sits in S Block (building S), floor 1."
   },
   {
     "id": "s-f2-mid-3",
@@ -204,7 +204,7 @@
       ],
       "synonyms": []
     },
-    "text": "S268 is visible from photo s-f2-mid-3. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S268 is visible from photo s-f2-mid-3. It sits in S Block (building S), floor 2."
   },
   {
     "id": "s-f2-mid-4",
@@ -221,7 +221,7 @@
       ],
       "synonyms": []
     },
-    "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2."
   },
   {
     "id": "s-f2-south-5",
@@ -240,7 +240,7 @@
       ],
       "synonyms": []
     },
-    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2. Other rooms in view: S254. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2. Other rooms in view: S254."
   },
   {
     "id": "s-f2-south-6",
@@ -257,7 +257,7 @@
       ],
       "synonyms": []
     },
-    "text": "S255 is visible from photo s-f2-south-6. It sits in S Block (building S), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S255 is visible from photo s-f2-south-6. It sits in S Block (building S), floor 2."
   },
   {
     "id": "s-f2-south-7",
@@ -276,7 +276,7 @@
       ],
       "synonyms": []
     },
-    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2. Other rooms in view: S264, S262. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2. Other rooms in view: S264, S262."
   },
   {
     "id": "s-f4-mid-4",
@@ -293,7 +293,7 @@
       ],
       "synonyms": []
     },
-    "text": "S469 is visible from photo s-f4-mid-4. It sits in S Block (building S), floor 4. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S469 is visible from photo s-f4-mid-4. It sits in S Block (building S), floor 4."
   },
   {
     "id": "s-f4-north-7",
@@ -311,7 +311,7 @@
       ],
       "synonyms": []
     },
-    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4. Other rooms in view: S460. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4. Other rooms in view: S460."
   },
   {
     "id": "s-f4-north-8",
@@ -330,7 +330,7 @@
       ],
       "synonyms": []
     },
-    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4. Other rooms in view: S455, S458. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4. Other rooms in view: S455, S458."
   },
   {
     "id": "w-f2-4",
@@ -347,7 +347,7 @@
       ],
       "synonyms": []
     },
-    "text": "W209 is visible from photo w-f2-4. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "W209 is visible from photo w-f2-4. It sits in W Block (building W), floor 2."
   },
   {
     "id": "w-f2-5",
@@ -364,7 +364,7 @@
       ],
       "synonyms": []
     },
-    "text": "W210 is visible from photo w-f2-5. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "W210 is visible from photo w-f2-5. It sits in W Block (building W), floor 2."
   },
   {
     "id": "w-f2-6",
@@ -381,7 +381,7 @@
       ],
       "synonyms": []
     },
-    "text": "W211 is visible from photo w-f2-6. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "W211 is visible from photo w-f2-6. It sits in W Block (building W), floor 2."
   },
   {
     "id": "w-f2-7",
@@ -398,7 +398,7 @@
       ],
       "synonyms": []
     },
-    "text": "W212 is visible from photo w-f2-7. It sits in W Block (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "W212 is visible from photo w-f2-7. It sits in W Block (building W), floor 2."
   },
   {
     "id": "w-gym-overlook-1",
@@ -423,7 +423,31 @@
         "gym lounge"
       ]
     },
-    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. It sits in The Recreation Centre (building W), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. It sits in The Recreation Centre (building W), floor 2."
+  },
+  {
+    "id": "inside-student-lounge",
+    "metadata": {
+      "areaId": "student-lounge-area",
+      "areaName": "Student Lounge",
+      "buildingBlock": "lounge",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Student Lounge"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "student lounge",
+        "student social space",
+        "student commons",
+        "campus lounge",
+        "student hub",
+        "student hangout"
+      ]
+    },
+    "text": "Student Lounge is visible from photo inside-student-lounge. It provides social seating adjacent to the cafeteria entrance on the ground floor."
   },
   {
     "id": "x-f1-east-4",
@@ -447,7 +471,7 @@
         "grab a coffee"
       ]
     },
-    "text": "Coffee Infusion is visible from photo x-f1-east-4. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "Coffee Infusion is visible from photo x-f1-east-4. It sits in X Block (building X), floor 1."
   },
   {
     "id": "x-f1-mid-6-aside",
@@ -471,7 +495,7 @@
         "security station"
       ]
     },
-    "text": "Security Services is visible from photo x-f1-mid-6-aside. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "Security Services is visible from photo x-f1-mid-6-aside. It sits in X Block (building X), floor 1."
   },
   {
     "id": "x-f1-mid-6-library",
@@ -495,7 +519,7 @@
         "learning commons"
       ]
     },
-    "text": "The Library is visible from photo x-f1-mid-6-library. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "The Library is visible from photo x-f1-mid-6-library. It sits in X Block (building X), floor 1."
   },
   {
     "id": "x-f1-mid-7",
@@ -519,7 +543,7 @@
         "welcome desk"
       ]
     },
-    "text": "Information Desk is visible from photo x-f1-mid-7. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "Information Desk is visible from photo x-f1-mid-7. It sits in X Block (building X), floor 1."
   },
   {
     "id": "x-f1-mid-8",
@@ -545,7 +569,7 @@
         "tautoko space"
       ]
     },
-    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. Other rooms in view: The Hub. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. Other rooms in view: The Hub."
   },
   {
     "id": "x-f1-west-10",
@@ -572,7 +596,7 @@
         "career advice"
       ]
     },
-    "text": "X110 - Student Finance is visible from photo x-f1-west-10. It sits in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X110 - Student Finance is visible from photo x-f1-west-10. It sits in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment."
   },
   {
     "id": "x-f1-west-11",
@@ -596,7 +620,7 @@
         "connect centre"
       ]
     },
-    "text": "Ara Connect is visible from photo x-f1-west-11. It sits in X Block (building X), floor 1. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "Ara Connect is visible from photo x-f1-west-11. It sits in X Block (building X), floor 1."
   },
   {
     "id": "x-f2-north-9-aside",
@@ -614,7 +638,7 @@
       ],
       "synonyms": []
     },
-    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in X Block (building X), floor 2. Other rooms in view: L203. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in X Block (building X), floor 2. Other rooms in view: L203."
   },
   {
     "id": "x-f2-west-2",
@@ -631,7 +655,7 @@
       ],
       "synonyms": []
     },
-    "text": "X202 is visible from photo x-f2-west-2. It sits in X Block (building X), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X202 is visible from photo x-f2-west-2. It sits in X Block (building X), floor 2."
   },
   {
     "id": "x-f2-west-3-aside",
@@ -649,7 +673,7 @@
       ],
       "synonyms": []
     },
-    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2. Other rooms in view: X205. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2. Other rooms in view: X205."
   },
   {
     "id": "x-f2-west-4",
@@ -667,7 +691,7 @@
       ],
       "synonyms": []
     },
-    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2. Other rooms in view: X206. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2. Other rooms in view: X206."
   },
   {
     "id": "x-f2-west-5-aside",
@@ -685,7 +709,7 @@
       ],
       "synonyms": []
     },
-    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2. Other rooms in view: X210. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2. Other rooms in view: X210."
   },
   {
     "id": "x-f2-west-6",
@@ -702,7 +726,7 @@
       ],
       "synonyms": []
     },
-    "text": "X208 is visible from photo x-f2-west-6. It sits in X Block (building X), floor 2. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X208 is visible from photo x-f2-west-6. It sits in X Block (building X), floor 2."
   },
   {
     "id": "x-f3-east-6",
@@ -720,7 +744,7 @@
       ],
       "synonyms": []
     },
-    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3. Other rooms in view: X308. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3. Other rooms in view: X308."
   },
   {
     "id": "x-f3-east-8",
@@ -737,7 +761,7 @@
       ],
       "synonyms": []
     },
-    "text": "X313 is visible from photo x-f3-east-8. It sits in X Block (building X), floor 3. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X313 is visible from photo x-f3-east-8. It sits in X Block (building X), floor 3."
   },
   {
     "id": "x-f3-west-1",
@@ -755,7 +779,7 @@
       ],
       "synonyms": []
     },
-    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3. Other rooms in view: X304. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3. Other rooms in view: X304."
   },
   {
     "id": "x-f3-west-1-aside",
@@ -773,6 +797,6 @@
       ],
       "synonyms": []
     },
-    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3. Other rooms in view: X305. Add conversational synonyms to metadata before uploading to improve recall."
+    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3. Other rooms in view: X305."
   }
 ]
