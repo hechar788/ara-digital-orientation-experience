@@ -1,7 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
+import type { UseRouteNavigationReturn, NavigationSpeed } from '@/hooks/useRouteNavigation'
+import { NAVIGATION_SPEEDS } from '@/hooks/useRouteNavigation'
 
 /**
  * Props for the AIChatPopup component
@@ -10,12 +12,14 @@ import { getChatResponse } from '@/lib/ai-client'
  * @property onClose - Callback invoked when the popup should be dismissed
  * @property currentPhotoId - The ID of the location currently displayed in the viewer
  * @property onNavigate - Handler that jumps the viewer to the supplied destination photo
+ * @property routeNavigation - Sequential navigation controller used to walk through AI-provided routes
  */
 interface AIChatPopupProps {
   isOpen: boolean
   onClose: () => void
   currentPhotoId: string
   onNavigate?: (photoId: string) => void
+  routeNavigation?: UseRouteNavigationReturn
 }
 
 /**
@@ -48,6 +52,16 @@ function generateMessageId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function formatLocationId(photoId?: string | null): string {
+  if (!photoId) {
+    return 'Current location'
+  }
+  return photoId
+    .split('-')
+    .map(segment => (segment.length > 0 ? segment[0].toUpperCase() + segment.slice(1) : segment))
+    .join(' ')
+}
+
 /**
  * AI chat popup that connects the UI to the campus navigation server function
  *
@@ -66,7 +80,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   isOpen,
   onClose,
   currentPhotoId,
-  onNavigate
+  onNavigate,
+  routeNavigation
 }) => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([])
   const [input, setInput] = useState('')
@@ -76,6 +91,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     summary: null,
     messages: []
   })
+  const speedOptions = useMemo<NavigationSpeed[]>(() => Object.values(NAVIGATION_SPEEDS), [])
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -177,19 +193,23 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
         const { photoId, path, distance, routeDescription, error } =
           result.response.functionCall.arguments
 
+        const pathArray = Array.isArray(path) ? path : []
+        const hasRoute = pathArray.length > 0
+
         navigationData = {
           photoId,
-          path,
+          path: pathArray,
           distance,
           routeDescription,
           error
         }
 
         if (!error) {
-          if (onNavigate) {
-            setTimeout(() => {
-              onNavigate(photoId)
-            }, 500)
+          if (hasRoute && routeNavigation) {
+            routeNavigation.startNavigation(pathArray)
+          } else if (onNavigate) {
+            routeNavigation?.cancelNavigation()
+            onNavigate(photoId)
           } else {
             navigationData.error = 'Navigation handler is unavailable.'
           }
@@ -224,6 +244,22 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     }
   }
 
+  const navigationState = routeNavigation?.navigationState
+  const isNavigating = navigationState?.isNavigating ?? false
+  const totalSteps = navigationState?.totalSteps ?? 0
+  const currentStepIndex = navigationState?.currentStepIndex ?? -1
+  const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1
+  const progressPercent =
+    totalSteps > 0 ? Math.min(100, Math.max(0, (currentStepNumber / totalSteps) * 100)) : 0
+  const currentStepId =
+    currentStepIndex >= 0 && navigationState?.path[currentStepIndex]
+      ? navigationState.path[currentStepIndex]
+      : navigationState?.path[0]
+  const nextStepId =
+    navigationState && currentStepIndex + 1 < navigationState.path.length
+      ? navigationState.path[currentStepIndex + 1]
+      : null
+
   if (!isOpen) {
     return null
   }
@@ -246,7 +282,65 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           </button>
         </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        {routeNavigation && isNavigating && totalSteps > 0 && (
+          <div className="border-b border-blue-100 bg-blue-50/60 px-4 py-3 text-sm text-blue-900">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold">
+                  Step {Math.min(currentStepNumber, totalSteps)} of {totalSteps}
+                </p>
+                <p className="text-xs text-blue-900/75">
+                  {formatLocationId(currentStepId)}
+                  {nextStepId ? ` → ${formatLocationId(nextStepId)}` : ''}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={routeNavigation.skipToEnd}
+                  className="rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  Skip
+                </button>
+                <button
+                  type="button"
+                  onClick={routeNavigation.cancelNavigation}
+                  className="rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-blue-200/70">
+              <div
+                className="h-full rounded-full bg-blue-600 transition-all duration-300 ease-out"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-blue-900/80">
+              <span className="font-medium">Speed:</span>
+              {speedOptions.map(option => {
+                const isActive = option.delayMs === routeNavigation.currentSpeed.delayMs
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => routeNavigation.setSpeed(option)}
+                    className={`rounded-full border px-3 py-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${
+                      isActive
+                        ? 'border-blue-400 bg-blue-600 text-white'
+                        : 'border-blue-200 text-blue-700 hover:bg-blue-100'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map(message => {
               const isUser = message.role === 'user'
               const timestamp = message.timestamp.toLocaleTimeString([], {
@@ -296,7 +390,10 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
                             )}
                             {navigationData.path && navigationData.path.length > 1 && (
                               <p className="text-[11px] text-blue-900/80">
-                                Path: {navigationData.path.join(' → ')}
+                                Path:{' '}
+                                {navigationData.path
+                                  .map(segment => formatLocationId(segment))
+                                  .join(' → ')}
                               </p>
                             )}
                           </div>
