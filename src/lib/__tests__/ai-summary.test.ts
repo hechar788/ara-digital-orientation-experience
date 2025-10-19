@@ -22,8 +22,111 @@ vi.mock('openai', () => {
 
 import * as aiModule from '../ai'
 
+describe('executeChat pathfinding integration', () => {
+  beforeEach(() => {
+    createResponseMock.mockReset()
+    process.env.OPENAI_API_KEY = 'test-key'
+    process.env.OPENAI_LOCATIONS_VECTOR_STORE_ID = 'test-vector-store'
+  })
+
+  it('attaches pathfinding metadata to navigation tool calls', async () => {
+    createResponseMock.mockResolvedValueOnce({
+      id: 'resp_test_path',
+      object: 'response',
+      created_at: Date.now(),
+      output_text: 'Absolutely, I can guide you there.',
+      error: null,
+      incomplete_details: null,
+      instructions: null,
+      metadata: null,
+      model: 'gpt-4o-mini',
+      output: [
+        {
+          type: 'message',
+          role: 'assistant',
+          content: [
+            {
+              type: 'output_text',
+              text: 'Absolutely, I can guide you there.'
+            }
+          ]
+        },
+        {
+          type: 'function_call',
+          name: 'navigate_to',
+          arguments: JSON.stringify({ photoId: 'library-f1-entrance' })
+        }
+      ],
+      parallel_tool_calls: false,
+      temperature: 0.2,
+      tool_choice: { type: 'auto' },
+      tools: []
+    } as unknown)
+
+    const response = await aiModule.executeChat({
+      messages: [{ role: 'user', content: 'Take me to the library' }],
+      currentLocation: 'a-f1-north-entrance'
+    })
+
+    expect(response.functionCall).not.toBeNull()
+    expect(response.functionCall?.arguments.photoId).toBe('library-f1-entrance')
+    expect(response.functionCall?.arguments.path).toBeDefined()
+    expect(response.functionCall?.arguments.path?.[0]).toBe('a-f1-north-entrance')
+    const resolvedPath = response.functionCall?.arguments.path ?? []
+    expect(resolvedPath[resolvedPath.length - 1]).toBe('library-f1-entrance')
+    expect(response.functionCall?.arguments.distance).toBeGreaterThanOrEqual(1)
+    expect(response.functionCall?.arguments.routeDescription).toMatch(/Route found:/)
+  })
+
+  it('surfaces an error when no route can be computed', async () => {
+    createResponseMock.mockResolvedValueOnce({
+      id: 'resp_test_error',
+      object: 'response',
+      created_at: Date.now(),
+      output_text: 'Attempting to navigate.',
+      error: null,
+      incomplete_details: null,
+      instructions: null,
+      metadata: null,
+      model: 'gpt-4o-mini',
+      output: [
+        {
+          type: 'message',
+          role: 'assistant',
+          content: [
+            {
+              type: 'output_text',
+              text: 'Attempting to navigate.'
+            }
+          ]
+        },
+        {
+          type: 'function_call',
+          name: 'navigate_to',
+          arguments: JSON.stringify({ photoId: 'library-f1-entrance' })
+        }
+      ],
+      parallel_tool_calls: false,
+      temperature: 0.2,
+      tool_choice: { type: 'auto' },
+      tools: []
+    } as unknown)
+
+    const response = await aiModule.executeChat({
+      messages: [{ role: 'user', content: 'Navigate to the library' }],
+      currentLocation: 'invalid-photo-id'
+    })
+
+    expect(response.functionCall).not.toBeNull()
+    expect(response.functionCall?.arguments.photoId).toBe('library-f1-entrance')
+    expect(response.functionCall?.arguments.error).toMatch(/Unable to calculate a route/i)
+    expect(response.functionCall?.arguments.path).toBeUndefined()
+    expect(response.functionCall?.arguments.distance).toBeUndefined()
+  })
+})
+
 describe('executeChatWithSummaries', () => {
-  let executeChatSpy: ReturnType<typeof vi.spyOn>
+  let executeChatSpy: ReturnType<typeof vi.spyOn<any, any>>
 
   beforeEach(() => {
     createResponseMock.mockReset()
@@ -47,7 +150,7 @@ describe('executeChatWithSummaries', () => {
     })
 
     expect(executeChatSpy).toHaveBeenCalledTimes(1)
-    const payload = executeChatSpy.mock.calls[0][0]
+    const payload = executeChatSpy.mock.calls[0]?.[0] as Parameters<typeof aiModule.executeChat>[0]
     expect(payload.messages).toEqual([{ role: 'user', content: 'Hello AI helper' }])
     expect(result.state.summary).toBeNull()
     expect(result.state.messages).toHaveLength(2)
@@ -80,7 +183,7 @@ describe('executeChatWithSummaries', () => {
     expect(createResponseMock).toHaveBeenCalledTimes(1)
     expect(executeChatSpy).toHaveBeenCalledTimes(1)
 
-    const payload = executeChatSpy.mock.calls[0][0]
+    const payload = executeChatSpy.mock.calls[0]?.[0] as Parameters<typeof aiModule.executeChat>[0]
     expect(payload.messages[0].role).toBe('system')
     expect(payload.messages[0].content).toContain('Conversation summary: Goals: Reach the library')
     expect(payload.messages.slice(1)).toHaveLength(6)
