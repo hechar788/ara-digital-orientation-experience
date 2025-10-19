@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { Send, X, MapPin, AlertCircle } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
 
@@ -35,77 +34,11 @@ interface ChatMessageDisplay {
   timestamp: Date
   navigationData?: {
     photoId: string
+    path?: string[]
+    distance?: number
+    routeDescription?: string
     error?: string
   }
-}
-
-function Messages({
-  messages,
-  isLoading
-}: {
-  messages: Array<ChatMessageDisplay>
-  isLoading: boolean
-}) {
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight
-    }
-  }, [messages])
-
-  if (!messages.length) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-600 text-sm">
-        Ask me anything about the panoramic view!
-      </div>
-    )
-  }
-
-  return (
-    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
-      {messages.map(({ id, role, content }) => (
-        <div
-          key={id}
-          className={`py-3 ${
-            role === 'assistant'
-              ? 'bg-gradient-to-r from-blue-500/5 to-purple-600/5'
-              : 'bg-transparent'
-          }`}
-        >
-          <div className="flex items-start gap-2 px-4">
-            {role === 'assistant' ? (
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-xs font-medium text-white flex-shrink-0">
-                AI
-              </div>
-            ) : (
-              <div className="w-6 h-6 rounded-lg bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-700 flex-shrink-0">
-                U
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="text-sm text-gray-800 whitespace-pre-wrap">
-                {content}
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-      {isLoading && (
-        <div className="py-3 bg-gradient-to-r from-blue-500/5 to-purple-600/5">
-          <div className="flex items-start gap-2 px-4">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-xs font-medium text-white flex-shrink-0">
-              AI
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-gray-600 text-sm">Thinking...</div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
 }
 
 function generateMessageId() {
@@ -144,6 +77,33 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     messages: []
   })
 
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, isOpen])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setErrorMessage(null)
+      return
+    }
+
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: generateMessageId(),
+          role: 'assistant',
+          content: 'Hi there! I can help you find facilities across campus. Ask me where you would like to go next.',
+          timestamp: new Date()
+        }
+      ])
+    }
+  }, [isOpen, messages.length])
+
   const appendAssistantMessage = (
     content: string,
     navigationData?: ChatMessageDisplay['navigationData']
@@ -160,15 +120,16 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     ])
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const processMessage = async () => {
     const trimmed = input.trim()
-    if (!trimmed || isLoading) return
+    if (!trimmed || isLoading) {
+      return
+    }
 
     if (!currentPhotoId) {
       appendAssistantMessage(
-        'I need to know where you currently are before I can help. Please try again once the viewer finishes loading.',
-        { error: 'Missing current location.' }
+        'I need to know where you are in the tour before I can calculate directions. Please try again once the viewer finishes loading.',
+        { photoId: currentPhotoId ?? 'unknown-location', error: 'Missing current location.' }
       )
       setInput('')
       return
@@ -196,15 +157,15 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       setConversationState(result.state)
 
       if (result.response.error) {
-        appendAssistantMessage(
-          result.response.error,
-          { error: 'The AI service reported an error.' }
-        )
+        appendAssistantMessage(result.response.error, {
+          photoId: currentPhotoId,
+          error: result.response.error
+        })
         setErrorMessage(result.response.error)
         return
       }
 
-      const messageText =
+      const resolvedMessage =
         result.response.message ??
         (result.response.functionCall
           ? `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
@@ -213,136 +174,190 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       let navigationData: ChatMessageDisplay['navigationData'] | undefined
 
       if (result.response.functionCall) {
-        const destination = result.response.functionCall.arguments.photoId
-        if (onNavigate) {
-          onNavigate(destination)
-          navigationData = { photoId: destination }
-        } else {
-          navigationData = {
-            photoId: destination,
-            error: 'Navigation handler is unavailable.'
+        const { photoId, path, distance, routeDescription, error } =
+          result.response.functionCall.arguments
+
+        navigationData = {
+          photoId,
+          path,
+          distance,
+          routeDescription,
+          error
+        }
+
+        if (!error) {
+          if (onNavigate) {
+            setTimeout(() => {
+              onNavigate(photoId)
+            }, 500)
+          } else {
+            navigationData.error = 'Navigation handler is unavailable.'
           }
         }
       }
 
-      appendAssistantMessage(messageText, navigationData)
+      appendAssistantMessage(resolvedMessage, navigationData)
     } catch (error) {
       console.error('[AI Chat Popup] Failed to fetch AI response', error)
       const fallbackMessage =
         'Sorry, I ran into a problem trying to contact the campus AI. Please try again in a moment.'
-      appendAssistantMessage(fallbackMessage, { error: 'Network or service error.' })
+      appendAssistantMessage(fallbackMessage, {
+        photoId: currentPhotoId ?? 'unknown-location',
+        error: 'Network or service error.'
+      })
       setErrorMessage('Unable to reach the AI service. Check your connection and try again.')
     } finally {
       setIsLoading(false)
+      requestAnimationFrame(() => textareaRef.current?.focus())
     }
   }
 
-  useEffect(() => {
-    if (!isOpen || messages.length > 0) {
-      return
-    }
-
-    setMessages([
-      {
-        id: generateMessageId(),
-        role: 'assistant',
-        content: 'Hi there! I can help you find facilities across campus. Ask me where you’d like to go.',
-        timestamp: new Date()
-      }
-    ])
-  }, [isOpen, messages.length])
-
-  useEffect(() => {
-    if (!isOpen) {
-      setErrorMessage(null)
-    }
-  }, [isOpen])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value)
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    void processMessage()
   }
 
-  const latestAssistantNavigation = messages
-    .slice()
-    .reverse()
-    .find(message => message.role === 'assistant' && message.navigationData)
+  const handleTextareaKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      void processMessage()
+    }
+  }
+
+  if (!isOpen) {
+    return null
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-2xl max-h-[85vh] h-[600px] max-sm:h-[80vh] max-sm:w-[95vw] max-sm:max-w-none flex flex-col p-0">
-        <DialogHeader className="p-4 pb-2">
-          <div className="flex items-center justify-between">
-            <DialogTitle>AI Chat Assistant</DialogTitle>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-800 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+      <div className="flex w-[min(22rem,calc(100vw-2rem))] max-h-[80vh] lg:h-[50vh] min-h-[18rem] flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between rounded-t-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-white">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <p className="text-sm font-semibold">Campus Assistant</p>
           </div>
-          <DialogDescription className="sr-only">
-            Chat with the AI assistant to get help with the panoramic viewer navigation and controls
-          </DialogDescription>
-        </DialogHeader>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-blue-600"
+            aria-label="Close chat"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-        <Messages messages={messages} isLoading={isLoading} />
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            {messages.map(message => {
+              const isUser = message.role === 'user'
+              const timestamp = message.timestamp.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+              const navigationData = message.navigationData
 
-        {latestAssistantNavigation && latestAssistantNavigation.navigationData && (
-          <div className="px-4 py-2 border-t border-gray-200 bg-blue-50 text-xs text-blue-800 flex items-center gap-2">
-            <MapPin className="w-4 h-4 flex-shrink-0" />
-            {latestAssistantNavigation.navigationData.error ? (
-              <span>
-                Tried to navigate to <strong>{latestAssistantNavigation.navigationData.photoId}</strong>, but encountered an issue: {latestAssistantNavigation.navigationData.error}
-              </span>
-            ) : (
-              <span>
-                Navigating to <strong>{latestAssistantNavigation.navigationData.photoId}</strong>.
-              </span>
+              return (
+                <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                      isUser
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-900'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+
+                    {navigationData && (
+                      <div
+                        className={`mt-3 rounded-xl border px-3 py-2 text-xs ${
+                          navigationData.error
+                            ? 'border-red-200 bg-red-50 text-red-700'
+                            : 'border-blue-200 bg-blue-50 text-blue-800'
+                        }`}
+                      >
+                        {navigationData.error ? (
+                          <div className="flex items-start gap-2">
+                            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                            <p>
+                              Unable to complete navigation to{' '}
+                              <strong>{navigationData.photoId}</strong>. {navigationData.error}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 font-medium">
+                              <MapPin className="h-4 w-4" />
+                              <span>
+                                Route ready ({navigationData.distance ?? 0}{' '}
+                                {navigationData.distance === 1 ? 'step' : 'steps'})
+                              </span>
+                            </div>
+                            {navigationData.routeDescription && (
+                              <p>{navigationData.routeDescription}</p>
+                            )}
+                            {navigationData.path && navigationData.path.length > 1 && (
+                              <p className="text-[11px] text-blue-900/80">
+                                Path: {navigationData.path.join(' → ')}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="mt-1 text-[11px] opacity-70">{timestamp}</p>
+                  </div>
+                </div>
+              )
+            })}
+
+            {isLoading && (
+              <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2 text-sm text-gray-700 shadow-sm">
+                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                Thinking…
+              </div>
             )}
-          </div>
-        )}
 
-        {errorMessage && (
-          <div className="px-4 py-2 border-t border-red-200 bg-red-50 text-xs text-red-700 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <span>{errorMessage}</span>
+            <div ref={messagesEndRef} />
           </div>
-        )}
 
-        <div className="p-4 border-t border-gray-200">
-          <form onSubmit={handleSubmit}>
+          {errorMessage && (
+            <div className="mx-4 mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p>{errorMessage}</p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="border-t border-gray-200 px-4 py-3">
             <div className="relative">
               <textarea
+                ref={textareaRef}
                 value={input}
-                onChange={handleInputChange}
-                placeholder="Ask me anything about the panoramic viewer..."
-                className="w-full rounded-lg border border-gray-300 bg-white pl-3 pr-10 py-2 text-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none overflow-hidden"
-                rows={1}
-                style={{ minHeight: '36px', maxHeight: '120px' }}
-                onInput={(e) => {
-                  const target = e.target as HTMLTextAreaElement
+                placeholder="Ask me about campus locations…"
+                onChange={event => setInput(event.target.value)}
+                onKeyDown={handleTextareaKeyDown}
+                className="h-full max-h-32 min-h-[38px] w-full resize-none rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-gray-100"
+                disabled={isLoading}
+                maxLength={500}
+                onInput={event => {
+                  const target = event.currentTarget
                   target.style.height = 'auto'
-                  target.style.height =
-                    Math.min(target.scrollHeight, 120) + 'px'
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSubmit(e)
-                  }
+                  target.style.height = `${Math.min(target.scrollHeight, 128)}px`
                 }}
               />
               <button
                 type="submit"
-                disabled={!input.trim() || isLoading || !currentPhotoId}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-blue-500 hover:text-blue-400 disabled:text-gray-400 transition-colors focus:outline-none"
+                disabled={isLoading || !input.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-blue-600 transition-colors hover:text-blue-500 disabled:text-gray-400"
+                aria-label="Send message"
               >
-                <Send className="w-4 h-4" />
+                <Send className="h-4 w-4" />
               </button>
             </div>
+            <p className="mt-1 text-[11px] text-gray-500">Enter to send • Shift+Enter for a new line</p>
           </form>
         </div>
-      </DialogContent>
-    </Dialog>
+    </div>
   )
 }
