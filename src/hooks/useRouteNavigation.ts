@@ -54,6 +54,8 @@ interface InternalState extends NavigationState {
  * @property currentSpeed - Currently selected speed descriptor
  * @property pauseNavigation - Temporarily pauses navigation without clearing the remaining path
  * @property resumeNavigation - Resumes navigation from the next pending step
+ * @property stepBackward - Moves the viewer back to the previous step in the current path
+ * @property stepForward - Advances the viewer to the next step in the current path
  */
 export interface UseRouteNavigationReturn {
   navigationState: NavigationState
@@ -64,6 +66,8 @@ export interface UseRouteNavigationReturn {
   currentSpeed: NavigationSpeed
   pauseNavigation: () => void
   resumeNavigation: () => void
+  stepBackward: () => void
+  stepForward: () => void
 }
 
 /**
@@ -93,9 +97,10 @@ type TimeoutHandle = ReturnType<typeof setTimeout> | null
  *
  * @example
  * ```tsx
- * const { navigationState, startNavigation, skipToEnd } = useRouteNavigation(jumpToPhoto)
+ * const { navigationState, startNavigation, stepForward } = useRouteNavigation(jumpToPhoto)
  *
  * startNavigation(result.path)
+ * stepForward()
  * ```
  */
 export function useRouteNavigation(
@@ -240,6 +245,72 @@ export function useRouteNavigation(
     }))
   }, [clearScheduledStep, onNavigate, state.isNavigating, state.path])
 
+  const goToStep = useCallback(
+    async (targetIndex: number) => {
+      const snapshot = stateRef.current
+      if (!snapshot.isNavigating || snapshot.path.length === 0) {
+        return
+      }
+
+      const boundedIndex = Math.min(Math.max(targetIndex, 0), snapshot.path.length - 1)
+      if (boundedIndex === snapshot.currentStepIndex) {
+        return
+      }
+
+      const destinationId = snapshot.path[boundedIndex]
+      if (!destinationId) {
+        return
+      }
+
+      clearScheduledStep()
+
+      const upcomingPhotoId =
+        boundedIndex + 1 < snapshot.path.length ? snapshot.path[boundedIndex + 1] : undefined
+
+      await onNavigate(destinationId, {
+        isSequential: true,
+        stepIndex: boundedIndex,
+        totalSteps: snapshot.path.length,
+        nextPhotoId: upcomingPhotoId
+      })
+
+      setState(prev => {
+        const updatedPending = prev.path.slice(boundedIndex + 1)
+        const nextState: InternalState = {
+          ...prev,
+          isNavigating: prev.isNavigating,
+          isPaused: true,
+          currentStepIndex: boundedIndex,
+          totalSteps: prev.path.length,
+          currentPhotoId: destinationId,
+          pendingPath: updatedPending
+        }
+        stateRef.current = nextState
+        return nextState
+      })
+    },
+    [clearScheduledStep, onNavigate]
+  )
+
+  const stepBackward = useCallback(() => {
+    const snapshot = stateRef.current
+    if (!snapshot.isNavigating) {
+      return
+    }
+    const previousIndex = snapshot.currentStepIndex <= 0 ? 0 : snapshot.currentStepIndex - 1
+    void goToStep(previousIndex)
+  }, [goToStep])
+
+  const stepForward = useCallback(() => {
+    const snapshot = stateRef.current
+    if (!snapshot.isNavigating) {
+      return
+    }
+    const nextIndex =
+      snapshot.currentStepIndex < 0 ? 0 : Math.min(snapshot.currentStepIndex + 1, snapshot.path.length - 1)
+    void goToStep(nextIndex)
+  }, [goToStep])
+
   const cancelNavigation = useCallback(() => {
     if (!state.isNavigating) {
       return
@@ -320,6 +391,8 @@ export function useRouteNavigation(
     setSpeed,
     currentSpeed: speed,
     pauseNavigation,
-    resumeNavigation
+    resumeNavigation,
+    stepBackward,
+    stepForward
   }
 }
