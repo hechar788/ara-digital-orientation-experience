@@ -76,7 +76,7 @@ export const Tour: React.FC<TourProps> = ({
         const jumpOptions: JumpToPhotoOptions | undefined = options?.isSequential
           ? {
               previewDirection: true,
-              previewDelayMs: 1.3500,
+              previewDelayMs: 1350,
               nextPhotoId: options?.nextPhotoId
             }
           : undefined
@@ -108,7 +108,7 @@ export const Tour: React.FC<TourProps> = ({
     <>
       <RouteNavigationStatus
         routeNavigation={routeNavigation}
-        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-40 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[20rem] lg:bottom-auto lg:top-4 lg:left-4 lg:-translate-x-0 lg:w-62"
+        className="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-[calc(1rem+env(safe-area-inset-left,0px))] z-40 w-[calc(100vw-2rem)] max-w-[27rem] lg:top-4 lg:left-4 lg:w-[27rem]"
       />
 
       <TourControls

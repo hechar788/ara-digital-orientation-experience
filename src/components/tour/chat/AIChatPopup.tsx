@@ -339,8 +339,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      <div className="flex w-[calc(100vw-2rem)] max-w-[22rem] h-[min(32rem,calc(100vh-6rem))] min-h-[18rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl lg:h-[50vh] lg:w-[min(22rem,calc(100vw-2rem))]">
-        <div className="flex items-center justify-between rounded-t-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-white">
+      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[50vh] lg:w-[min(22rem,calc(100vw-2rem))]">
+        <div className="flex items-center justify-between rounded-t-2xl bg-[#0C586E] px-4 py-3 text-white">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <p className="text-sm font-semibold">Campus Assistant</p>
@@ -348,7 +348,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-blue-600"
+            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E]"
             aria-label="Close chat"
           >
             <X className="h-4 w-4" />

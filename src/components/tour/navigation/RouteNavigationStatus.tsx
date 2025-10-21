@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react'
-import { NAVIGATION_SPEEDS, type NavigationSpeed, type UseRouteNavigationReturn } from '@/hooks/useRouteNavigation'
+import { Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  NAVIGATION_SPEEDS,
+  type NavigationSpeed,
+  type UseRouteNavigationReturn
+} from '@/hooks/useRouteNavigation'
 import { cn } from '@/lib/utils'
-import { formatLocationId } from '@/lib/location-format'
 
 /**
  * Props for the RouteNavigationStatus component
@@ -29,7 +33,7 @@ interface RouteNavigationStatusProps {
  * ```tsx
  * <RouteNavigationStatus
  *   routeNavigation={routeNavigation}
- *   className="w-[11.55rem]"
+ *   className="w-[18rem]"
  * />
  * ```
  */
@@ -43,9 +47,17 @@ export const RouteNavigationStatus: React.FC<RouteNavigationStatusProps> = ({
     return null
   }
 
-  const { navigationState, skipToEnd, cancelNavigation, currentSpeed, setSpeed, pauseNavigation, resumeNavigation } =
-    routeNavigation
-  const { isNavigating, isPaused, totalSteps, currentStepIndex, path } = navigationState
+  const {
+    navigationState,
+    cancelNavigation,
+    currentSpeed,
+    setSpeed,
+    pauseNavigation,
+    resumeNavigation,
+    stepBackward,
+    stepForward
+  } = routeNavigation
+  const { isNavigating, isPaused, totalSteps, currentStepIndex } = navigationState
 
   if (!isNavigating || totalSteps <= 0) {
     return null
@@ -54,62 +66,68 @@ export const RouteNavigationStatus: React.FC<RouteNavigationStatusProps> = ({
   const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1
   const progressPercent =
     totalSteps > 0 ? Math.min(100, Math.max(0, (currentStepNumber / totalSteps) * 100)) : 0
-  const currentStepId =
-    currentStepIndex >= 0 && path[currentStepIndex] ? path[currentStepIndex] : path[0] ?? null
-  const nextStepId =
-    currentStepIndex + 1 < path.length ? path[currentStepIndex + 1] ?? null : null
+  const isAtFirstStep = currentStepIndex <= 0
+  const isAtLastStep = currentStepIndex >= totalSteps - 1
 
   return (
     <div
       className={cn(
-        'rounded-2xl border border-blue-200 bg-white/90 p-4 shadow-xl text-sm text-blue-900 backdrop-blur-md',
-        'w-[min(20rem,calc(100vw-3rem))]',
+        'rounded-2xl border border-blue-200 bg-white/90 p-5 shadow-xl text-sm text-blue-900 backdrop-blur-md',
+        'w-[min(27rem,calc(100vw-3rem))]',
         className
       )}
       role="status"
       aria-live="polite"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-semibold">
-            Step {Math.min(currentStepNumber, totalSteps)} of {totalSteps}
-          </p>
-          <p className="text-xs text-blue-900/75">
-            {formatLocationId(currentStepId)}
-            {nextStepId ? ` → ${formatLocationId(nextStepId)}` : ''}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="relative mb-1">
+        <p className="text-center text-base font-semibold">
+          Step {Math.min(currentStepNumber, totalSteps)} of {totalSteps}
+        </p>
+        <button
+          type="button"
+          onClick={cancelNavigation}
+          className="absolute right-0 top-0 rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          Cancel
+        </button>
+      </div>
+      <div className="mt-5.5 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={stepBackward}
+          disabled={isAtFirstStep}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Go to previous step"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <div className="relative flex-1">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-blue-200/70">
+            <div
+              className="h-full rounded-full bg-blue-600 transition-all duration-300 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
           <button
             type="button"
             onClick={isPaused ? resumeNavigation : pauseNavigation}
-            className="rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            className="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-blue-700 shadow-md ring-1 ring-blue-200 transition hover:bg-blue-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            aria-label={isPaused ? 'Resume navigation' : 'Pause navigation'}
           >
-            {isPaused ? 'Play' : 'Stop'}
-          </button>
-          <button
-            type="button"
-            onClick={skipToEnd}
-            className="rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            Skip
-          </button>
-          <button
-            type="button"
-            onClick={cancelNavigation}
-            className="rounded-lg border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-          >
-            Cancel
+            {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
           </button>
         </div>
+        <button
+          type="button"
+          onClick={stepForward}
+          disabled={isAtLastStep}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Go to next step"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-blue-200/70">
-        <div
-          className="h-full rounded-full bg-blue-600 transition-all duration-300 ease-out"
-          style={{ width: `${progressPercent}%` }}
-        />
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-blue-900/80">
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-blue-900/80">
         <span className="font-medium">Speed:</span>
         {speedOptions.map(option => {
           const isActive = option.delayMs === currentSpeed.delayMs
