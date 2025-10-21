@@ -76,7 +76,7 @@ export const Tour: React.FC<TourProps> = ({
         const jumpOptions: JumpToPhotoOptions | undefined = options?.isSequential
           ? {
               previewDirection: true,
-              previewDelayMs: 1500,
+              previewDelayMs: 1.3500,
               nextPhotoId: options?.nextPhotoId
             }
           : undefined
