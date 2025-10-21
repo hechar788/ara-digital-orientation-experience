@@ -5,7 +5,7 @@ import { Race } from '../race/Race'
 import { PanoramicHotspots } from './hotspots/PanoramicHotspots'
 import { DirectionalArrows3D } from './navigation/DirectionalArrows3D'
 import { Spinner } from '../ui/shadcn-io/spinner'
-import { TOUR_START_PHOTO_ID } from '../../hooks/useTourNavigation'
+import { TOUR_START_PHOTO_ID, type JumpToPhotoOptions } from '../../hooks/useTourNavigation'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
 import { getAreaForPhoto } from '../../data/blockUtils'
@@ -23,8 +23,10 @@ interface PanoramicViewerProps {
   onCameraChange?: (lon: number, lat: number) => void
   currentPhoto?: Photo | null
   onNavigate?: (direction: string) => void
-  onNavigateToPhoto?: (photoId: string) => void
+  onNavigateToPhoto?: (photoId: string, options?: JumpToPhotoOptions) => Promise<void> | void
   cameraLon?: number
+  cameraLat?: number
+  cameraCommandId?: number
   onFovChange?: (fov: number) => void
   initialFov?: number
   timerClassName?: string
@@ -43,6 +45,9 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
   currentPhoto = null,
   onNavigate,
   onNavigateToPhoto,
+  cameraLon,
+  cameraLat,
+  cameraCommandId,
   onFovChange,
   initialFov = 76,
   timerClassName = '',
@@ -92,6 +97,8 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     }
   }, [currentPhoto])  // Only currentPhoto dependency - prevents double-counting
   const animationRef = useRef<number | null>(null)
+  const orientationAnimationRef = useRef<number | null>(null)
+  const lastCameraCommandRef = useRef<number | undefined>(cameraCommandId)
   const sceneDataRef = useRef<{
     scene: THREE.Scene
     camera: THREE.PerspectiveCamera
@@ -501,6 +508,82 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
     }
   }, [photoImage, imageUrl, initialLoadComplete])
 
+  useEffect(() => {
+    if (!sceneDataRef.current) {
+      return
+    }
+    if (cameraCommandId === undefined) {
+      return
+    }
+    if (cameraCommandId === lastCameraCommandRef.current) {
+      return
+    }
+    if (typeof cameraLon !== 'number' || typeof cameraLat !== 'number') {
+      return
+    }
+
+    lastCameraCommandRef.current = cameraCommandId
+
+    if (orientationAnimationRef.current) {
+      cancelAnimationFrame(orientationAnimationRef.current)
+      orientationAnimationRef.current = null
+    }
+
+    const normalizeAngle = (angle: number) => {
+      let result = angle % 360
+      if (result < 0) {
+        result += 360
+      }
+      return result
+    }
+
+    const startLon = cameraControlRef.current.lon
+    const startLat = cameraControlRef.current.lat
+    const targetLon = cameraLon
+    const targetLat = cameraLat
+    const duration = 450
+    const startTime = performance.now()
+
+    const deltaLon = (() => {
+      const normalizedStart = normalizeAngle(startLon)
+      const normalizedTarget = normalizeAngle(targetLon)
+      let diff = normalizedTarget - normalizedStart
+      if (diff > 180) {
+        diff -= 360
+      } else if (diff < -180) {
+        diff += 360
+      }
+      return diff
+    })()
+
+    const animateOrientation = (time: number) => {
+      const elapsed = time - startTime
+      const progress = Math.min(1, elapsed / duration)
+      const eased =
+        progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2
+      const nextLon = normalizeAngle(startLon + deltaLon * eased)
+      const nextLat = startLat + (targetLat - startLat) * eased
+
+      cameraControlRef.current.lon = nextLon
+      cameraControlRef.current.lat = nextLat
+
+      if (progress < 1) {
+        orientationAnimationRef.current = requestAnimationFrame(animateOrientation)
+      } else {
+        orientationAnimationRef.current = null
+      }
+    }
+
+    orientationAnimationRef.current = requestAnimationFrame(animateOrientation)
+
+    return () => {
+      if (orientationAnimationRef.current) {
+        cancelAnimationFrame(orientationAnimationRef.current)
+        orientationAnimationRef.current = null
+      }
+    }
+  }, [cameraCommandId, cameraLat, cameraLon])
+
   const handleFovChange = (newFov: number) => {
     setFov(newFov)
     fovRef.current = newFov
@@ -557,7 +640,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           onEndRace={() => setIsRaceMode(false)}
           onRestart={() => {
             race.reset()
-            onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
+            void onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
           }}
           areasDiscovered={race.areasCount}
           keyLocationsFound={race.hiddenLocationsCount}
@@ -570,7 +653,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
             // CRITICAL: Set race mode BEFORE navigation to ensure correct tracking
             setIsRaceMode(true)
             race.reset()
-            onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
+            void onNavigateToPhoto?.(TOUR_START_PHOTO_ID)
           }}
           currentPhotoId={currentPhoto?.id ?? ''}
           onNavigateToPhoto={onNavigateToPhoto}

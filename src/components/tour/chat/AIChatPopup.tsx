@@ -1,7 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
+import type { UseRouteNavigationReturn, RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
+import { formatLocationId } from '@/lib/location-format'
 
 /**
  * Props for the AIChatPopup component
@@ -10,12 +12,14 @@ import { getChatResponse } from '@/lib/ai-client'
  * @property onClose - Callback invoked when the popup should be dismissed
  * @property currentPhotoId - The ID of the location currently displayed in the viewer
  * @property onNavigate - Handler that jumps the viewer to the supplied destination photo
+ * @property routeNavigation - Sequential navigation controller used to walk through AI-provided routes
  */
 interface AIChatPopupProps {
   isOpen: boolean
   onClose: () => void
   currentPhotoId: string
-  onNavigate?: (photoId: string) => void
+  onNavigate?: (photoId: string, options?: RouteNavigationHandlerOptions) => Promise<void> | void
+  routeNavigation?: UseRouteNavigationReturn
 }
 
 /**
@@ -48,6 +52,64 @@ function generateMessageId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function sanitizeAssistantMessage(content: string): string {
+  const uploadPattern = /\b(upload|uploaded|uploading|file|files|attachment|attachments)\b/i
+  if (uploadPattern.test(content)) {
+    return 'I’m here to help with campus locations and navigation. Let me know which building, room, or facility you would like to find.'
+  }
+  return content
+}
+
+function ensureQuestionSpacing(message: string): string {
+  const trailingWhitespaceMatch = message.match(/\s*$/)
+  const trailingWhitespace = trailingWhitespaceMatch ? trailingWhitespaceMatch[0] : ''
+  const core = message.slice(0, message.length - trailingWhitespace.length)
+  const lastQuestionIndex = core.lastIndexOf('?')
+  if (lastQuestionIndex === -1) {
+    return core + trailingWhitespace
+  }
+
+  const boundaryCandidates = [
+    core.lastIndexOf('\n', lastQuestionIndex - 1),
+    core.lastIndexOf('!', lastQuestionIndex - 1),
+    core.lastIndexOf('.', lastQuestionIndex - 1),
+    core.lastIndexOf('?', lastQuestionIndex - 1)
+  ]
+  let boundaryIndex = Math.max(...boundaryCandidates)
+  if (boundaryIndex === -1) {
+    boundaryIndex = 0
+  } else {
+    boundaryIndex += 1
+  }
+
+  const questionText = core.slice(boundaryIndex).trim()
+  const leading = core.slice(0, boundaryIndex).trimEnd()
+
+  if (leading.length === 0) {
+    return `${questionText}${trailingWhitespace}`
+  }
+
+  const separator = leading.endsWith('\n\n') ? '' : '\n\n'
+
+  return `${leading}${separator}${questionText}${trailingWhitespace}`
+}
+
+function formatAssistantMessageContent(content: string): string {
+  const sanitized = sanitizeAssistantMessage(content)
+  if (sanitized.length === 0) {
+    return sanitized
+  }
+  const confirmationPattern = /\s*Would you like me to take you there(?: automatically)?\??/i
+  const formatted = sanitized.replace(confirmationPattern, '\n\nWould you like me to take you there?')
+  return ensureQuestionSpacing(formatted)
+}
+
+const AFFIRMATIVE_RESPONSES = ['Sure thing!', 'Okay!', 'Here we go!', 'You got it!'] as const
+function pickAffirmativeResponse(): string {
+  const randomIndex = Math.floor(Math.random() * AFFIRMATIVE_RESPONSES.length)
+  return AFFIRMATIVE_RESPONSES[randomIndex]
+}
+
 /**
  * AI chat popup that connects the UI to the campus navigation server function
  *
@@ -66,7 +128,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   isOpen,
   onClose,
   currentPhotoId,
-  onNavigate
+  onNavigate,
+  routeNavigation
 }) => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([])
   const [input, setInput] = useState('')
@@ -76,9 +139,24 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     summary: null,
     messages: []
   })
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
+  const scheduleClose = useCallback(
+    (action?: () => void) => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+      closeTimeoutRef.current = setTimeout(() => {
+        action?.()
+        onClose()
+        closeTimeoutRef.current = null
+      }, 1500)
+    },
+    [onClose]
+  )
 
   useEffect(() => {
     if (isOpen) {
@@ -104,6 +182,22 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     }
   }, [isOpen, messages.length])
 
+  useEffect(
+    () => () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    },
+    []
+  )
+
+  useEffect(() => {
+    if (!isOpen && closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+  }, [isOpen])
+
   const appendAssistantMessage = (
     content: string,
     navigationData?: ChatMessageDisplay['navigationData']
@@ -113,7 +207,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       {
         id: generateMessageId(),
         role: 'assistant',
-        content,
+        content: formatAssistantMessageContent(content),
         timestamp: new Date(),
         navigationData
       }
@@ -172,31 +266,46 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           : 'I’m here if you need directions around campus!')
 
       let navigationData: ChatMessageDisplay['navigationData'] | undefined
+      let navigationAction: (() => void) | undefined
 
       if (result.response.functionCall) {
         const { photoId, path, distance, routeDescription, error } =
           result.response.functionCall.arguments
 
+        const pathArray = Array.isArray(path) ? path : []
+        const hasRoute = pathArray.length > 0
+
         navigationData = {
           photoId,
-          path,
+          path: pathArray,
           distance,
           routeDescription,
           error
         }
 
         if (!error) {
-          if (onNavigate) {
-            setTimeout(() => {
+          if (hasRoute && routeNavigation) {
+            routeNavigation.cancelNavigation()
+            navigationAction = () => routeNavigation.startNavigation(pathArray)
+          } else if (onNavigate) {
+            routeNavigation?.cancelNavigation()
+            navigationAction = () => {
               onNavigate(photoId)
-            }, 500)
+            }
           } else {
             navigationData.error = 'Navigation handler is unavailable.'
           }
+
+          const acknowledgement = pickAffirmativeResponse()
+          appendAssistantMessage(acknowledgement)
+          setIsLoading(false)
+          scheduleClose(navigationAction)
+          return
         }
       }
 
       appendAssistantMessage(resolvedMessage, navigationData)
+      navigationAction?.()
     } catch (error) {
       console.error('[AI Chat Popup] Failed to fetch AI response', error)
       const fallbackMessage =
@@ -230,7 +339,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      <div className="flex w-[min(22rem,calc(100vw-2rem))] max-h-[80vh] lg:h-[50vh] min-h-[18rem] flex-col rounded-2xl border border-gray-200 bg-white shadow-2xl">
+      <div className="flex w-[calc(100vw-2rem)] max-w-[22rem] h-[min(32rem,calc(100vh-6rem))] min-h-[18rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl lg:h-[50vh] lg:w-[min(22rem,calc(100vw-2rem))]">
         <div className="flex items-center justify-between rounded-t-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-white">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
@@ -246,7 +355,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           </button>
         </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map(message => {
               const isUser = message.role === 'user'
               const timestamp = message.timestamp.toLocaleTimeString([], {
@@ -258,7 +367,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
               return (
                 <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
                       isUser
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-900'
@@ -296,7 +405,10 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
                             )}
                             {navigationData.path && navigationData.path.length > 1 && (
                               <p className="text-[11px] text-blue-900/80">
-                                Path: {navigationData.path.join(' → ')}
+                                Path:{' '}
+                                {navigationData.path
+                                  .map(segment => formatLocationId(segment))
+                                  .join(' → ')}
                               </p>
                             )}
                           </div>

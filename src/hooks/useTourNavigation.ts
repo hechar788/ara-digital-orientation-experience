@@ -4,10 +4,15 @@
  *
  * @fileoverview Provides navigation logic for the VR campus tour system.
  */
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { findPhotoById, getAreaForPhoto } from '../data/blockUtils'
 import type { Photo, DirectionType, DirectionDefinition } from '../types/tour'
-import { DIRECTION_ANGLES } from '../types/tour'
+import { getArrowAngle } from '../components/viewer/navigation/arrowRegistry'
+import {
+  getDirectionAngle as computeDirectionAngle,
+  findDirectionToTarget,
+  isHorizontalDirection
+} from './utils/directionUtils'
 
 /**
  * Starting photo location for the VR tour
@@ -26,12 +31,6 @@ export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
  * @param direction - Direction name to calculate angle for
  * @returns Absolute angle in degrees (0-360)
  */
-function getDirectionAngle(photo: Photo, direction: DirectionType): number {
-  const startingAngle = photo.startingAngle ?? 0
-  const offset = DIRECTION_ANGLES[direction] ?? 0
-  return (startingAngle + offset) % 360
-}
-
 /**
  * Type guard verifying a direction definition contains a connection object
  *
@@ -193,7 +192,7 @@ function findClosestAvailableDirection(
   let minDiff = Infinity
 
   for (const dir of availableDirs) {
-    const dirAngle = getDirectionAngle(photo, dir)
+    const dirAngle = computeDirectionAngle(photo, dir)
     const diff = calculateAngularDifference(dirAngle, targetAngle)
 
     if (diff < minDiff) {
@@ -203,6 +202,127 @@ function findClosestAvailableDirection(
   }
 
   return closestDir
+}
+
+/**
+ * Finds the direction on a photo that leads to the specified target photo ID.
+ *
+ * Checks horizontal directions first (which include connection metadata),
+ * then falls back to vertical and special navigation entries that may be
+ * stored as strings or arrays.
+ *
+ * @param photo - Photo containing navigation directions
+ * @param targetPhotoId - Destination photo identifier to search for
+ * @returns Direction that connects to the target, or null if none connect
+ *
+ * @example
+ * ```typescript
+ * const direction = findDirectionToTarget(currentPhoto, 'library-f1-entrance')
+ * // Returns: 'forwardRight'
+ * ```
+ */
+function getHotspotHeading(
+  photo: Photo,
+  direction: DirectionType,
+  destinationId?: string
+): number | undefined {
+  const hotspots = photo.hotspots ?? []
+
+  for (const hotspot of hotspots) {
+    if (hotspot.direction !== direction) {
+      continue
+    }
+    if (destinationId && hotspot.destination && hotspot.destination !== destinationId) {
+      continue
+    }
+
+    const { x, z } = hotspot.position
+    const angleRad = Math.atan2(z, x)
+    const angleDeg = angleRad * (180 / Math.PI)
+    return normalizeAngle(angleDeg)
+  }
+
+  return undefined
+}
+
+/**
+ * Optional configuration applied when jumping directly to a photo.
+ *
+ * @property previewDirection - When true, rotates the camera toward the outgoing direction before moving
+ * @property previewDelayMs - Duration to wait after the preview rotation before navigating (defaults to 1000 ms)
+ * @property nextPhotoId - Optional upcoming photo ID used to pre-orient the camera after arrival
+ */
+export interface JumpToPhotoOptions {
+  previewDirection?: boolean
+  previewDelayMs?: number
+  nextPhotoId?: string
+}
+
+function normalizeAngle(angle: number): number {
+  let result = angle % 360
+  if (result < 0) {
+    result += 360
+  }
+  return result
+}
+
+/**
+ * Resolve the camera orientation to apply immediately after arriving at a destination photo.
+ *
+ * Maintains the heading used during the movement whenever available so the user
+ * keeps facing the travelled direction. Falls back to the upcoming orientation
+ * suggestion when the movement heading cannot be determined, and finally to the
+ * provided fallback angle (typically the photo's starting angle or current camera heading).
+ *
+ * @param movementAngle - Angle used while travelling to the destination (0-360 degrees)
+ * @param postArrivalAngle - Optional suggested angle for the next movement (0-360 degrees)
+ * @param fallbackAngle - Angle to use when no other data is available (0-360 degrees)
+ * @returns Normalized absolute angle in degrees (0-360) to apply after arrival
+ *
+ * @example
+ * ```typescript
+ * const arrival = resolveArrivalOrientation({
+ *   movementAngle: 180,
+ *   postArrivalAngle: 90,
+ *   fallbackAngle: 0
+ * })
+ * // arrival === 180
+ * ```
+ */
+export function resolveArrivalOrientation({
+  navigationAngle,
+  postArrivalAngle,
+  movementAngle,
+  fallbackAngle
+}: {
+  navigationAngle?: number
+  postArrivalAngle?: number
+  movementAngle?: number
+  fallbackAngle: number
+}): number {
+  if (typeof navigationAngle === 'number') {
+    return normalizeAngle(navigationAngle)
+  }
+
+  if (typeof postArrivalAngle === 'number') {
+    return normalizeAngle(postArrivalAngle)
+  }
+
+  if (typeof movementAngle === 'number') {
+    return normalizeAngle(movementAngle)
+  }
+
+  return normalizeAngle(fallbackAngle)
+}
+
+function clampLatitude(lat: number): number {
+  return Math.max(-25, Math.min(85, lat))
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
 }
 
 /**
@@ -244,7 +364,7 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
   for (const dir of horizontalDirections) {
     const dirDef = photo.directions[dir]
     if (isDirectionDefinition(dirDef)) {
-      const dirAngle = getDirectionAngle(photo, dir)
+      const dirAngle = computeDirectionAngle(photo, dir)
       const angleDiff = Math.abs(currentCameraAngle - dirAngle)
       // 15° tolerance accounts for VR navigation imprecision
       if (angleDiff < 15 || angleDiff > 345) {
@@ -289,9 +409,9 @@ function getUserOrientation(currentCameraAngle: number, photo: Photo): 'forward'
   let forwardAngle: number
 
   if (photo.directions.forward) {
-    forwardAngle = getDirectionAngle(photo, 'forward')
+    forwardAngle = computeDirectionAngle(photo, 'forward')
   } else if (photo.directions.back) {
-    const backAngle = getDirectionAngle(photo, 'back')
+    const backAngle = computeDirectionAngle(photo, 'back')
     forwardAngle = (backAngle + 180) % 360
   } else {
     forwardAngle = photo.startingAngle ?? 0
@@ -369,8 +489,8 @@ function analyzeNavigation(
   }
 
   // Check corridor geometry by comparing the actual connection angles being used
-  const currentDirectionAngle = getDirectionAngle(currentPhoto, direction)
-  const destinationReverseAngle = getDirectionAngle(destinationPhoto, reverseDirection)
+  const currentDirectionAngle = computeDirectionAngle(currentPhoto, direction)
+  const destinationReverseAngle = computeDirectionAngle(destinationPhoto, reverseDirection)
 
   if (currentDirectionAngle !== undefined && destinationReverseAngle !== undefined) {
     // Helper function to calculate angular difference with wraparound
@@ -440,7 +560,7 @@ function calculateNavigationAngle(
   const reverseDirection = findReverseConnection(currentPhoto, destinationPhoto)
 
   if (reverseDirection) {
-    const reverseAngle = getDirectionAngle(destinationPhoto, reverseDirection)
+    const reverseAngle = computeDirectionAngle(destinationPhoto, reverseDirection)
     const targetAngle = (reverseAngle + 180) % 360
 
     // For same-corridor bidirectional movement, preserve relative orientation
@@ -461,7 +581,7 @@ function calculateNavigationAngle(
       const closestDirection = findClosestAvailableDirection(destinationPhoto, targetAngle, effectiveMovementType)
 
       if (closestDirection) {
-        const result = getDirectionAngle(destinationPhoto, closestDirection)
+      const result = computeDirectionAngle(destinationPhoto, closestDirection)
         return result
       }
     }
@@ -470,24 +590,24 @@ function calculateNavigationAngle(
   // Strategy 2: Direct Direction Matching (Fallback for cases without reverse connection)
   if (isForwardMovement) {
     if (destinationPhoto.directions.forward) {
-      const result = getDirectionAngle(destinationPhoto, 'forward')
+      const result = computeDirectionAngle(destinationPhoto, 'forward')
       return result
     } else if (destinationPhoto.directions.forwardLeft) {
-      const result = getDirectionAngle(destinationPhoto, 'forwardLeft')
+      const result = computeDirectionAngle(destinationPhoto, 'forwardLeft')
       return result
     } else if (destinationPhoto.directions.forwardRight) {
-      const result = getDirectionAngle(destinationPhoto, 'forwardRight')
+      const result = computeDirectionAngle(destinationPhoto, 'forwardRight')
       return result
     }
   } else if (isBackMovement) {
     if (destinationPhoto.directions.back) {
-      const result = getDirectionAngle(destinationPhoto, 'back')
+      const result = computeDirectionAngle(destinationPhoto, 'back')
       return result
     } else if (destinationPhoto.directions.backLeft) {
-      const result = getDirectionAngle(destinationPhoto, 'backLeft')
+      const result = computeDirectionAngle(destinationPhoto, 'backLeft')
       return result
     } else if (destinationPhoto.directions.backRight) {
-      const result = getDirectionAngle(destinationPhoto, 'backRight')
+      const result = computeDirectionAngle(destinationPhoto, 'backRight')
       return result
     }
   }
@@ -523,8 +643,8 @@ function calculatePreservedOrientation(
   currentPhoto: Photo,
   destinationPhoto: Photo
 ): number {
-  const currentForward = currentPhoto.directions.forward ? getDirectionAngle(currentPhoto, 'forward') : undefined
-  const destForward = destinationPhoto.directions.forward ? getDirectionAngle(destinationPhoto, 'forward') : undefined
+  const currentForward = currentPhoto.directions.forward ? computeDirectionAngle(currentPhoto, 'forward') : undefined
+  const destForward = destinationPhoto.directions.forward ? computeDirectionAngle(destinationPhoto, 'forward') : undefined
 
   // Fallback to simple preservation if direction data is missing
   if (currentForward === undefined || destForward === undefined) {
@@ -574,9 +694,14 @@ export function useTourNavigation() {
   const [isLoading, setIsLoading] = useState(false)
   const [cameraLon, setCameraLon] = useState(180)
   const [cameraLat, setCameraLat] = useState(0)
+  const [cameraCommandId, setCameraCommandId] = useState(0)
   const [calculatedCameraAngle, setCalculatedCameraAngle] = useState<number | undefined>(undefined)
   const [currentPhotoImage, setCurrentPhotoImage] = useState<HTMLImageElement | null>(null)
-
+  const currentPhotoRef = useRef<Photo | null>(null)
+  const currentPhotoIdRef = useRef<string>(currentPhotoId)
+  const cameraLonRef = useRef<number>(cameraLon)
+  const isLoadingRef = useRef<boolean>(isLoading)
+  const isProcessingRef = useRef<boolean>(false)
   // Get current photo using centralized lookup
   const currentPhoto = useMemo(() => {
     return findPhotoById(currentPhotoId)
@@ -586,6 +711,30 @@ export function useTourNavigation() {
   const currentArea = useMemo(() => {
     return getAreaForPhoto(currentPhotoId)
   }, [currentPhotoId])
+
+  useEffect(() => {
+    currentPhotoRef.current = currentPhoto
+  }, [currentPhoto])
+
+  useEffect(() => {
+    currentPhotoIdRef.current = currentPhotoId
+  }, [currentPhotoId])
+
+  useEffect(() => {
+    cameraLonRef.current = cameraLon
+  }, [cameraLon])
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading
+  }, [isLoading])
+
+  const issueCameraOrientation = useCallback((lon: number, lat: number) => {
+    const normalizedLon = normalizeAngle(lon)
+    const clampedLat = clampLatitude(lat)
+    setCameraLon(normalizedLon)
+    setCameraLat(clampedLat)
+    setCameraCommandId(prev => prev + 1)
+  }, [])
 
   /**
    * Handle camera orientation changes from the panoramic viewer
@@ -628,6 +777,7 @@ export function useTourNavigation() {
 
     if (targetPhotoId) {
       setIsLoading(true)
+      isLoadingRef.current = true
 
 
       // Handle array of connections if needed
@@ -651,20 +801,24 @@ export function useTourNavigation() {
           setCurrentPhotoImage(img)
           setCurrentPhotoId(finalTargetId)
           setCalculatedCameraAngle(calculatedAngle)
+          issueCameraOrientation(calculatedAngle, 0)
           setIsLoading(false)
+          isLoadingRef.current = false
         }
         img.onerror = () => {
           setCurrentPhotoImage(null)
           setIsLoading(false)
+          isLoadingRef.current = false
           console.error('Failed to load image:', targetPhoto.imageUrl)
         }
         img.src = targetPhoto.imageUrl
       } else {
         setIsLoading(false)
+        isLoadingRef.current = false
         console.error('Target photo not found:', finalTargetId)
       }
     }
-  }, [currentPhoto, isLoading, cameraLon])
+  }, [currentPhoto, isLoading, cameraLon, issueCameraOrientation])
 
   /**
    * Jump directly to a specific photo by ID
@@ -673,32 +827,127 @@ export function useTourNavigation() {
    * following connection paths. Useful for location menu and search.
    *
    * @param photoId - Target photo ID to navigate to
+   * @param options - Optional configuration for direction preview behaviour
+   * @returns Promise that resolves once the navigation finishes loading
    */
-  const jumpToPhoto = useCallback((photoId: string) => {
-    if (isLoading || photoId === currentPhotoId) return
+  const jumpToPhoto = useCallback(async (photoId: string, options?: JumpToPhotoOptions) => {
+    const activeCurrentPhoto = currentPhotoRef.current ?? currentPhoto
+    const activeCurrentPhotoId = currentPhotoIdRef.current ?? currentPhotoId
+    const activeCameraLon = cameraLonRef.current ?? cameraLon
+
+    if (isProcessingRef.current || isLoadingRef.current || photoId === activeCurrentPhotoId) {
+      return
+    }
+    isProcessingRef.current = true
 
     const targetPhoto = findPhotoById(photoId)
-    if (targetPhoto) {
-      setIsLoading(true)
-
-      const img = new Image()
-      img.onload = () => {
-        setCurrentPhotoImage(img)
-        setCurrentPhotoId(photoId)
-        // For direct jumps, always use startingAngle if available
-        setCalculatedCameraAngle(targetPhoto.startingAngle)
-        setIsLoading(false)
-      }
-      img.onerror = () => {
-        setCurrentPhotoImage(null)
-        setIsLoading(false)
-        console.error('Failed to load image:', targetPhoto.imageUrl)
-      }
-      img.src = targetPhoto.imageUrl
-    } else {
+    if (!targetPhoto) {
       console.error('Photo not found:', photoId)
+      isProcessingRef.current = false
+      return
     }
-  }, [currentPhotoId, isLoading])
+
+    let resolvedDirection: DirectionType | null = null
+    let navigationAnalysis: NavigationAnalysis | null = null
+    let movementAngle: number | undefined
+    const upcomingPhotoId = options?.nextPhotoId
+    let postArrivalAngle: number | undefined
+
+    if (activeCurrentPhoto) {
+      resolvedDirection = findDirectionToTarget(activeCurrentPhoto, photoId)
+      if (resolvedDirection) {
+        navigationAnalysis = analyzeNavigation(activeCurrentPhoto, targetPhoto, resolvedDirection)
+        const arrowAngle = getArrowAngle(activeCurrentPhoto.id, resolvedDirection)
+        if (arrowAngle !== undefined) {
+          movementAngle = arrowAngle
+        } else if (isHorizontalDirection(resolvedDirection)) {
+          movementAngle = computeDirectionAngle(activeCurrentPhoto, resolvedDirection)
+        } else {
+          movementAngle = getHotspotHeading(activeCurrentPhoto, resolvedDirection, photoId)
+        }
+      }
+    }
+
+    if (upcomingPhotoId) {
+      const nextDirection = findDirectionToTarget(targetPhoto, upcomingPhotoId)
+      if (nextDirection) {
+        const arrowAngle = getArrowAngle(targetPhoto.id, nextDirection)
+        if (arrowAngle !== undefined) {
+          postArrivalAngle = arrowAngle
+        } else if (isHorizontalDirection(nextDirection)) {
+          postArrivalAngle = computeDirectionAngle(targetPhoto, nextDirection)
+        } else {
+          postArrivalAngle = getHotspotHeading(targetPhoto, nextDirection, upcomingPhotoId)
+        }
+      }
+    }
+
+    if (options?.previewDirection) {
+      const currentFacing = normalizeAngle(activeCameraLon)
+      const targetAngleCandidate = movementAngle ?? targetPhoto.startingAngle ?? activeCameraLon
+      const normalizedTarget = normalizeAngle(targetAngleCandidate)
+      const rotationNeeded = calculateAngularDifference(currentFacing, normalizedTarget)
+
+      issueCameraOrientation(normalizedTarget, 0)
+      movementAngle = normalizedTarget
+
+      if (rotationNeeded > 5) {
+        await delay(options.previewDelayMs ?? 1000)
+      }
+    } else if (movementAngle === undefined) {
+      movementAngle = targetPhoto.startingAngle ?? activeCameraLon
+    }
+
+    setIsLoading(true)
+    isLoadingRef.current = true
+
+    const navigationArrivalAngle =
+      activeCurrentPhoto && resolvedDirection && navigationAnalysis
+        ? calculateNavigationAngle(
+            movementAngle ?? activeCameraLon,
+            activeCurrentPhoto,
+            targetPhoto,
+            resolvedDirection,
+            navigationAnalysis.navigationType
+          )
+        : undefined
+
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => {
+          setCurrentPhotoImage(img)
+          setCurrentPhotoId(photoId)
+
+          const normalizedFinal = resolveArrivalOrientation({
+            navigationAngle: navigationArrivalAngle,
+            postArrivalAngle,
+            movementAngle,
+            fallbackAngle: targetPhoto.startingAngle ?? activeCameraLon
+          })
+
+          setCalculatedCameraAngle(normalizedFinal)
+          issueCameraOrientation(normalizedFinal, 0)
+          isLoadingRef.current = false
+
+          resolve()
+        }
+        img.onerror = () => {
+          setCurrentPhotoImage(null)
+          isLoadingRef.current = false
+          reject(new Error(`Failed to load image: ${targetPhoto.imageUrl}`))
+        }
+        img.src = targetPhoto.imageUrl
+      })
+    } catch (error) {
+      console.error('Failed to load image:', targetPhoto.imageUrl, error)
+    } finally {
+      setIsLoading(false)
+      isLoadingRef.current = false
+      isProcessingRef.current = false
+    }
+  }, [cameraLon, currentPhoto, currentPhotoId, isLoading, issueCameraOrientation])
 
 
   return {
@@ -710,6 +959,7 @@ export function useTourNavigation() {
     isLoading,
     cameraLon,
     cameraLat,
+    cameraCommandId,
     calculatedCameraAngle,
 
     // Navigation functions
