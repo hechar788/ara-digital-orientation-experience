@@ -2,10 +2,12 @@ import React, { useCallback, useEffect } from 'react'
 import { TourControls } from './menu/TourControls'
 import { AIChatPopup } from './chat/AIChatPopup'
 import { TourInformationPopup } from './information/TourInformationPopup'
+import { RouteNavigationStatus } from './navigation/RouteNavigationStatus'
 import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePopup } from '@/hooks/usePopup'
 import { useOnboarding } from '@/hooks/useOnboarding'
-import { useRouteNavigation } from '@/hooks/useRouteNavigation'
+import { useRouteNavigation, type RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
+import type { JumpToPhotoOptions } from '@/hooks/useTourNavigation'
 
 /**
  * Props for the Tour component
@@ -24,7 +26,7 @@ interface TourProps {
   style?: React.CSSProperties
   onStartRace?: () => void
   currentPhotoId: string
-  onNavigateToPhoto?: (photoId: string) => void
+  onNavigateToPhoto?: (photoId: string, options?: JumpToPhotoOptions) => Promise<void> | void
 }
 
 /**
@@ -69,9 +71,16 @@ export const Tour: React.FC<TourProps> = ({
   const { isVisible: isOnboardingVisible, startOnboarding, skipOnboarding } = useOnboarding()
 
   const handleRouteNavigation = useCallback(
-    (photoId: string) => {
+    async (photoId: string, options?: RouteNavigationHandlerOptions) => {
       if (onNavigateToPhoto) {
-        onNavigateToPhoto(photoId)
+        const jumpOptions: JumpToPhotoOptions | undefined = options?.isSequential
+          ? {
+              previewDirection: true,
+              previewDelayMs: 1500,
+              nextPhotoId: options?.nextPhotoId
+            }
+          : undefined
+        await onNavigateToPhoto(photoId, jumpOptions)
       } else {
         console.warn('[Tour] Navigation callback missing while AI attempted to navigate to', photoId)
       }
@@ -97,6 +106,11 @@ export const Tour: React.FC<TourProps> = ({
 
   return (
     <>
+      <RouteNavigationStatus
+        routeNavigation={routeNavigation}
+        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-40 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[20rem] lg:bottom-auto lg:top-4 lg:left-4 lg:-translate-x-0 lg:w-62"
+      />
+
       <TourControls
         className={className}
         style={style}

@@ -315,13 +315,13 @@ const AFFIRMATION_REMINDER = [
 
 const EXAMPLE_CONVERSATIONS = [
   'User: "Where is the library?"',
-  'You: "The Library is southwest from the main entrance. From A Block, follow the corridor and turn left at the atrium. Would you like me to take you there automatically?"',
+  'You: "The Library is southwest from the main entrance. From A Block, follow the corridor and turn left at the atrium.\nWould you like me to take you there?"',
   '',
   'User: "yes please"',
   'You: [Call navigate_to function with photoId: "x-f1-mid-6-library"]',
   '',
   'User: "I can\'t find the cafe."',
-  'You: "The café, Coffee Infusion, is inside X Block on the first floor. Would you like me to take you there automatically?"',
+  'You: "The café, Coffee Infusion, is inside X Block on the first floor.\nWould you like me to take you there?"',
   '',
   'User: "yes please"',
   'You: [Call navigate_to function with photoId: "x-f1-east-4"]',
@@ -330,7 +330,13 @@ const EXAMPLE_CONVERSATIONS = [
   'You: "Hello! I can help you find locations around Ara Institute. What would you like to find?"',
   '',
   'User: "I need the Student Finance office."',
-  'You: "Student Finance is inside X Block near Careers & Employment. From your current location, head toward the western wing. Would you like me to take you there?"'
+  'You: "Student Finance is inside X Block near Careers & Employment. From your current location, head toward the western wing.\nWould you like me to take you there?"',
+  '',
+  'User: "Can you help me with fitness tips?"',
+  'You: "I’m here to help with campus locations and navigation. Ask me about a building, room, or facility you would like to visit."',
+  '',
+  'User: "No thanks"',
+  'You: "No problem! Let me know if you need directions to another location around campus."'
 ].join('\n')
 
 function buildSystemPrompt(currentLocation: string): string {
@@ -353,6 +359,8 @@ function buildSystemPrompt(currentLocation: string): string {
     '- Keep responses focused and free of filler.',
     '- Handle greetings naturally.',
     '- Apologise when a destination is unavailable.',
+    '- Users cannot upload files. Never mention uploads, attachments, or documents under any circumstance.',
+    '- Stay on topic. For requests unrelated to campus navigation, politely redirect the user to ask about locations instead of providing off-topic guidance.',
     '',
     'Example conversations:',
     EXAMPLE_CONVERSATIONS,

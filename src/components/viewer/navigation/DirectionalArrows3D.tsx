@@ -11,7 +11,8 @@
 import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Photo } from '@/types/tour'
-import { DIRECTION_ANGLES } from '@/types/tour'
+import { getDirectionAngle } from '@/hooks/utils/directionUtils'
+import { registerArrowAngle, unregisterArrowAngles } from './arrowRegistry'
 import { useOnboarding } from '@/hooks/useOnboarding'
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 import {
@@ -104,7 +105,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
 
     const { sphere } = sceneRef.current
     const { directions } = currentPhoto
-    const startingAngle = currentPhoto.startingAngle ?? 0
+    const photoId = currentPhoto.id
 
     // Create or get arrows group
     let arrowsGroup = arrowsGroupRef.current
@@ -125,6 +126,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
       }
     })
     arrowsGroup.clear()
+    unregisterArrowAngles(photoId)
     setArrowsReady(false)
 
     // Create arrows for each available horizontal direction
@@ -137,8 +139,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
     const arrowPromises = directionalKeys.map(async (direction) => {
       if (!directions[direction]) return null
 
-      const offset = DIRECTION_ANGLES[direction] ?? 0
-      const angle = (startingAngle + offset) % 360
+      const angle = getDirectionAngle(currentPhoto, direction)
 
       try {
         const arrow = await createDirectionalArrow(direction)
@@ -150,6 +151,8 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
         arrow.userData.direction = direction
         arrow.userData.targetAngle = angle
         arrow.name = `arrow-${direction}`
+
+        registerArrowAngle(photoId, direction, angle)
 
         return arrow
       } catch (error) {
@@ -168,6 +171,7 @@ export const DirectionalArrows3D: React.FC<DirectionalArrows3DProps> = ({
     })
 
     return () => {
+      unregisterArrowAngles(photoId)
       if (arrowsGroupRef.current && sceneRef.current) {
         arrowsGroupRef.current.children.forEach(child => {
           if (child instanceof THREE.Mesh) {

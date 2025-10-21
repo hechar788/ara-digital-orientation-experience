@@ -24,6 +24,7 @@ export const NAVIGATION_SPEEDS: Record<'SLOW' | 'NORMAL' | 'FAST', NavigationSpe
  * Represents the current sequential navigation progress.
  *
  * @property isNavigating - Indicates whether step-by-step navigation is active
+ * @property isPaused - Indicates whether navigation is currently paused awaiting a resume command
  * @property currentStepIndex - Zero-based index for the current hop inside the path array
  * @property totalSteps - Total path length
  * @property currentPhotoId - Photo identifier used for the most recent onNavigate call
@@ -31,6 +32,7 @@ export const NAVIGATION_SPEEDS: Record<'SLOW' | 'NORMAL' | 'FAST', NavigationSpe
  */
 export interface NavigationState {
   isNavigating: boolean
+  isPaused: boolean
   currentStepIndex: number
   totalSteps: number
   currentPhotoId: string | null
@@ -50,14 +52,32 @@ interface InternalState extends NavigationState {
  * @property cancelNavigation - Stops navigation and clears any remaining steps
  * @property setSpeed - Updates the active speed preset
  * @property currentSpeed - Currently selected speed descriptor
+ * @property pauseNavigation - Temporarily pauses navigation without clearing the remaining path
+ * @property resumeNavigation - Resumes navigation from the next pending step
  */
 export interface UseRouteNavigationReturn {
   navigationState: NavigationState
   startNavigation: (path: string[]) => void
-  skipToEnd: () => void
+  skipToEnd: () => Promise<void>
   cancelNavigation: () => void
   setSpeed: (speed: NavigationSpeed) => void
   currentSpeed: NavigationSpeed
+  pauseNavigation: () => void
+  resumeNavigation: () => void
+}
+
+/**
+ * Additional metadata supplied to navigation handlers when sequential navigation advances.
+ *
+ * @property isSequential - Indicates the navigation request originated from the sequential navigator
+ * @property stepIndex - Zero-based index for the step being executed
+ * @property totalSteps - Total number of steps within the active path
+ */
+export interface RouteNavigationHandlerOptions {
+  isSequential?: boolean
+  stepIndex?: number
+  totalSteps?: number
+  nextPhotoId?: string
 }
 
 type TimeoutHandle = ReturnType<typeof setTimeout> | null
@@ -68,7 +88,7 @@ type TimeoutHandle = ReturnType<typeof setTimeout> | null
  * The hook defers execution between steps based on the selected speed preset, exposes
  * progress metadata for the UI, and supports skipping or cancelling navigation entirely.
  *
- * @param onNavigate - Callback invoked for each path step with the destination photo identifier
+ * @param onNavigate - Callback invoked for each path step with the destination photo identifier (supports async handlers)
  * @returns Navigation state and helper actions for controlling sequential routing
  *
  * @example
@@ -78,10 +98,13 @@ type TimeoutHandle = ReturnType<typeof setTimeout> | null
  * startNavigation(result.path)
  * ```
  */
-export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRouteNavigationReturn {
+export function useRouteNavigation(
+  onNavigate: (photoId: string, options?: RouteNavigationHandlerOptions) => Promise<void> | void
+): UseRouteNavigationReturn {
   const [speed, setSpeedValue] = useState<NavigationSpeed>(NAVIGATION_SPEEDS.NORMAL)
   const [state, setState] = useState<InternalState>({
     isNavigating: false,
+    isPaused: false,
     currentStepIndex: -1,
     totalSteps: 0,
     currentPhotoId: null,
@@ -89,6 +112,11 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
     pendingPath: []
   })
   const timeoutRef = useRef<TimeoutHandle>(null)
+  const stateRef = useRef(state)
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   const clearScheduledStep = useCallback(() => {
     if (timeoutRef.current) {
@@ -100,20 +128,29 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
   const navigationState: NavigationState = useMemo(
     () => ({
       isNavigating: state.isNavigating,
+      isPaused: state.isPaused,
       currentStepIndex: state.currentStepIndex,
       totalSteps: state.totalSteps,
       currentPhotoId: state.currentPhotoId,
       path: state.path
     }),
-    [state.currentPhotoId, state.currentStepIndex, state.isNavigating, state.path, state.totalSteps]
+    [
+      state.currentPhotoId,
+      state.currentStepIndex,
+      state.isNavigating,
+      state.isPaused,
+      state.path,
+      state.totalSteps
+    ]
   )
 
   const advanceToNextStep = useCallback(
-    (path: string[], nextIndex: number) => {
+    async (path: string[], nextIndex: number) => {
       if (nextIndex >= path.length) {
         setState(prev => ({
           ...prev,
           isNavigating: false,
+          isPaused: false,
           currentStepIndex: path.length - 1,
           totalSteps: path.length,
           pendingPath: []
@@ -122,19 +159,37 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
       }
 
       const nextPhotoId = path[nextIndex]
-      onNavigate(nextPhotoId)
+      const upcomingPhotoId = nextIndex + 1 < path.length ? path[nextIndex + 1] : undefined
+      await onNavigate(nextPhotoId, {
+        isSequential: true,
+        stepIndex: nextIndex,
+        totalSteps: path.length,
+        nextPhotoId: upcomingPhotoId
+      })
+
+      const latestState = stateRef.current
+      const navigationStillActive = latestState.isNavigating
+      const pausedDuringStep = latestState.isPaused
+      const shouldMaintainPending = navigationStillActive || pausedDuringStep
+
       setState(prev => ({
         ...prev,
-        isNavigating: true,
+        isNavigating: navigationStillActive,
+        isPaused: pausedDuringStep,
         currentStepIndex: nextIndex,
         totalSteps: path.length,
         currentPhotoId: nextPhotoId,
-        pendingPath: path.slice(nextIndex + 1)
+        pendingPath: shouldMaintainPending ? path.slice(nextIndex + 1) : []
       }))
 
       clearScheduledStep()
+
+      if (!navigationStillActive || pausedDuringStep) {
+        return
+      }
+
       timeoutRef.current = setTimeout(() => {
-        advanceToNextStep(path, nextIndex + 1)
+        void advanceToNextStep(path, nextIndex + 1)
       }, speed.delayMs)
     },
     [clearScheduledStep, onNavigate, speed.delayMs]
@@ -149,6 +204,7 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
       clearScheduledStep()
       setState({
         isNavigating: true,
+        isPaused: false,
         currentStepIndex: -1,
         totalSteps: cleanedPath.length,
         currentPhotoId: null,
@@ -156,22 +212,28 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
         pendingPath: cleanedPath
       })
       timeoutRef.current = setTimeout(() => {
-        advanceToNextStep(cleanedPath, 0)
+        void advanceToNextStep(cleanedPath, 0)
       }, 10)
     },
     [advanceToNextStep, clearScheduledStep]
   )
 
-  const skipToEnd = useCallback(() => {
+  const skipToEnd = useCallback(async () => {
     if (!state.isNavigating || state.path.length === 0) {
       return
     }
     clearScheduledStep()
     const destinationId = state.path[state.path.length - 1]
-    onNavigate(destinationId)
+    await onNavigate(destinationId, {
+      isSequential: true,
+      stepIndex: state.path.length - 1,
+      totalSteps: state.path.length,
+      nextPhotoId: undefined
+    })
     setState(prev => ({
       ...prev,
       isNavigating: false,
+      isPaused: false,
       currentStepIndex: prev.path.length - 1,
       currentPhotoId: destinationId,
       pendingPath: []
@@ -186,25 +248,66 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
     setState(prev => ({
       ...prev,
       isNavigating: false,
+      isPaused: false,
       pendingPath: []
     }))
   }, [clearScheduledStep, state.isNavigating])
 
+  const pauseNavigation = useCallback(() => {
+    if (!state.isNavigating || state.isPaused) {
+      return
+    }
+    clearScheduledStep()
+    setState(prev => ({
+      ...prev,
+      isPaused: true
+    }))
+  }, [clearScheduledStep, state.isNavigating, state.isPaused])
+
+  const resumeNavigation = useCallback(() => {
+    const snapshot = stateRef.current
+    if (!snapshot.isNavigating || !snapshot.isPaused || snapshot.pendingPath.length === 0) {
+      return
+    }
+
+    setState(prev => ({
+      ...prev,
+      isPaused: false
+    }))
+
+    clearScheduledStep()
+    const nextIndex = snapshot.currentStepIndex + 1
+    const path = snapshot.path
+
+    timeoutRef.current = setTimeout(() => {
+      const latest = stateRef.current
+      if (!latest.isNavigating || latest.isPaused || latest.pendingPath.length === 0) {
+        return
+      }
+      void advanceToNextStep(path, nextIndex)
+    }, 10)
+  }, [advanceToNextStep, clearScheduledStep])
+
   const setSpeed = useCallback(
     (nextSpeed: NavigationSpeed) => {
       setSpeedValue(nextSpeed)
-      if (!state.isNavigating || state.pendingPath.length === 0) {
+
+      const snapshot = stateRef.current
+      if (!snapshot.isNavigating || snapshot.pendingPath.length === 0 || snapshot.isPaused) {
         return
       }
-      const resumePath = [state.currentPhotoId, ...state.pendingPath].filter(
-        (value): value is string => typeof value === 'string'
-      )
+
       clearScheduledStep()
       timeoutRef.current = setTimeout(() => {
-        advanceToNextStep(resumePath, 1)
+        const latest = stateRef.current
+        if (!latest.isNavigating || latest.isPaused || latest.pendingPath.length === 0) {
+          return
+        }
+        const nextIndex = latest.currentStepIndex + 1
+        void advanceToNextStep(latest.path, nextIndex)
       }, nextSpeed.delayMs)
     },
-    [advanceToNextStep, clearScheduledStep, state.currentPhotoId, state.isNavigating, state.pendingPath]
+    [advanceToNextStep, clearScheduledStep]
   )
 
   useEffect(() => () => clearScheduledStep(), [clearScheduledStep])
@@ -215,6 +318,8 @@ export function useRouteNavigation(onNavigate: (photoId: string) => void): UseRo
     skipToEnd,
     cancelNavigation,
     setSpeed,
-    currentSpeed: speed
+    currentSpeed: speed,
+    pauseNavigation,
+    resumeNavigation
   }
 }

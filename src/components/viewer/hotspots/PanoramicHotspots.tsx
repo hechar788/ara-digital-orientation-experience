@@ -25,6 +25,7 @@ import { HotspotConfirmationDialog } from './HotspotConfirmationDialog'
 import { HiddenLocationFoundPopup } from '../../race/popups/HiddenLocationFoundPopup'
 import { getAreaForPhoto } from '../../../data/blockUtils'
 import { getHiddenLocationsForPhoto } from '@/data/hidden_locations/hiddenLocations'
+import type { JumpToPhotoOptions } from '../../../hooks/useTourNavigation'
 
 /**
  * Props for PanoramicHotspots component
@@ -50,7 +51,7 @@ interface PanoramicHotspotsProps {
   }>
   fov: number
   onNavigate: (direction: string) => void
-  onNavigateToPhoto?: (photoId: string) => void
+  onNavigateToPhoto?: (photoId: string, options?: JumpToPhotoOptions) => Promise<void> | void
   isRaceMode?: boolean
   foundHiddenLocations?: Set<string>
   onHiddenLocationFound?: (id: string, name: string, description: string) => void
@@ -501,7 +502,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     if (!pendingNavigation) return
 
     if (pendingNavigation.destination && onNavigateToPhoto) {
-      onNavigateToPhoto(pendingNavigation.destination)
+      void onNavigateToPhoto(pendingNavigation.destination)
     } else {
       onNavigate(pendingNavigation.direction)
     }

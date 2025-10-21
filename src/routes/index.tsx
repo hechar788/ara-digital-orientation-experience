@@ -30,6 +30,7 @@ function App() {
     currentPhotoId,
     cameraLon,
     cameraLat,
+    cameraCommandId,
     calculatedCameraAngle,
     handleCameraChange
   } = useTourNavigation()
@@ -100,6 +101,8 @@ function App() {
           onNavigate={(direction) => navigateDirection(direction as DirectionType)}
           onNavigateToPhoto={jumpToPhoto}
           cameraLon={cameraLon}
+          cameraLat={cameraLat}
+          cameraCommandId={cameraCommandId}
           initialFov={currentFov}
           onFovChange={setCurrentFov}
           timerClassName="absolute top-4 left-4 z-40"
