@@ -3,7 +3,7 @@ import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
 import type { UseRouteNavigationReturn, RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
-import { formatLocationId } from '@/lib/location-format'
+import { formatLocationId } from './locationFormat'
 
 /**
  * Props for the AIChatPopup component

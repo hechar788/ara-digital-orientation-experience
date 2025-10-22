@@ -2,67 +2,9 @@
 
 import OpenAI, { APIError } from 'openai'
 import type { Response as OpenAIResponse, ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses'
+import { LOCATION_KEYWORD_OVERRIDES, VALID_LOCATION_ID_SET } from './ai.locations'
+import { buildSystemPrompt, NAVIGATION_TOOL, SUMMARISATION_SYSTEM_PROMPT } from './ai.prompts'
 import { findPath, getRouteDescription, validatePath } from './pathfinding'
-
-const LOCATION_IDS = [
-  'a-f1-north-3-side',
-  'a-f2-north-stairs-entrance',
-  'n-f1-east-south-4',
-  'n-f1-west-9',
-  'n-f2-east-4',
-  'n-f2-mid-3',
-  's-f1-mid-3',
-  's-f1-north-4',
-  's-f1-south-2',
-  's-f1-south-entrance',
-  's-f2-mid-3',
-  's-f2-mid-4',
-  's-f2-south-5',
-  's-f2-south-6',
-  's-f2-south-7',
-  's-f4-mid-4',
-  's-f4-north-7',
-  's-f4-north-8',
-  'w-f2-4',
-  'w-f2-5',
-  'w-f2-6',
-  'w-f2-7',
-  'w-gym-overlook-1',
-  'inside-student-lounge',
-  'x-f1-east-4',
-  'x-f1-mid-6-aside',
-  'x-f1-mid-6-library',
-  'x-f1-mid-7',
-  'x-f1-mid-8',
-  'x-f1-west-10',
-  'x-f1-west-11',
-  'x-f2-north-9-aside',
-  'x-f2-west-2',
-  'x-f2-west-3-aside',
-  'x-f2-west-4',
-  'x-f2-west-5-aside',
-  'x-f2-west-6',
-  'x-f3-east-6',
-  'x-f3-east-8',
-  'x-f3-west-1',
-  'x-f3-west-1-aside'
-] as const
-
-const VALID_LOCATION_ID_SET = new Set<string>(LOCATION_IDS)
-
-const LOCATION_KEYWORD_OVERRIDES = [
-  {
-    photoId: 'x-f1-east-4',
-    keywords: ['coffee infusion', 'caf', 'cafe', 'café', 'coffee shop', 'coffee bar', 'coffee barista']
-  },
-  {
-    photoId: 'inside-student-lounge',
-    keywords: ['student lounge', 'student hub', 'student social space', 'student commons', 'student hangout']
-  }
-] as const satisfies Array<{
-  photoId: (typeof LOCATION_IDS)[number]
-  keywords: string[]
-}>
 let cachedClient: OpenAI | null = null
 type GeneratedResponse = OpenAIResponse
 type CreateResponseResult = Awaited<ReturnType<OpenAI['responses']['create']>>
@@ -208,7 +150,7 @@ export interface ChatResponse {
  * @example
  * ```typescript
  * const state: ConversationState = {
- *   summary: 'Goal: Locate the library. Confirmed: navigation requested to x-f1-mid-6-library.',
+ *   summary: 'Goal: Locate the library. Confirmed: navigation requested to library-f1-entrance.',
  *   messages: [{ role: 'user', content: 'Can you take me to the library?' }]
  * }
  * ```
@@ -274,102 +216,6 @@ const SUMMARY_TRIGGER_THRESHOLD = 10
 const SUMMARY_CHARACTER_THRESHOLD = 3500
 const SUMMARY_TAIL_MESSAGE_COUNT = 6
 
-const SUMMARISATION_SYSTEM_PROMPT = [
-  'You compress campus navigation chats into a short memory summary.',
-  'Capture the user’s goals, any confirmed destinations, and unresolved follow-ups.',
-  'Keep the tone neutral and informative so it can be reused as context in future turns.',
-  'Format the result as three concise bullet points prefixed with "Goals", "Confirmed", and "FollowUps".',
-  'If information is unavailable for a bullet, write "None".',
-  'Limit the entire summary to at most 120 words.',
-  'Do not include filler phrases or explanations about the summarisation process.'
-].join('\n')
-
-const NAVIGATION_TOOL = {
-  type: 'function' as const,
-  name: 'navigate_to',
-  description:
-    'Automatically move the campus viewer to a specific location after the user confirms. Confirmations include phrases like "yes", "sure", or "please take me there". Use the photoId from the vector store record that matches the user request.',
-  parameters: {
-    type: 'object',
-    properties: {
-      photoId: {
-        type: 'string',
-        enum: LOCATION_IDS,
-        description: 'Destination campus photo identifier'
-      }
-    },
-    required: ['photoId'],
-    additionalProperties: false
-  },
-  strict: true
-}
-
-const AFFIRMATION_REMINDER = [
-  '- Only call the navigate_to tool when the user confirms they want navigation',
-  '- Use the vector store results to double-check that the destination exists before navigating',
-  '- Do not call navigate_to if the user merely asks for information without confirming',
-  '- When a user explicitly provides a photoId (for example, photoId: "x-f1-east-4"), call navigate_to with that exact identifier as long as it appears in the allowlist',
-  '- When you identify the correct record in the vector store, use that document’s id as the navigate_to photoId. Do not substitute a different allowlisted id',
-  '- Example: For Coffee Infusion, call navigate_to with photoId: "x-f1-east-4" once the user confirms'
-].join('\n')
-
-const EXAMPLE_CONVERSATIONS = [
-  'User: "Where is the library?"',
-  'You: "The Library is southwest from the main entrance. From A Block, follow the corridor and turn left at the atrium.\nWould you like me to take you there?"',
-  '',
-  'User: "yes please"',
-  'You: [Call navigate_to function with photoId: "x-f1-mid-6-library"]',
-  '',
-  'User: "I can\'t find the cafe."',
-  'You: "The café, Coffee Infusion, is inside X Block on the first floor.\nWould you like me to take you there?"',
-  '',
-  'User: "yes please"',
-  'You: [Call navigate_to function with photoId: "x-f1-east-4"]',
-  '',
-  'User: "hi"',
-  'You: "Hello! I can help you find locations around Ara Institute. What would you like to find?"',
-  '',
-  'User: "I need the Student Finance office."',
-  'You: "Student Finance is inside X Block near Careers & Employment. From your current location, head toward the western wing.\nWould you like me to take you there?"',
-  '',
-  'User: "Can you help me with fitness tips?"',
-  'You: "I’m here to help with campus locations and navigation. Ask me about a building, room, or facility you would like to visit."',
-  '',
-  'User: "No thanks"',
-  'You: "No problem! Let me know if you need directions to another location around campus."'
-].join('\n')
-
-function buildSystemPrompt(currentLocation: string): string {
-  return [
-    'You are a helpful campus navigation assistant at Ara Institute of Canterbury.',
-    '',
-    `Current user location: ${currentLocation}`,
-    '',
-    'Knowledge source:',
-    'Use the "locations" vector store via the file_search tool to interpret destinations, synonyms, and building context. If you cannot find a match, apologise and explain that the location is not yet available.',
-    '- When you cite a vector store result, use that document’s `id` as the photoId if the user confirms navigation.',
-    '',
-    'Your role:',
-    '1. Provide concise, friendly directions from the current location.',
-    '2. Ask whether the user would like automatic navigation.',
-    '3. Only when the user confirms with an affirmative phrase, call the navigate_to tool.',
-    '',
-    'Conversation style:',
-    '- Be approachable and clear.',
-    '- Keep responses focused and free of filler.',
-    '- Handle greetings naturally.',
-    '- Apologise when a destination is unavailable.',
-    '- Users cannot upload files. Never mention uploads, attachments, or documents under any circumstance.',
-    '- Stay on topic. For requests unrelated to campus navigation, politely redirect the user to ask about locations instead of providing off-topic guidance.',
-    '',
-    'Example conversations:',
-    EXAMPLE_CONVERSATIONS,
-    '',
-    'Important reminders:',
-    AFFIRMATION_REMINDER
-  ].join('\n')
-}
-
 function parseResponseText(output: GeneratedResponse['output']): string | null {
   const parts: string[] = []
   for (const item of output ?? []) {
@@ -413,6 +259,19 @@ function normaliseMessageInput(messages: ChatMessage[]) {
   }))
 }
 
+function sanitiseAssistantMessage(text: string | null): string | null {
+  if (!text) {
+    return null
+  }
+  const normalised = text.replace(/\r\n/g, '\n')
+  const collapsedQuotes = normalised
+    .replace(/"([^"\n]*?)\s*\n+\s*"/g, (_match, content: string) => `"${content.trim()}"`)
+    .replace(/\s*\n{3,}\s*/g, '\n\n')
+    .trim()
+  const joinedConjunctions = collapsedQuotes.replace(/\b(or)\s*\n+(?=[a-z])/gi, (_, conj: string) => `${conj} `)
+  return joinedConjunctions.replace(/\bor\s+([A-Z])/g, (_match, letter: string) => `or ${letter.toLowerCase()}`)
+}
+
 function findOverrideFromText(text: string | null): string | null {
   if (!text) {
     return null
@@ -427,7 +286,7 @@ function findOverrideFromText(text: string | null): string | null {
 }
 
 function findLatestUserMessage(messages: ChatMessage[]): string | null {
-  for (let index = messages.length - 1; index >= 0; index--) {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index]
     if (message.role === 'user') {
       return message.content
@@ -740,10 +599,9 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
     } satisfies ResponseCreateParamsNonStreaming)
     const response = ensureNonStreamingResponse(rawResponse)
 
-    const message =
-      response.output_text?.trim() ??
-      parseResponseText(response.output) ??
-      null
+    const message = sanitiseAssistantMessage(
+      response.output_text?.trim() ?? parseResponseText(response.output) ?? null
+    )
     const functionCall = parseFunctionCall(response.output)
 
     const adjustedFunctionCall = applyKeywordOverrides(functionCall, message, messages)
@@ -884,9 +742,11 @@ export async function executeChatWithSummaries({
   })
 
   const assistantContent =
-    response.message ??
-    response.functionCall?.arguments.routeDescription ??
-    (response.functionCall ? `Navigation command issued for ${response.functionCall.arguments.photoId}.` : null)
+    sanitiseAssistantMessage(
+      response.message ??
+        response.functionCall?.arguments.routeDescription ??
+        (response.functionCall ? `Navigation command issued for ${response.functionCall.arguments.photoId}.` : null)
+    )
 
   let nextStateMessages = workingMessages
 
