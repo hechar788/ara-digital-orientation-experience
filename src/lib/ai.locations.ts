@@ -1,6 +1,6 @@
 'use server'
 
-import { readFileSync } from 'node:fs'
+import vectorStoreDocument from '../data/locations-vector-store.json'
 
 interface VectorStoreLocation {
   id: string
@@ -11,18 +11,14 @@ interface VectorStoreLocation {
   }
 }
 
-const vectorStoreFileUrl = new URL('../data/locations-vector-store.json', import.meta.url)
-
-function loadVectorStoreLocations(): VectorStoreLocation[] {
-  const rawContents = readFileSync(vectorStoreFileUrl, 'utf-8')
-  const parsed = JSON.parse(rawContents) as unknown
-  if (!Array.isArray(parsed)) {
+function loadVectorStoreLocations(document: unknown): VectorStoreLocation[] {
+  if (!Array.isArray(document)) {
     throw new Error('locations-vector-store.json is malformed. Expected an array of locations.')
   }
-  return parsed as VectorStoreLocation[]
+  return document as VectorStoreLocation[]
 }
 
-const vectorStoreLocations = loadVectorStoreLocations()
+const vectorStoreLocations = loadVectorStoreLocations(vectorStoreDocument)
 
 function extractTokens(label: string): string[] {
   return label
