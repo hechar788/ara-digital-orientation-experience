@@ -11,7 +11,7 @@ interface VectorStoreLocation {
   }
 }
 
-const vectorStoreFileUrl = new URL('../../documentation/ai-implementation-openai/locations-vector-store.json', import.meta.url)
+const vectorStoreFileUrl = new URL('../data/locations-vector-store.json', import.meta.url)
 
 function loadVectorStoreLocations(): VectorStoreLocation[] {
   const rawContents = readFileSync(vectorStoreFileUrl, 'utf-8')
