@@ -436,6 +436,60 @@ interface NavigationAnalysis {
   preserveOrientation: boolean
 }
 
+interface DoorOrientationOverride {
+  matches(current: Photo, destination: Photo): boolean
+  headingSource?: 'destination' | 'origin'
+  offsetDegrees?: number
+  absoluteAngle?: number
+}
+
+const DOOR_ORIENTATION_OVERRIDES: DoorOrientationOverride[] = [
+  {
+    matches: (current, destination) =>
+      current.id === 'n-f1-sandys-office' && destination.id === 'n-f1-west-9',
+    headingSource: 'destination',
+    offsetDegrees: -90
+  },
+  {
+    matches: (current, destination) =>
+      destination.id === 'n-f1-mid-7' && current.id === 'outside-n-north-entrance',
+    headingSource: 'destination',
+    offsetDegrees: -100
+  },
+  {
+    matches: (current, destination) =>
+      destination.id === 'n-f1-mid-7' && current.id === 'outside-s-north-entrance',
+    headingSource: 'destination',
+    offsetDegrees: -100
+  },
+  {
+    matches: (current, destination) =>
+      destination.id === 'n-f1-mid-7' && current.id === 'outside-s-north-1',
+    headingSource: 'destination',
+    offsetDegrees: -100
+  },
+  {
+    matches: (current, destination) =>
+      destination.id === 'library-f1-entrance' &&
+      (current.id === 'x-f1-mid-6' || current.id === 'x-f1-mid-6-library'),
+    headingSource: 'destination',
+    offsetDegrees: 90
+  },
+  {
+    matches: (current, destination) =>
+      (current.id === 'library-f1-entrance' || current.id === 'library-f1-1') &&
+      (destination.id === 'x-f1-mid-6' || destination.id === 'x-f1-mid-6-library'),
+    headingSource: 'destination',
+    offsetDegrees: 115,
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-x-north-entrance' && destination.id === 'x-f1-west-12',
+    headingSource: 'destination',
+    offsetDegrees: -80
+  }
+]
+
 /**
  * Analyzes navigation context to determine orientation handling approach
  *
@@ -544,6 +598,42 @@ function calculateNavigationAngle(
   const isForwardMovement = direction === 'forward' || direction === 'forwardLeft' || direction === 'forwardRight'
   const isBackMovement = direction === 'back' || direction === 'backLeft' || direction === 'backRight'
   const isPureTurn = direction === 'left' || direction === 'right'
+
+  if (direction === 'door') {
+    const destinationHeading =
+      getHotspotHeading(destinationPhoto, 'door', currentPhoto.id) ??
+      getHotspotHeading(destinationPhoto, 'door')
+    const originHeading =
+      getHotspotHeading(currentPhoto, 'door', destinationPhoto.id) ??
+      getHotspotHeading(currentPhoto, 'door')
+    const override = DOOR_ORIENTATION_OVERRIDES.find(entry => entry.matches(currentPhoto, destinationPhoto))
+
+    if (override) {
+      if (typeof override.absoluteAngle === 'number') {
+        return normalizeAngle(override.absoluteAngle)
+      }
+
+      const preferredHeading =
+        override.headingSource === 'origin'
+          ? originHeading
+          : override.headingSource === 'destination'
+            ? destinationHeading
+            : destinationHeading ?? originHeading
+      const offset = override.offsetDegrees ?? 0
+
+      if (typeof preferredHeading === 'number') {
+        return normalizeAngle(preferredHeading + offset)
+      }
+    }
+
+    if (typeof destinationHeading === 'number') {
+      return normalizeAngle(destinationHeading + 180)
+    }
+
+    if (typeof originHeading === 'number') {
+      return normalizeAngle(originHeading + 180)
+    }
+  }
 
   // Determine effective movement type based on user's actual orientation
   let effectiveMovementType: 'forward' | 'backward' | null = null
