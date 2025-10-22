@@ -34,7 +34,7 @@ export interface UsePopupReturn {
  * const info = usePopup(true) // starts open
  *
  * <button onClick={aiChat.open}>Open Chat</button>
- * <AIChatPopup isOpen={aiChat.isOpen} onClose={aiChat.close} currentPhotoId="x-f1-mid-6-library" />
+ * <AIChatPopup isOpen={aiChat.isOpen} onClose={aiChat.close} currentPhotoId="library-f1-entrance" />
  * ```
  */
 export const usePopup = (initialState = false): UsePopupReturn => {

@@ -150,7 +150,7 @@ export interface ChatMessage {
  * ```typescript
  * const call: FunctionCall = {
  *   name: 'navigate_to',
- *   arguments: { photoId: 'x-f1-mid-6-library' }
+ *   arguments: { photoId: 'library-f1-entrance' }
  * }
  * ```
  */
@@ -232,7 +232,7 @@ const LOCATION_IDS = [
   'inside-student-lounge',
   'x-f1-east-4',
   'x-f1-mid-6-aside',
-  'x-f1-mid-6-library',
+ 'library-f1-entrance',
   'x-f1-mid-7',
   'x-f1-mid-8',
   'x-f1-west-10',
@@ -353,7 +353,7 @@ const EXAMPLE_CONVERSATIONS = [
   'You: "The Library is southwest from the main entrance. From A Block, follow the corridor and turn left at the atrium. Would you like me to take you there automatically?"',
   '',
   'User: "yes please"',
-  'You: [Call navigate_to function with photoId: "x-f1-mid-6-library"]',
+ 'You: [Call navigate_to function with photoId: "library-f1-entrance"]',
   '',
   'User: "I can't find the cafe."',
   'You: "The café, Coffee Infusion, is inside X Block on the first floor. Would you like me to take you there automatically?"',

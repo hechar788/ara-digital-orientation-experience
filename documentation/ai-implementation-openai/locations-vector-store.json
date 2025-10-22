@@ -404,7 +404,7 @@
     "id": "w-gym-overlook-1",
     "metadata": {
       "areaId": "w-block-gym-floor-2",
-      "areaName": "The Recreation Centre",
+      "areaName": "The Zone",
       "buildingBlock": "w",
       "floorLevel": 2,
       "roomNumbers": [
@@ -415,15 +415,45 @@
       ],
       "synonyms": [
         "the zone",
-        "recreation centre",
-        "campus gym",
-        "fitness zone",
-        "student fitness",
-        "exercise space",
-        "gym lounge"
+        "sports science and wellness centre",
+        "wellness centre",
+        "sports science clinic",
+        "health and wellbeing centre",
+        "performance centre",
+        "zone overlook",
+        "gym mezzanine",
+        "fitness lounge",
+        "viewing deck",
+        "sports viewing area"
       ]
     },
-    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. It sits in The Recreation Centre (building W), floor 2."
+    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. The Zone is a Sports Science and Wellness Centre offering body scans, nutrition clinics, and fitness testing in a purpose-built facility at Ara’s W Block on the 2nd floor."
+  },
+  {
+    "id": "w-gym-entry",
+    "metadata": {
+      "areaId": "w-block-gym-floor-1",
+      "areaName": "W Block Gym Entrance",
+      "buildingBlock": "w",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "W200 - Gym Entrance"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "gym",
+        "campus gym",
+        "city campus recreation centre",
+        "sport and recreation centre",
+        "recreation centre",
+        "sports hall",
+        "student gym",
+        "gym entrance"
+      ]
+    },
+    "text": "The main gymnasium entry is visible from photo w-gym-entry. The City Campus Sport and Recreation Centre offers a gym, social sports such as badminton, basketball, volleyball, netball, futsal, indoor touch, and kiorahi, plus free group fitness classes—including yoga, tai chi, Zumba, boxing, and HIIT—so students can stay active or unwind with friends in W Block on floor 1."
   },
   {
     "id": "inside-student-lounge",
@@ -495,17 +525,17 @@
         "security station"
       ]
     },
-    "text": "Security Services is visible from photo x-f1-mid-6-aside. It sits in X Block (building X), floor 1."
+    "text": "Security Services is visible from photo x-f1-mid-6-aside. It sits in X Block (building X), floor 1. This frontline team issues and renews student ID cards, programmes building access, and provides on-campus safety support. For immediate assistance or if you feel unsafe, call Ara Security on 027 540 8076 for the Madras and Woolston campuses. If you are distressed or unsure what to do next, Security Services can connect you with the right people and guide you through your options."
   },
   {
-    "id": "x-f1-mid-6-library",
+    "id": "library-f1-entrance",
     "metadata": {
-      "areaId": "x-block-floor-1-main",
-      "areaName": "X Block",
-      "buildingBlock": "x",
+      "areaId": "library-floor-1-main",
+      "areaName": "Library",
+      "buildingBlock": "library",
       "floorLevel": 1,
       "roomNumbers": [
-        "The Library"
+        "The Library Entrance"
       ],
       "roomTypes": [
         "facility"
@@ -516,10 +546,37 @@
         "campus library",
         "books",
         "study library",
-        "learning commons"
+        "learning commons",
+        "library entrance",
+        "library foyer"
       ]
     },
-    "text": "The Library is visible from photo x-f1-mid-6-library. It sits in X Block (building X), floor 1."
+    "text": "The Library entrance is visible from photo library-f1-entrance. It sits in the Library building, floor 1."
+  },
+  {
+    "id": "library-f1-5",
+    "metadata": {
+      "areaId": "library-floor-1-main",
+      "areaName": "Library",
+      "buildingBlock": "library",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Learning Services"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "learning services",
+        "studysmart",
+        "learning advisors",
+        "academic workshops",
+        "quick questions hub",
+        "pass study group",
+        "learning support centre"
+      ]
+    },
+    "text": "Learning Services is visible from photo library-f1-5. It sits in the Library building, floor 1. The advisors coach students to manage their study independently, strengthening academic writing and maths skills through one-on-one guidance and tutor referrals. StudySmart on MyAra, along with on-campus print resources, offers self-paced study tools, while regular workshops, Quick Question sessions, and PASS peer-assisted study groups provide collaborative learning opportunities. Timetables for these sessions are available at the City campus Library or via the Explore MyAra tile in MyAra. The team shares strategies for last-minute revision, exam preparation, and stress management, and maintains Māori and Pacific learning spaces staffed by specialist advisors—open seven days a week from 7am until midnight. Communications about these services are delivered as calm, plain sentences without extra emphasis to keep the tone consistent and accessible."
   },
   {
     "id": "x-f1-mid-7",
@@ -553,8 +610,7 @@
       "buildingBlock": "x",
       "floorLevel": 1,
       "roomNumbers": [
-        "L103 - Student Support",
-        "The Hub"
+        "L103 - Student Support"
       ],
       "roomTypes": [
         "facility"
@@ -562,14 +618,12 @@
       "synonyms": [
         "student support",
         "support services",
-        "student hub",
-        "the hub",
         "student help centre",
         "student wellbeing",
         "tautoko space"
       ]
     },
-    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. Other rooms in view: The Hub."
+    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. This team delivers holistic assistance with academic planning, policy navigation, and advocacy when issues arise with courses, tutors, or institutional processes. Advisors provide practical help for life concerns—housing, finances, and Government agency interactions such as StudyLink or Work and Income NZ—alongside referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources. Specialist staff offer culturally grounded guidance for Māori and Pacific learners, international student advice, disability services, and assessment accommodations. Other rooms in view: The Hub."
   },
   {
     "id": "x-f1-west-10",
