@@ -56,8 +56,16 @@ export const outsideArea: Area = {
       directions: {
         left: { connection: 'outside-x-north-2' },
         forwardRight: { connection: 'outside-g-mid-4' },
-        back: { connection: 'outside-x-north-entrance' }
-      }
+        back: { connection: 'outside-x-north-entrance' },
+        door: 'x-f1-west-12'
+      },
+      hotspots: [
+        {
+          direction: 'door',
+          position: { x: -1.85, y: 0, z: 9 },
+          destination: 'x-f1-west-12'
+        }
+      ]
     },
     {
       id: 'outside-x-north-2',
