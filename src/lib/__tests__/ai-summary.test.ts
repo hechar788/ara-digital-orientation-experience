@@ -196,4 +196,24 @@ describe('executeChatWithSummaries', () => {
     })
     expect(result.state.messages).toHaveLength(7)
   })
+
+  it('strips markdown bold markers from assistant messages stored in state', async () => {
+    executeChatSpy.mockResolvedValueOnce({
+      message: 'The cafe offers **coffee**, **snacks**, and comfortable seating.',
+      functionCall: null
+    })
+
+    const result = await aiModule.executeChatWithSummaries({
+      state: { summary: null, messages: [] },
+      nextMessage: { role: 'user', content: 'Tell me about the cafe' },
+      currentLocation: 'a-f1-north-entrance'
+    })
+
+    const latestMessage = result.state.messages[result.state.messages.length - 1]
+    expect(latestMessage).toEqual({
+      role: 'assistant',
+      content: 'The cafe offers coffee, snacks, and comfortable seating.'
+    })
+    expect(result.response.message).toBe('The cafe offers coffee, snacks, and comfortable seating.')
+  })
 })

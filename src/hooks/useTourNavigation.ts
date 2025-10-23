@@ -487,6 +487,18 @@ const DOOR_ORIENTATION_OVERRIDES: DoorOrientationOverride[] = [
       current.id === 'outside-x-north-entrance' && destination.id === 'x-f1-west-12',
     headingSource: 'destination',
     offsetDegrees: -80
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-north-entry' && destination.id === 'x-f2-west-1',
+    headingSource: 'destination',
+    offsetDegrees: -100
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-west-1' && destination.id === 'x-f2-north-entry',
+    headingSource: 'destination',
+    offsetDegrees: -100
   }
 ]
 
