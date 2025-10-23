@@ -436,69 +436,89 @@ interface NavigationAnalysis {
   preserveOrientation: boolean
 }
 
-interface DoorOrientationOverride {
+interface OrientationOverride {
   matches(current: Photo, destination: Photo): boolean
-  headingSource?: 'destination' | 'origin'
   offsetDegrees?: number
   absoluteAngle?: number
 }
 
-const DOOR_ORIENTATION_OVERRIDES: DoorOrientationOverride[] = [
+const ORIENTATION_OVERRIDES: OrientationOverride[] = [
   {
     matches: (current, destination) =>
       current.id === 'n-f1-sandys-office' && destination.id === 'n-f1-west-9',
-    headingSource: 'destination',
     offsetDegrees: -90
   },
   {
     matches: (current, destination) =>
       destination.id === 'n-f1-mid-7' && current.id === 'outside-n-north-entrance',
-    headingSource: 'destination',
     offsetDegrees: -100
   },
   {
     matches: (current, destination) =>
       destination.id === 'n-f1-mid-7' && current.id === 'outside-s-north-entrance',
-    headingSource: 'destination',
     offsetDegrees: -100
   },
   {
     matches: (current, destination) =>
       destination.id === 'n-f1-mid-7' && current.id === 'outside-s-north-1',
-    headingSource: 'destination',
     offsetDegrees: -100
   },
   {
     matches: (current, destination) =>
       destination.id === 'library-f1-entrance' &&
       (current.id === 'x-f1-mid-6' || current.id === 'x-f1-mid-6-library'),
-    headingSource: 'destination',
     offsetDegrees: 90
   },
   {
     matches: (current, destination) =>
       (current.id === 'library-f1-entrance' || current.id === 'library-f1-1') &&
       (destination.id === 'x-f1-mid-6' || destination.id === 'x-f1-mid-6-library'),
-    headingSource: 'destination',
     offsetDegrees: 115,
   },
   {
     matches: (current, destination) =>
       current.id === 'outside-x-north-entrance' && destination.id === 'x-f1-west-12',
-    headingSource: 'destination',
     offsetDegrees: -80
   },
   {
     matches: (current, destination) =>
       current.id === 'x-f2-north-entry' && destination.id === 'x-f2-west-1',
-    headingSource: 'destination',
     offsetDegrees: -100
   },
   {
     matches: (current, destination) =>
       current.id === 'x-f2-west-1' && destination.id === 'x-f2-north-entry',
-    headingSource: 'destination',
     offsetDegrees: -100
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-north-entry' && destination.id === 'x-f3-west-entry',
+    offsetDegrees: -180
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-g-mid-5' && destination.id === 'outside-g-mid-4',
+    offsetDegrees: 35
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-n-north-1-aside' && destination.id === 'outside-n-north-1',
+    offsetDegrees: 160
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-s-north-1-aside-1' && destination.id === 'outside-s-north-1-aside-2',
+    offsetDegrees: 0
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-g-mid-4' && destination.id === 'outside-x-north-1',
+    offsetDegrees: 140
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-x-north-1' && destination.id === 'outside-x-north-2',
+    offsetDegrees: 90
   }
 ]
 
@@ -611,6 +631,35 @@ function calculateNavigationAngle(
   const isBackMovement = direction === 'back' || direction === 'backLeft' || direction === 'backRight'
   const isPureTurn = direction === 'left' || direction === 'right'
 
+  // Check for orientation overrides first (applies to all directions)
+  const override = ORIENTATION_OVERRIDES.find(entry => entry.matches(currentPhoto, destinationPhoto))
+  if (override) {
+    if (typeof override.absoluteAngle === 'number') {
+      return normalizeAngle(override.absoluteAngle)
+    }
+
+    // For door directions, use hotspot headings
+    if (direction === 'door') {
+      const destinationHeading =
+        getHotspotHeading(destinationPhoto, 'door', currentPhoto.id) ??
+        getHotspotHeading(destinationPhoto, 'door')
+      const offset = override.offsetDegrees ?? 0
+
+      if (typeof destinationHeading === 'number') {
+        return normalizeAngle(destinationHeading + offset)
+      }
+    } else {
+      // For non-door directions, use destination photo's direction angle
+      const destinationAngle = computeDirectionAngle(destinationPhoto, direction)
+      const offset = override.offsetDegrees ?? 0
+
+      if (typeof destinationAngle === 'number') {
+        return normalizeAngle(destinationAngle + offset)
+      }
+    }
+  }
+
+  // Handle door-specific logic when no override matches
   if (direction === 'door') {
     const destinationHeading =
       getHotspotHeading(destinationPhoto, 'door', currentPhoto.id) ??
@@ -618,25 +667,6 @@ function calculateNavigationAngle(
     const originHeading =
       getHotspotHeading(currentPhoto, 'door', destinationPhoto.id) ??
       getHotspotHeading(currentPhoto, 'door')
-    const override = DOOR_ORIENTATION_OVERRIDES.find(entry => entry.matches(currentPhoto, destinationPhoto))
-
-    if (override) {
-      if (typeof override.absoluteAngle === 'number') {
-        return normalizeAngle(override.absoluteAngle)
-      }
-
-      const preferredHeading =
-        override.headingSource === 'origin'
-          ? originHeading
-          : override.headingSource === 'destination'
-            ? destinationHeading
-            : destinationHeading ?? originHeading
-      const offset = override.offsetDegrees ?? 0
-
-      if (typeof preferredHeading === 'number') {
-        return normalizeAngle(preferredHeading + offset)
-      }
-    }
 
     if (typeof destinationHeading === 'number') {
       return normalizeAngle(destinationHeading + 180)

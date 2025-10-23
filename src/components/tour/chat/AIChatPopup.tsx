@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react'
+import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
@@ -55,7 +55,7 @@ function generateMessageId() {
 function sanitizeAssistantMessage(content: string): string {
   const uploadPattern = /\b(upload|uploaded|uploading|file|files|attachment|attachments)\b/i
   if (uploadPattern.test(content)) {
-    return 'I’m here to help with campus locations and navigation. Let me know which building, room, or facility you would like to find.'
+    return 'I\'m here to help with campus locations and navigation. Let me know which building, room, or facility you would like to find.'
   }
   return content
 }
@@ -99,9 +99,130 @@ function formatAssistantMessageContent(content: string): string {
   if (sanitized.length === 0) {
     return sanitized
   }
-  const confirmationPattern = /\s*Would you like me to take you there(?: automatically)?\??/i
-  const formatted = sanitized.replace(confirmationPattern, '\n\nWould you like me to take you there?')
-  return ensureQuestionSpacing(formatted)
+  
+  // Simply ensure proper spacing before the final question
+  return ensureQuestionSpacing(sanitized)
+}
+
+/**
+ * Parses message content and returns formatted JSX with bold location headers and bullet points for lists
+ *
+ * Identifies lines that appear to be location/facility names (followed by
+ * description text) and wraps them in strong tags for emphasis. Also detects
+ * list items separated by blank lines and formats them as bullet points.
+ *
+ * @param content - Raw message text from the assistant
+ * @param isUser - Whether this is a user message (skips formatting for user messages)
+ * @returns React nodes with formatted content
+ */
+function formatMessageWithHeaders(content: string, isUser: boolean): React.ReactNode {
+  if (isUser) {
+    return content
+  }
+
+  const lines = content.split('\n')
+  const elements: React.ReactNode[] = []
+  let i = 0
+  
+  while (i < lines.length) {
+    const line = lines[i]
+    const trimmedLine = line.trim()
+    const nextLine = i < lines.length - 1 ? lines[i + 1] : null
+    const nextTrimmed = nextLine ? nextLine.trim() : null
+    
+    // Check if this line ends with a colon (potential list introduction)
+    if (trimmedLine.endsWith(':')) {
+      // Look ahead to see if we have a list pattern
+      // List pattern: multiple lines ending with periods, separated by blank lines
+      let tempIndex = i + 1
+      const potentialListItems: string[] = []
+      
+      while (tempIndex < lines.length) {
+        const checkLine = lines[tempIndex].trim()
+        
+        if (checkLine.length === 0) {
+          // Empty line, skip
+          tempIndex++
+          continue
+        }
+        
+        if (checkLine.endsWith('.') && /^[A-Z]/.test(checkLine)) {
+          // Potential list item
+          potentialListItems.push(checkLine)
+          tempIndex++
+          
+          // Skip any following empty lines
+          while (tempIndex < lines.length && lines[tempIndex].trim().length === 0) {
+            tempIndex++
+          }
+        } else {
+          // Not a list item pattern, stop looking
+          break
+        }
+      }
+      
+      // If we found multiple items that look like list items, treat as a list
+      if (potentialListItems.length >= 2) {
+        // Render the intro line
+        elements.push(
+          <React.Fragment key={`text-${i}`}>
+            {line}
+            <br />
+          </React.Fragment>
+        )
+        
+        // Render the list
+        elements.push(
+          <ul key={`list-${i}`} className="list-disc list-outside space-y-1.5 my-2 ml-5">
+            {potentialListItems.map((item, idx) => (
+              <li key={`item-${i}-${idx}`}>{item}</li>
+            ))}
+          </ul>
+        )
+        
+        // Add spacing after the list
+        elements.push(<br key={`br-list-${i}`} />)
+        
+        // Skip past the list items we just rendered
+        i = tempIndex
+        continue
+      }
+    }
+    
+    // Check if this line looks like a header:
+    // - Not empty
+    // - Starts with a capital letter
+    // - Doesn't end with sentence-ending punctuation
+    // - Next line exists and looks like a description
+    const isHeader = 
+      trimmedLine.length > 0 &&
+      /^[A-Z]/.test(trimmedLine) &&
+      !/[.!?]$/.test(trimmedLine) &&
+      nextTrimmed &&
+      nextTrimmed.length > 0 &&
+      /^(A |An |The |[A-Z])/.test(nextTrimmed) &&
+      nextTrimmed.endsWith('.')
+    
+    if (isHeader) {
+      elements.push(
+        <strong key={`header-${i}`} className="underline">{line}</strong>,
+        <br key={`br-${i}`} />
+      )
+    } else if (trimmedLine.length === 0) {
+      elements.push(<br key={`br-${i}`} />)
+    } else {
+      elements.push(
+        <React.Fragment key={`text-${i}`}>
+          {line}
+          {i < lines.length - 1 && <br />}
+        </React.Fragment>
+      )
+    }
+    
+    i++
+  }
+  
+  return elements
 }
 
 const AFFIRMATIVE_RESPONSES = ['Sure thing!', 'Okay!', 'Here we go!', 'You got it!'] as const
@@ -144,6 +265,34 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
+  const adjustTextareaHeight = useCallback((element?: HTMLTextAreaElement | null) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const target = element ?? textareaRef.current
+    if (!target) {
+      return
+    }
+
+    const styles = window.getComputedStyle(target)
+    const fontSize = Number.parseFloat(styles.fontSize) || 0
+    const rawLineHeight = Number.parseFloat(styles.lineHeight)
+    const fallbackLineHeight = fontSize > 0 ? fontSize * 1.2 : 16
+    const lineHeight = Number.isFinite(rawLineHeight) && rawLineHeight > 0 ? rawLineHeight : fallbackLineHeight
+    const paddingTop = Number.parseFloat(styles.paddingTop) || 0
+    const paddingBottom = Number.parseFloat(styles.paddingBottom) || 0
+    const singleLineHeight = lineHeight + paddingTop + paddingBottom
+    const doubleLineHeight = lineHeight * 2 + paddingTop + paddingBottom
+
+    target.style.height = 'auto'
+    target.style.minHeight = `${singleLineHeight}px`
+    target.style.maxHeight = `${doubleLineHeight}px`
+    const constrainedHeight = Math.min(Math.max(target.scrollHeight, singleLineHeight), doubleLineHeight)
+    target.style.height = `${constrainedHeight}px`
+    target.style.overflowY = target.scrollHeight > doubleLineHeight ? 'auto' : 'hidden'
+  }, [])
+
   const scheduleClose = useCallback(
     (action?: () => void) => {
       if (closeTimeoutRef.current) {
@@ -176,7 +325,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           id: generateMessageId(),
           role: 'assistant',
           content:
-            'Kia ora!\n\nI can help you find facilities across campus and share details about the services they provide.\n\nAsk me where you would like to go next.',
+            'Kia ora!\n\nI can help you find facilities across campus and share details about the services they provide.',
           timestamp: new Date()
         }
       ])
@@ -198,6 +347,20 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       closeTimeoutRef.current = null
     }
   }, [isOpen])
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    adjustTextareaHeight()
+  }, [isOpen, adjustTextareaHeight])
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    adjustTextareaHeight()
+  }, [input, isOpen, adjustTextareaHeight])
 
   const appendAssistantMessage = (
     content: string,
@@ -264,7 +427,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
         result.response.message ??
         (result.response.functionCall
           ? `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
-          : 'I’m here if you need directions around campus!')
+          : 'I\'m here if you need directions around campus!')
 
       let navigationData: ChatMessageDisplay['navigationData'] | undefined
       let navigationAction: (() => void) | undefined
@@ -275,6 +438,15 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
 
         const pathArray = Array.isArray(path) ? path : []
         const hasRoute = pathArray.length > 0
+
+        console.info('[AI Chat Popup] Navigation payload', {
+          destination: photoId,
+          pathLength: pathArray.length,
+          distance,
+          routeDescription,
+          error,
+          path: pathArray
+        })
 
         navigationData = {
           photoId,
@@ -374,7 +546,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
                         : 'bg-gray-100 text-gray-900'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <div>{formatMessageWithHeaders(message.content, isUser)}</div>
 
                     {navigationData && (
                       <div
@@ -450,14 +622,10 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
                 placeholder="Ask me about campus locations…"
                 onChange={event => setInput(event.target.value)}
                 onKeyDown={handleTextareaKeyDown}
-                className="h-full max-h-32 min-h-[38px] w-full resize-none rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-gray-100"
+                className="w-full resize-none overflow-y-auto rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-gray-100"
                 disabled={isLoading}
                 maxLength={500}
-                onInput={event => {
-                  const target = event.currentTarget
-                  target.style.height = 'auto'
-                  target.style.height = `${Math.min(target.scrollHeight, 128)}px`
-                }}
+                onInput={event => adjustTextareaHeight(event.currentTarget)}
               />
               <button
                 type="submit"

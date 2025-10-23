@@ -30,6 +30,11 @@ function extractTokens(label: string): string[] {
 
 const locationTokenCandidates = new Map<string, Set<string>>()
 const tokenOwnership = new Map<string, Set<string>>()
+const roomNumberOwnership = new Map<string, Set<string>>()
+
+function normaliseRoomLabel(label: string): string {
+  return label.toLowerCase().replace(/[\s-]+/g, '')
+}
 
 for (const location of vectorStoreLocations) {
   const tokens = new Set<string>()
@@ -46,6 +51,20 @@ for (const location of vectorStoreLocations) {
   }
 
   locationTokenCandidates.set(location.id, tokens)
+
+  if (location.metadata?.roomNumbers) {
+    for (const roomLabel of location.metadata.roomNumbers) {
+      const normalisedRoom = normaliseRoomLabel(roomLabel)
+      if (!normalisedRoom) {
+        continue
+      }
+
+      if (!roomNumberOwnership.has(normalisedRoom)) {
+        roomNumberOwnership.set(normalisedRoom, new Set<string>())
+      }
+      roomNumberOwnership.get(normalisedRoom)!.add(location.id)
+    }
+  }
 
   for (const token of tokens) {
     if (!tokenOwnership.has(token)) {
@@ -75,7 +94,8 @@ export const LOCATION_IDS = vectorStoreLocations.map(location => location.id) as
  * Set-based lookup generated from `LOCATION_IDS` for quick validation
  *
  * Used to ensure AI function calls reference destinations that exist in the
- * vector store and, by extension, inside the campus viewer.
+ * vector store and, by extension, inside the campus viewer. Includes virtual
+ * location IDs that map to real photo locations.
  *
  * @returns Set of location identifiers compatible with pathfinding
  *
@@ -85,7 +105,12 @@ export const LOCATION_IDS = vectorStoreLocations.map(location => location.id) as
  * const isValid = VALID_LOCATION_ID_SET.has('x-f1-east-4')
  * ```
  */
-export const VALID_LOCATION_ID_SET = new Set<string>(LOCATION_IDS)
+export const VALID_LOCATION_ID_SET = new Set<string>([
+  ...LOCATION_IDS,
+  // Virtual location IDs that map to real photo locations
+  'outside-s-east-5-visions',
+  'outside-s-east-5-pantry'
+])
 
 /**
  * Describes keyword overrides sourced from vector store synonyms
@@ -156,3 +181,112 @@ export const LOCATION_KEYWORD_OVERRIDES: ReadonlyArray<LocationKeywordOverride> 
     }
   })
   .filter(entry => entry.keywords.length > 0)
+
+const ROOM_NUMBER_LOOKUP = Array.from(roomNumberOwnership.entries()).reduce<Map<string, string>>(
+  (accumulator, [roomLabel, owners]) => {
+    if (owners.size === 1) {
+      const [photoId] = owners
+      accumulator.set(roomLabel, photoId)
+    }
+    return accumulator
+  },
+  new Map<string, string>()
+)
+
+function scoreKeyword(keyword: string): number {
+  const compactLength = keyword.replace(/\s+/g, '').length
+  if (compactLength === 0) {
+    return 0
+  }
+  const digitBonus = /\d/.test(keyword) ? 100 : 0
+  const alphanumericBonus = /^[a-z0-9]+$/i.test(keyword) ? 10 : 0
+  return compactLength + digitBonus + alphanumericBonus
+}
+
+/**
+ * Locates the most specific vector store entry that matches the supplied text
+ *
+ * Iterates through all generated keyword overrides, computes a relevance score
+ * for each match, and returns the photo identifier with the highest ranking.
+ * Keywords containing room numbers or other alphanumeric identifiers are given
+ * additional weight so precise intents outrank broad area names like "S Block."
+ *
+ * @param text - Free-form user input or assistant message to analyse
+ * @returns Matched vector store photo identifier or `null` if no keyword applies
+ *
+ * @example
+ * ```typescript
+ * import { matchLocationByKeywords } from './ai.locations'
+ * const destination = matchLocationByKeywords('Take me to S453 please')
+ * // destination === 's-f4-north-7'
+ * ```
+ */
+export function matchLocationByKeywords(text: string | null | undefined): string | null {
+  if (!text) {
+    return null
+  }
+
+  const normalised = text.toLowerCase()
+  const condensed = normalised.replace(/[\s-_]+/g, '')
+  let bestMatch: { photoId: string; score: number; length: number } | null = null
+  const directRoomMatches = new Set<string>()
+  const roomPattern = /([a-z])\s*-?\s*(\d{3,4})/gi
+  let roomMatch: RegExpExecArray | null
+
+  while ((roomMatch = roomPattern.exec(normalised)) !== null) {
+    const roomIdentifier = `${roomMatch[1]}${roomMatch[2]}`.toLowerCase()
+    if (directRoomMatches.has(roomIdentifier)) {
+      continue
+    }
+    directRoomMatches.add(roomIdentifier)
+
+    const destination = ROOM_NUMBER_LOOKUP.get(roomIdentifier)
+    if (!destination) {
+      continue
+    }
+
+    const roomScore = 1000 + roomMatch[2].length
+    if (!bestMatch || roomScore > bestMatch.score) {
+      bestMatch = {
+        photoId: destination,
+        score: roomScore,
+        length: roomMatch[2].length
+      }
+    }
+  }
+
+  for (const mapping of LOCATION_KEYWORD_OVERRIDES) {
+    for (const keyword of mapping.keywords) {
+      if (!keyword) {
+        continue
+      }
+      const condensedKeyword = keyword.replace(/[\s-_]+/g, '')
+      const hasDirectMatch = normalised.includes(keyword)
+      const hasCondensedMatch =
+        condensedKeyword.length >= 3 ? condensed.includes(condensedKeyword) : false
+      if (!hasDirectMatch && !hasCondensedMatch) {
+        continue
+      }
+
+      const effectiveKey = condensedKeyword.length >= 3 ? condensedKeyword : keyword
+      const score = scoreKeyword(effectiveKey)
+      if (score === 0) {
+        continue
+      }
+
+      if (
+        !bestMatch ||
+        score > bestMatch.score ||
+        (score === bestMatch.score && effectiveKey.length > bestMatch.length)
+      ) {
+        bestMatch = {
+          photoId: mapping.photoId,
+          score,
+          length: effectiveKey.length
+        }
+      }
+    }
+  }
+
+  return bestMatch?.photoId ?? null
+}

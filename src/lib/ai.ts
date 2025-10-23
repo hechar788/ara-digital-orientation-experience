@@ -2,9 +2,32 @@
 
 import OpenAI, { APIError } from 'openai'
 import type { Response as OpenAIResponse, ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses'
-import { LOCATION_KEYWORD_OVERRIDES, VALID_LOCATION_ID_SET } from './ai.locations'
+import { matchLocationByKeywords, VALID_LOCATION_ID_SET } from './ai.locations'
 import { buildSystemPrompt, NAVIGATION_TOOL, SUMMARISATION_SYSTEM_PROMPT } from './ai.prompts'
 import { findPath, getRouteDescription, validatePath } from './pathfinding'
+
+/**
+ * Maps virtual location IDs to their actual photo IDs for navigation
+ *
+ * Some locations in the vector store use virtual IDs to distinguish between
+ * different facilities at the same photo location (e.g., Visions Restaurant
+ * and The Pantry both at outside-s-east-5).
+ */
+const VIRTUAL_LOCATION_MAP: Record<string, string> = {
+  'outside-s-east-5-visions': 'outside-s-east-5',
+  'outside-s-east-5-pantry': 'outside-s-east-5'
+}
+
+/**
+ * Resolves virtual location IDs to their actual photo IDs for navigation
+ *
+ * @param photoId - Location ID that may be virtual or real
+ * @returns Actual photo ID for navigation, or the original ID if not virtual
+ */
+function resolvePhotoId(photoId: string): string {
+  return VIRTUAL_LOCATION_MAP[photoId] ?? photoId
+}
+
 let cachedClient: OpenAI | null = null
 type GeneratedResponse = OpenAIResponse
 type CreateResponseResult = Awaited<ReturnType<OpenAI['responses']['create']>>
@@ -263,60 +286,112 @@ function sanitiseAssistantMessage(text: string | null): string | null {
   if (!text) {
     return null
   }
-  const normalised = text.replace(/\r\n/g, '\n')
-  const collapsedQuotes = normalised
-    .replace(/"([^"\n]*?)\s*\n+\s*"/g, (_match, content: string) => `"${content.trim()}"`)
-    .replace(/\s*\n{3,}\s*/g, '\n\n')
-    .trim()
-  const joinedConjunctions = collapsedQuotes.replace(/\b(or)\s*\n+(?=[a-z])/gi, (_, conj: string) => `${conj} `)
-  const normalisedCase = joinedConjunctions.replace(/\bor\s+([A-Z])/g, (_match, letter: string) => `or ${letter.toLowerCase()}`)
-  return normalisedCase.replace(/\*\*(.*?)\*\*/g, (_match, content: string) => content)
+
+  // Normalise line endings and collapse excessive newlines
+  let processedText = text.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n')
+
+  // Remove incomplete sentences or fragments at the end of the text
+  processedText = processedText.replace(/\s*\([^)]*\)?$/, '')
+
+  // Remove markdown-style formatting (e.g., **, *)
+  processedText = processedText.replace(/\*\*|\*/g, '')
+
+  // Trim leading/trailing whitespace
+  processedText = processedText.trim()
+
+  return processedText
 }
 
-function findOverrideFromText(text: string | null): string | null {
-  if (!text) {
-    return null
-  }
-  const normalised = text.toLowerCase()
-  for (const mapping of LOCATION_KEYWORD_OVERRIDES) {
-    if (mapping.keywords.some(keyword => normalised.includes(keyword))) {
-      return mapping.photoId
-    }
-  }
-  return null
-}
-
-function findLatestUserMessage(messages: ChatMessage[]): string | null {
+function gatherOverrideSources(
+  messages: ChatMessage[],
+  assistantMessage: string | null
+): Array<{ content: string; role: ChatMessage['role'] | 'assistant' }> {
+  const sources: Array<{ content: string; role: ChatMessage['role'] | 'assistant' }> = []
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index]
-    if (message.role === 'user') {
-      return message.content
+    if (message.role === 'user' && message.content.trim().length > 0) {
+      sources.push({ content: message.content, role: message.role })
     }
   }
-  return null
+  if (assistantMessage && assistantMessage.trim().length > 0) {
+    sources.push({ content: assistantMessage, role: 'assistant' })
+  }
+  return sources
 }
 
 function applyKeywordOverrides(
   originalCall: FunctionCall | null,
   assistantMessage: string | null,
   messages: ChatMessage[]
-): FunctionCall | null {
-  if (!originalCall) {
-    return null
-  }
-  const sources: Array<string | null> = [assistantMessage, findLatestUserMessage(messages)]
+): { call: FunctionCall | null; overridden: boolean } {
+  const sources = gatherOverrideSources(messages, assistantMessage)
+
   for (const source of sources) {
-    const overridePhotoId = findOverrideFromText(source)
-    if (overridePhotoId && overridePhotoId !== originalCall.arguments.photoId && VALID_LOCATION_ID_SET.has(overridePhotoId)) {
+    const matchedPhotoId = matchLocationByKeywords(source.content)
+    if (!matchedPhotoId) {
+      continue
+    }
+
+    if (!VALID_LOCATION_ID_SET.has(matchedPhotoId)) {
+      console.warn('[AI] Keyword override candidate rejected (invalid id)', {
+        source: source.content.slice(0, 120),
+        candidate: matchedPhotoId
+      })
+      continue
+    }
+
+    if (originalCall?.arguments.photoId === matchedPhotoId) {
+      console.info('[AI] Keyword override matched existing destination', {
+        source: source.content.slice(0, 120),
+        photoId: matchedPhotoId
+      })
       return {
-        name: 'navigate_to',
-        arguments: {
-          photoId: overridePhotoId
-        }
+        call: originalCall,
+        overridden: false
       }
     }
+
+    // Do NOT synthesize a navigate_to call without explicit model intent.
+    // Only adjust the destination if the model already requested navigation.
+    if (originalCall) {
+      console.info('[AI] Keyword override adjusted destination for existing tool call', {
+        source: source.content.slice(0, 120),
+        from: originalCall.arguments.photoId,
+        to: matchedPhotoId
+      })
+      return {
+        call: {
+          name: originalCall.name,
+          arguments: { photoId: matchedPhotoId }
+        },
+        overridden: true
+      }
+    }
+
+    // No existing tool call: respect confirmation workflow and do not create one.
+    console.info('[AI] Keyword match found but no tool call present; awaiting user confirmation')
+    return {
+      call: null,
+      overridden: false
+    }
   }
-  return originalCall
+
+  if (originalCall) {
+    console.info('[AI] No keyword override applied', {
+      sourceCount: sources.length,
+      destination: originalCall.arguments.photoId
+    })
+  } else {
+    console.info('[AI] No keyword override applied', {
+      sourceCount: sources.length,
+      destination: null
+    })
+  }
+
+  return {
+    call: originalCall,
+    overridden: false
+  }
 }
 
 function augmentFunctionCallWithPath(
@@ -342,23 +417,33 @@ function augmentFunctionCallWithPath(
   }
 
   const destinationId = originalCall.arguments.photoId
-  const pathResult = findPath(currentLocation, destinationId)
+  const resolvedDestinationId = resolvePhotoId(destinationId)
+  const pathResult = findPath(currentLocation, resolvedDestinationId)
 
   if (!pathResult) {
+    console.warn('[AI] Pathfinding failed', {
+      from: currentLocation,
+      to: destinationId
+    })
     return {
       name: originalCall.name,
       arguments: {
-        photoId: destinationId,
+        photoId: resolvedDestinationId,
         error: 'Unable to calculate a route from the current location to the requested destination.'
       }
     }
   }
 
   if (!validatePath(pathResult)) {
+    console.warn('[AI] Path validation failed', {
+      from: currentLocation,
+      to: destinationId,
+      path: pathResult.path
+    })
     return {
       name: originalCall.name,
       arguments: {
-        photoId: destinationId,
+        photoId: resolvedDestinationId,
         error: 'Calculated route failed validation. Please try again.'
       }
     }
@@ -366,10 +451,17 @@ function augmentFunctionCallWithPath(
 
   const routeDescription = getRouteDescription(pathResult)
 
+  console.info('[AI] Pathfinding succeeded', {
+    from: currentLocation,
+    to: destinationId,
+    steps: pathResult.distance,
+    path: pathResult.path
+  })
+
   return {
     name: originalCall.name,
     arguments: {
-      photoId: destinationId,
+      photoId: resolvedDestinationId,
       path: pathResult.path,
       distance: pathResult.distance,
       routeDescription
@@ -589,14 +681,14 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
         ...normaliseMessageInput(messages)
       ],
       tools: [
+        NAVIGATION_TOOL,
         {
-          type: 'file_search',
+          type: 'file_search' as const,
           vector_store_ids: [vectorStoreId]
-        },
-        NAVIGATION_TOOL
+        }
       ],
       temperature: 0.2,
-      max_output_tokens: 200
+      max_output_tokens: 250
     } satisfies ResponseCreateParamsNonStreaming)
     const response = ensureNonStreamingResponse(rawResponse)
 
@@ -605,8 +697,20 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
     )
     const functionCall = parseFunctionCall(response.output)
 
-    const adjustedFunctionCall = applyKeywordOverrides(functionCall, message, messages)
-    const pathAwareFunctionCall = augmentFunctionCallWithPath(adjustedFunctionCall, currentLocation)
+    const { call: intentAwareFunctionCall, overridden } = applyKeywordOverrides(
+      functionCall,
+      message,
+      messages
+    )
+    let pathAwareFunctionCall = augmentFunctionCallWithPath(intentAwareFunctionCall, currentLocation)
+
+    if (!pathAwareFunctionCall && overridden && functionCall) {
+      console.warn('[AI] Override path failed; falling back to original destination', {
+        overrideDestination: intentAwareFunctionCall?.arguments.photoId,
+        fallbackDestination: functionCall.arguments.photoId
+      })
+      pathAwareFunctionCall = augmentFunctionCallWithPath(functionCall, currentLocation)
+    }
 
     console.info('[AI] OpenAI response summary', {
       hasMessage: !!message,
