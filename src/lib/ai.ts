@@ -269,7 +269,8 @@ function sanitiseAssistantMessage(text: string | null): string | null {
     .replace(/\s*\n{3,}\s*/g, '\n\n')
     .trim()
   const joinedConjunctions = collapsedQuotes.replace(/\b(or)\s*\n+(?=[a-z])/gi, (_, conj: string) => `${conj} `)
-  return joinedConjunctions.replace(/\bor\s+([A-Z])/g, (_match, letter: string) => `or ${letter.toLowerCase()}`)
+  const normalisedCase = joinedConjunctions.replace(/\bor\s+([A-Z])/g, (_match, letter: string) => `or ${letter.toLowerCase()}`)
+  return normalisedCase.replace(/\*\*(.*?)\*\*/g, (_match, content: string) => content)
 }
 
 function findOverrideFromText(text: string | null): string | null {
@@ -741,12 +742,14 @@ export async function executeChatWithSummaries({
     currentLocation
   })
 
-  const assistantContent =
-    sanitiseAssistantMessage(
-      response.message ??
-        response.functionCall?.arguments.routeDescription ??
-        (response.functionCall ? `Navigation command issued for ${response.functionCall.arguments.photoId}.` : null)
-    )
+  const sanitisedMessage = sanitiseAssistantMessage(response.message)
+  const routeDescriptionFallback = response.functionCall?.arguments.routeDescription
+  const defaultNavigationNotice = response.functionCall
+    ? `Navigation command issued for ${response.functionCall.arguments.photoId}.`
+    : null
+  const assistantContent = sanitiseAssistantMessage(
+    sanitisedMessage ?? routeDescriptionFallback ?? defaultNavigationNotice
+  )
 
   let nextStateMessages = workingMessages
 
@@ -765,7 +768,10 @@ export async function executeChatWithSummaries({
   }
 
   return {
-    response,
+    response: {
+      ...response,
+      message: sanitisedMessage
+    },
     state: {
       summary: workingSummary,
       messages: nextStateMessages
