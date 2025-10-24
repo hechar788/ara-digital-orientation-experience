@@ -21,7 +21,8 @@ import {
  * they are reset to when starting/restarting The Amazing Race.
  */
 // export const TOUR_START_PHOTO_ID = 'a-f1-north-entrance'
-export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
+// OUTSIDE BY THE GYM export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
+export const TOUR_START_PHOTO_ID = 'x-f1-east-3'
 
 
 /**

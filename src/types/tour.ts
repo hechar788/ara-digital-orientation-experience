@@ -107,24 +107,29 @@ export interface NearbyRoom {
 }
 
 /**
- * Represents a clickable hotspot in a 360° photo for vertical navigation.
- * Only used for stairs/elevators/doors where users need to click specific areas in the image.
+ * Represents a clickable hotspot in a 360° photo for vertical navigation or information display.
+ * Used for stairs/elevators/doors where users need to click specific areas in the image,
+ * and for information hotspots that display contextual details.
  *
- * @property direction - Navigation direction type
+ * @property direction - Navigation direction type or 'information' for info hotspots
  * @property position - 3D coordinates on the sphere (Cartesian coordinates)
  * @property position.x - X coordinate in 3D space
  * @property position.y - Y coordinate in 3D space
  * @property position.z - Z coordinate in 3D space
  * @property destination - Optional specific photo ID for this hotspot (overrides direction-based lookup)
+ * @property title - Title for information hotspots (required when direction is 'information')
+ * @property description - Description text for information hotspots (required when direction is 'information')
  */
 export interface NavigationHotspot {
-  direction: 'up' | 'down' | 'elevator' | 'door'
+  direction: 'up' | 'down' | 'elevator' | 'door' | 'information'
   position: {
     x: number  // X coordinate in 3D space
     y: number  // Y coordinate in 3D space
     z: number  // Z coordinate in 3D space
   }
   destination?: string  // Specific photo ID this hotspot leads to
+  title?: string  // Title for information hotspots
+  description?: string  // Description for information hotspots
 }
 
 /**
