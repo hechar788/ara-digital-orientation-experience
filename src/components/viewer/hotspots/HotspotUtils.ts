@@ -542,6 +542,15 @@ export async function createHotspotGeometry(direction: string): Promise<{
 export const MIN_NAVIGATION_HOTSPOT_SCALE = 0.825
 
 /**
+ * Mobile scale factor for navigation and information hotspots
+ *
+ * Applies a 7.5% size increase to navigation (stairs/elevator/door) and information
+ * hotspots on touch devices to improve tap target accessibility. Does not apply
+ * to directional arrows or hidden location hotspots.
+ */
+export const MOBILE_HOTSPOT_SCALE_FACTOR = 1.075
+
+/**
  * Calculate dynamic scale for hotspot based on camera zoom level
  *
  * Adjusts hotspot size based on field of view to maintain visibility

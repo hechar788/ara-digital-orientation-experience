@@ -617,6 +617,7 @@ export const PanoramicViewer: React.FC<PanoramicViewerProps> = ({
           foundHiddenLocations={race.foundHiddenLocations}
           onHiddenLocationFound={race.addHiddenLocation}
           isDraggingRef={isDraggingRef}
+          isTouchDevice={isTouchDevice}
         />
       )}
 
