@@ -81,6 +81,18 @@ export const aBlockFloor1Area: Area = {
         {
           direction: 'up',
           position: { x: -3, y: 0.55, z: 3.35 }
+        },
+        {
+          direction: 'information',
+          position: { x: -5, y: 0, z: 1.55 },
+          title: 'A121 - Academic Records',
+          description: 'Need help with your academic records or enrolment?\n\nAcademic Records can assist you with:\n\n• Academic transcripts and record requests\n• Enrolment verification and confirmations\n• Official documentation for your studies\n• Student record updates and changes\n• Graduation and qualification records\n\nWhether you need official documents for employment, further study, or other purposes, our team is here to help you access your academic records.'
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'A121 - Academic Records',
+          roomType: 'facility'
         }
       ]
     },
@@ -98,6 +110,18 @@ export const aBlockFloor1Area: Area = {
         {
           direction: 'up',
           position: { x: 2.5, y: 0, z: 3.5 }
+        },
+        {
+          direction: 'information',
+          position: { x: -1, y: 0, z: 3.25 },
+          title: 'A121 - Academic Records',
+          description: 'Need help with your academic records or enrolment?\n\nAcademic Records can assist you with:\n\n• Academic transcripts and record requests\n• Enrolment verification and confirmations\n• Official documentation for your studies\n• Student record updates and changes\n• Graduation and qualification records\n\nWhether you need official documents for employment, further study, or other purposes, our team is here to help you access your academic records.'
+        }
+      ],
+      nearbyRooms: [
+        {
+          roomNumber: 'A121 - Academic Records',
+          roomType: 'facility'
         }
       ]
     },
@@ -113,6 +137,12 @@ export const aBlockFloor1Area: Area = {
         {
           direction: 'up',
           position: { x: 2.75, y: -0.5, z: -2.5}
+        },
+        {
+          direction: 'information',
+          position: { x: -1.75, y: 0, z: -2 },
+          title: 'A121 - Academic Records',
+          description: 'Need help with your academic records or enrolment?\n\nAcademic Records can assist you with:\n\n• Academic transcripts and record requests\n• Enrolment verification and confirmations\n• Official documentation for your studies\n• Student record updates and changes\n• Graduation and qualification records\n\nWhether you need official documents for employment, further study, or other purposes, our team is here to help you access your academic records.'
         }
       ],
       nearbyRooms: [

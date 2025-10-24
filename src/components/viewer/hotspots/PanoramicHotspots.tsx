@@ -23,6 +23,7 @@ import {
 } from './HotspotUtils'
 import { HotspotConfirmationDialog } from './HotspotConfirmationDialog'
 import { HiddenLocationFoundPopup } from '../../race/popups/HiddenLocationFoundPopup'
+import { InfoHotspotPopup } from './InfoHotspotPopup'
 import { getAreaForPhoto } from '../../../data/blockUtils'
 import { getHiddenLocationsForPhoto } from '@/data/hidden_locations/hiddenLocations'
 import type { JumpToPhotoOptions } from '../../../hooks/useTourNavigation'
@@ -108,6 +109,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const hotspots = currentPhoto?.hotspots || []
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
   const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
+  const [pendingInformation, setPendingInformation] = useState<{ title: string, description: string } | null>(null)
 
   // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
   const hiddenLocationsForPhoto = useMemo(() => {
@@ -130,6 +132,10 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         // Hidden locations scale normally without minimum, and apply size factor
         const hiddenLocationScale = calculateHotspotScale(fov, false) * HIDDEN_LOCATION_SCALE_FACTOR
         object.scale.setScalar(hiddenLocationScale)
+      } else if (hotspotType === 'information') {
+        // Information hotspots scale normally without minimum
+        const informationScale = calculateHotspotScale(fov, false)
+        object.scale.setScalar(informationScale)
       } else {
         // Navigation hotspots (elevator/stairs/door) have minimum size
         const navigationScale = calculateHotspotScale(fov, true)
@@ -239,13 +245,15 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
             }
 
             hotspotObject.userData = {
-              type: 'navigation',
+              type: hotspot.direction === 'information' ? 'information' : 'navigation',
               direction: hotspot.direction,
               destination: destination,
+              title: hotspot.title,
+              description: hotspot.description,
               index,
               originalPosition: position.clone()
             }
-            hotspotObject.name = `nav-hotspot-${index}`
+            hotspotObject.name = hotspot.direction === 'information' ? `info-hotspot-${index}` : `nav-hotspot-${index}`
 
             // Orient hotspot to face camera
             orientHotspotToCamera(hotspotObject)
@@ -422,6 +430,19 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
               id: hiddenLocationId,
               name: hiddenLocationName,
               description: hiddenLocationDescription
+            })
+          }
+        }
+        // Handle information hotspot click
+        else if (hotspotType === 'information') {
+          const title = hotspotObject.userData.title
+          const description = hotspotObject.userData.description
+
+          if (title && description) {
+            // Show information popup
+            setPendingInformation({
+              title,
+              description
             })
           }
         }
@@ -616,6 +637,13 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         name={pendingHiddenLocation?.name || ''}
         description={pendingHiddenLocation?.description || ''}
         onClose={handleHiddenLocationClose}
+      />
+
+      <InfoHotspotPopup
+        isOpen={!!pendingInformation}
+        title={pendingInformation?.title || ''}
+        description={pendingInformation?.description || ''}
+        onClose={() => setPendingInformation(null)}
       />
     </>
   )
