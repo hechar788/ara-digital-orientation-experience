@@ -548,7 +548,7 @@ export const MIN_NAVIGATION_HOTSPOT_SCALE = 0.825
  * hotspots on touch devices to improve tap target accessibility. Does not apply
  * to directional arrows or hidden location hotspots.
  */
-export const MOBILE_HOTSPOT_SCALE_FACTOR = 1.075
+export const MOBILE_HOTSPOT_SCALE_FACTOR = 1.1
 
 /**
  * Calculate dynamic scale for hotspot based on camera zoom level
