@@ -17,6 +17,7 @@ import {
   orientHotspotToCamera,
   getScreenPosition,
   HIDDEN_LOCATION_SCALE_FACTOR,
+  MOBILE_HOTSPOT_SCALE_FACTOR,
   getDialogPosition,
   type ScreenPosition,
   type DialogPosition
@@ -40,6 +41,7 @@ import type { JumpToPhotoOptions } from '../../../hooks/useTourNavigation'
  * @property foundHiddenLocations - Set of already-found hidden location IDs
  * @property onHiddenLocationFound - Callback when a hidden location is discovered
  * @property isDraggingRef - Reference to track if user is dragging (prevents accidental clicks)
+ * @property isTouchDevice - Whether the device uses touch input (for mobile scaling)
  */
 interface PanoramicHotspotsProps {
   currentPhoto: Photo | null
@@ -57,6 +59,7 @@ interface PanoramicHotspotsProps {
   foundHiddenLocations?: Set<string>
   onHiddenLocationFound?: (id: string, name: string, description: string) => void
   isDraggingRef: React.RefObject<boolean>
+  isTouchDevice: boolean
 }
 
 /**
@@ -103,7 +106,8 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   isRaceMode = false,
   foundHiddenLocations = new Set(),
   onHiddenLocationFound,
-  isDraggingRef
+  isDraggingRef,
+  isTouchDevice
 }) => {
   const hotspotsGroupRef = useRef<THREE.Group | null>(null)
   const hotspots = currentPhoto?.hotspots || []
@@ -123,6 +127,8 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const updateHotspotDisplay = useCallback(() => {
     if (!hotspotsGroupRef.current) return
 
+    const mobileScaleFactor = isTouchDevice ? MOBILE_HOTSPOT_SCALE_FACTOR : 1.0
+
     hotspotsGroupRef.current.children.forEach((object) => {
       const hotspotType = object.userData?.type
 
@@ -133,16 +139,16 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         const hiddenLocationScale = calculateHotspotScale(fov, false) * HIDDEN_LOCATION_SCALE_FACTOR
         object.scale.setScalar(hiddenLocationScale)
       } else if (hotspotType === 'information') {
-        // Information hotspots scale normally without minimum
-        const informationScale = calculateHotspotScale(fov, false)
+        // Information hotspots scale normally without minimum, 7.5% bigger on mobile
+        const informationScale = calculateHotspotScale(fov, false) * mobileScaleFactor
         object.scale.setScalar(informationScale)
       } else {
-        // Navigation hotspots (elevator/stairs/door) have minimum size
-        const navigationScale = calculateHotspotScale(fov, true)
+        // Navigation hotspots (elevator/stairs/door) have minimum size, 7.5% bigger on mobile
+        const navigationScale = calculateHotspotScale(fov, true) * mobileScaleFactor
         object.scale.setScalar(navigationScale)
       }
     })
-  }, [fov])
+  }, [fov, isTouchDevice])
 
 
   /**
