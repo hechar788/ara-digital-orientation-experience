@@ -990,9 +990,26 @@
         "it administrator",
         "it admin office",
         "computer administrator",
-        "admin office"
+        "admin office",
+        "timetable clash",
+        "timetable clashes",
+        "schedule clash",
+        "schedule conflict",
+        "course enrollment",
+        "course enrolment",
+        "enroll in course",
+        "enrol in course",
+        "picking electives",
+        "choose electives",
+        "cross credit",
+        "cross-credit",
+        "cross crediting",
+        "transfer credits",
+        "lecturer availability",
+        "find lecturer",
+        "lecturer office"
       ]
     },
-    "text": "Sandy's Office is visible from photo n-f1-sandys-office. Sandy's Office is located in N Block (building N), floor 1, west wing. Sandy is the Computing Administrator."
+    "text": "Sandy's Office is visible from photo n-f1-sandys-office. Sandy is the Computing Administrator and helps students with timetable clashes, course enrollments, picking electives, cross-crediting, and other administrative matters for computing courses. Sandy can also help with liaising with lecturers, finding lecturer offices, checking if lecturers are on campus, and finding out when they might be available. Sandy's Office is located in N Block (building N), floor 1, west wing."
   }
 ]
