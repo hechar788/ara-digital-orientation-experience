@@ -109,7 +109,9 @@ export const VALID_LOCATION_ID_SET = new Set<string>([
   ...LOCATION_IDS,
   // Virtual location IDs that map to real photo locations
   'outside-s-east-5-visions',
-  'outside-s-east-5-pantry'
+  'outside-s-east-5-pantry',
+  'x-f1-west-10-finance',
+  'x-f1-west-10-careers'
 ])
 
 /**

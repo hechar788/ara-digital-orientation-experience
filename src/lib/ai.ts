@@ -15,7 +15,9 @@ import { findPath, getRouteDescription, validatePath } from './pathfinding'
  */
 const VIRTUAL_LOCATION_MAP: Record<string, string> = {
   'outside-s-east-5-visions': 'outside-s-east-5',
-  'outside-s-east-5-pantry': 'outside-s-east-5'
+  'outside-s-east-5-pantry': 'outside-s-east-5',
+  'x-f1-west-10-finance': 'x-f1-west-10',
+  'x-f1-west-10-careers': 'x-f1-west-10'
 }
 
 /**

@@ -325,7 +325,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           id: generateMessageId(),
           role: 'assistant',
           content:
-            'Kia ora!\n\nI can help you find facilities across campus and share details about the services they provide.',
+            'Kia ora!\n\nI can help you find facilities and services around campus, answer questions about your studies at Ara, and help guide you where you need to go.',
           timestamp: new Date()
         }
       ])

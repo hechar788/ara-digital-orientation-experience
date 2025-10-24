@@ -200,6 +200,47 @@ async function createStarIconTexture(): Promise<THREE.Texture> {
 }
 
 /**
+ * Create canvas texture with info icon for information hotspots
+ *
+ * Generates a texture with an info icon (lowercase "i" in a circle)
+ * on transparent background for overlay on information sphere hotspots.
+ *
+ * @returns Promise resolving to Three.js texture with info icon
+ */
+async function createInfoIconTexture(): Promise<THREE.Texture> {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')!
+
+  // Clear with transparent background
+  ctx.clearRect(0, 0, 64, 64)
+
+  const centerX = 32
+  const centerY = 32
+  const radius = 24
+
+  // Draw circle outline
+  ctx.strokeStyle = '#FFFFFF' // White for contrast on dark sphere
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+  ctx.stroke()
+
+  // Draw "i" character
+  ctx.fillStyle = '#FFFFFF'
+  ctx.font = 'bold 36px Arial'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('i', centerX, centerY + 2) // Slight offset for visual centering
+
+  // Create and return texture
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+/**
  * Create hotspot geometry and material based on direction type
  *
  * Generates appropriate 3D geometry and material for different types of
@@ -432,6 +473,51 @@ export async function createHotspotGeometry(direction: string): Promise<{
     } catch (error) {
       console.warn('Failed to load star texture, using fallback:', error)
       // Fallback to just the gold sphere
+      return { geometry: sphereGeometry, material: sphereMaterial }
+    }
+  }
+
+  if (direction === 'information') {
+    // Sphere with AI chat header color and info icon
+    const sphereGeometry = new THREE.SphereGeometry(0.45, 16, 12)
+
+    // Create solid sphere material with AI chat header color (#0C586E)
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+      color: 0x0C586E, // AI chat header color
+      transparent: false,
+      opacity: 1.0,
+      side: THREE.DoubleSide
+    })
+
+    // Create a plane for the info icon that sits on top
+    try {
+      const infoTexture = await createInfoIconTexture()
+      const iconGeometry = new THREE.PlaneGeometry(0.4, 0.4)
+      const iconMaterial = new THREE.MeshBasicMaterial({
+        map: infoTexture,
+        transparent: true,
+        opacity: 1.0,
+        side: THREE.DoubleSide,
+        alphaTest: 0.1 // Only render non-transparent parts
+      })
+
+      // Create meshes
+      const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+      const iconMesh = new THREE.Mesh(iconGeometry, iconMaterial)
+      iconMesh.position.z = 0.46 // Position slightly in front of sphere
+
+      // Create a group containing both the sphere and icon
+      const group = new THREE.Group()
+      group.add(sphereMesh)
+      group.add(iconMesh)
+
+      return {
+        geometry: group, // Return the group containing sphere + icon
+        material: sphereMaterial // Return sphere material as main material
+      }
+    } catch (error) {
+      console.warn('Failed to load info texture, using fallback:', error)
+      // Fallback to just the colored sphere
       return { geometry: sphereGeometry, material: sphereMaterial }
     }
   }

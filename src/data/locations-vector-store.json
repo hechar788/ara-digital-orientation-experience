@@ -626,15 +626,14 @@
     "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. This team delivers holistic assistance with academic planning, policy navigation, and advocacy when issues arise with courses, tutors, or institutional processes. Advisors provide practical help for life concerns—housing, finances, and Government agency interactions such as StudyLink or Work and Income NZ—alongside referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources. Specialist staff offer culturally grounded guidance for Māori and Pacific learners, international student advice, disability services, and assessment accommodations. Other rooms in view: The Hub."
   },
   {
-    "id": "x-f1-west-10",
+    "id": "x-f1-west-10-finance",
     "metadata": {
       "areaId": "x-block-floor-1-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 1,
       "roomNumbers": [
-        "X110 - Student Finance",
-        "X108 - Careers & Employment"
+        "X110 - Student Finance"
       ],
       "roomTypes": [
         "facility"
@@ -643,14 +642,40 @@
         "student finance",
         "fees office",
         "financial support",
+        "finance office",
+        "student fees",
+        "metro card",
+        "gym fees"
+      ]
+    },
+    "text": "X110 - Student Finance is visible from photo x-f1-west-10. Student Finance helps with all your financial needs at Ara. The team can assist with student metro card applications and top-ups, gym fee payments for gym members, financial questions while studying at Ara, and course fee payments. Located in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment."
+  },
+  {
+    "id": "x-f1-west-10-careers",
+    "metadata": {
+      "areaId": "x-block-floor-1-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "X108 - Careers & Employment"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
         "careers office",
         "careers and employment",
         "job centre",
         "employment support",
-        "career advice"
+        "career advice",
+        "careers",
+        "employment",
+        "job search",
+        "career guidance"
       ]
     },
-    "text": "X110 - Student Finance is visible from photo x-f1-west-10. It sits in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment."
+    "text": "X108 - Careers & Employment is visible from photo x-f1-west-10. The Careers & Employment team provides support for your career development and job search. They can help with resume writing, interview preparation, career planning, job search strategies, and connecting with potential employers. Located in X Block (building X), floor 1. Other rooms in view: X110 - Student Finance."
   },
   {
     "id": "x-f1-west-11",
@@ -667,14 +692,12 @@
       ],
       "synonyms": [
         "ara connect",
-        "student it help",
-        "tech support",
-        "device help",
-        "computer helpdesk",
+        "short computing course",
+        "computing skills course",
         "connect centre"
       ]
     },
-    "text": "Ara Connect is visible from photo x-f1-west-11. It sits in X Block (building X), floor 1."
+    "text": "Ara Connect is visible from photo x-f1-west-11. Ara Connect offers free, self-paced computing courses for job seekers and anyone looking to improve their computer skills. Courses range from fundamentals for beginners to advanced skills in programs like Word, Excel, and PowerPoint. Learning is flexible - you can drop in at times that suit you, including evenings and Saturdays. Friendly staff provide personal help when needed, and courses can lead to formal qualifications for employment. Perfect for building competitive job-seeking skills or enhancing existing computer knowledge. Located in X Block (building X), floor 1."
   },
   {
     "id": "x-f2-north-9-aside",
@@ -990,9 +1013,26 @@
         "it administrator",
         "it admin office",
         "computer administrator",
-        "admin office"
+        "admin office",
+        "timetable clash",
+        "timetable clashes",
+        "schedule clash",
+        "schedule conflict",
+        "course enrollment",
+        "course enrolment",
+        "enroll in course",
+        "enrol in course",
+        "picking electives",
+        "choose electives",
+        "cross credit",
+        "cross-credit",
+        "cross crediting",
+        "transfer credits",
+        "lecturer availability",
+        "find lecturer",
+        "lecturer office"
       ]
     },
-    "text": "Sandy's Office is visible from photo n-f1-sandys-office. Sandy's Office is located in N Block (building N), floor 1, west wing. Sandy is the Computing Administrator."
+    "text": "Sandy's Office is visible from photo n-f1-sandys-office. Sandy is the Computing Administrator and helps students with timetable clashes, course enrollments, picking electives, cross-crediting, and other administrative matters for computing courses. Sandy can also help with liaising with lecturers, finding lecturer offices, checking if lecturers are on campus, and finding out when they might be available. Sandy's Office is located in N Block (building N), floor 1, west wing."
   }
 ]

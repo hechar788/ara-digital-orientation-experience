@@ -88,6 +88,12 @@ export const xBlockFloor1Area: Area = {
         {
           direction: 'up',
           position: { x: -4, y: -0.15, z: -4.25 }  // Stairs
+        },
+        {
+          direction: 'information',
+          position: { x: 4, y: 0, z: -3 },
+          title: 'Coffee Infusion',
+          description: 'Welcome to Coffee Infusion, the café in the heart of X Block!\n\nOur menu features:\n\n• Hot and iced drinks including coffee, hot chocolate, and matcha\n• Fresh food made daily\n• Sandwiches and wraps\n• Baked goods\n• Hot pies\n\nPerfect for a study break or catching up with friends!'
         }
       ]
     },
@@ -104,6 +110,12 @@ export const xBlockFloor1Area: Area = {
         {
           direction: 'up',
           position: { x: -5.25, y: -0.35, z: -7.5 }  // Stairs
+        },
+        {
+          direction: 'information',
+          position: { x: 2.75, y: 0, z: -5 },
+          title: 'Coffee Infusion',
+          description: 'Welcome to Coffee Infusion, the café in the heart of X Block!\n\nOur menu features:\n\n• Hot and iced drinks including coffee, hot chocolate, and matcha\n• Fresh food made daily\n• Sandwiches and wraps\n• Baked goods\n• Hot pies\n\nPerfect for a study break or catching up with friends!'
         }
       ],
       nearbyRooms: [
@@ -143,6 +155,12 @@ export const xBlockFloor1Area: Area = {
           direction: 'door',
           position: { x: -4.5, y: -0.15, z: 6.5 },
           destination: 'library-f1-entrance'
+        },
+        {
+          direction: 'information',
+          position: { x: 1.5, y: -0.125, z: 5 },
+          title: 'Information Desk',
+          description: 'Welcome to the Information Desk! Our friendly staff are here to help you with:\n\n• Campus directions and room locations\n• General inquiries about Ara services and facilities\n• Event information and campus activities\n• Visitor assistance\n• Quick questions about student services\n\nIf you\'re new to campus or need help finding your way around, stop by and say hello. We\'re here to make your campus experience as smooth as possible!'
         }
       ]
     },
@@ -180,6 +198,12 @@ export const xBlockFloor1Area: Area = {
         {
           direction: 'elevator',
           position: { x: -4, y: -1, z: 0 }  // Elevator
+        },
+        {
+          direction: 'information',
+          position: { x: 2, y: -0.125, z: -5 },
+          title: 'Security Services',
+          description: 'Your campus safety and support team!\n\nSecurity Services provides essential support for students:\n\n• Issue and renew student ID cards\n• Programme building access\n• On-campus safety support\n• Connect you with the right people if you\'re distressed or unsure what to do next\n\nFor immediate assistance or if you feel unsafe, call Ara Security on 027 540 8076 (Madras and Woolston campuses).\n\nWe\'re here to keep you safe and help you navigate any challenging situations.'
         }
       ],
       nearbyRooms: [
@@ -202,6 +226,24 @@ export const xBlockFloor1Area: Area = {
         {
           direction: 'elevator',
           position: { x: -6, y: -0.35, z: -8 }  // Elevator
+        },
+        {
+          direction: 'information',
+          position: { x: 3.5, y: -0.15, z: 5 },
+          title: 'L103 - Student Support',
+          description: 'Student Support delivers holistic assistance to help you succeed:\n\n• Academic planning, policy navigation, advocacy for course or tutor issues, disability services, and assessment accommodations\n• Practical help with housing, finances, and Government agencies (StudyLink, Work and Income NZ)\n• Referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources\n• Culturally grounded guidance for Māori and Pacific learners\n• International student advice\n\nOur comprehensive student services are designed to enhance your study success and support your wellbeing. In addition to the services listed above, you can talk to your tutor or any member of the Student Support team if you ever need advice or guidance. If they can\'t directly help, they\'ll connect you to someone who can.\n\nWe want you to enjoy your time at Ara and achieve your study goals. It\'s an investment in your future, and we\'ll do whatever we can to help you get the most out of it.'
+        },
+        {
+          direction: 'information',
+          position: { x: -2.25, y: -0.125, z: 4 },
+          title: 'Information Desk',
+          description: 'Welcome to the Information Desk! Our friendly staff are here to help you with:\n\n• Campus directions and room locations\n• General inquiries about Ara services and facilities\n• Event information and campus activities\n• Visitor assistance\n• Quick questions about student services\n\nIf you\'re new to campus or need help finding your way around, stop by and say hello. We\'re here to make your campus experience as smooth as possible!'
+        },
+        {
+          direction: 'information',
+          position: { x: 4, y: -0.1, z: -3.5 },
+          title: 'The Hub',
+          description: 'The Hub is your go-to destination for all things enrolment and qualifications!\n\nOur team can help you with:\n\n• Enrollments and registration\n• Requirements for certificates, diplomas, and postgraduate diplomas\n• Bachelor\'s degree information and prerequisites\n• Overview of all qualifications available at Ara\n• Course selection and programme planning\n• Entry requirements and pathways\n\nWhether you\'re just starting your journey or looking to advance your qualifications, The Hub team are here to guide you through your options and help you make informed decisions about your future study.'
         }
       ],
       nearbyRooms: [
@@ -218,6 +260,26 @@ export const xBlockFloor1Area: Area = {
         forward: { connection: 'x-f1-west-9' },
         back: { connection: 'x-f1-mid-7' }
       },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -1.35, y: -0.125, z: 5 },
+          title: 'L103 - Student Support',
+          description: 'Student Support delivers holistic assistance to help you succeed:\n\n• Academic planning, policy navigation, advocacy for course or tutor issues, disability services, and assessment accommodations\n• Practical help with housing, finances, and Government agencies (StudyLink, Work and Income NZ)\n• Referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources\n• Culturally grounded guidance for Māori and Pacific learners\n• International student advice\n\nOur comprehensive student services are designed to enhance your study success and support your wellbeing. In addition to the services listed above, you can talk to your tutor or any member of the Student Support team if you ever need advice or guidance. If they can\'t directly help, they\'ll connect you to someone who can.\n\nWe want you to enjoy your time at Ara and achieve your study goals. It\'s an investment in your future, and we\'ll do whatever we can to help you get the most out of it.'
+        },
+        {
+          direction: 'information',
+          position: { x: -0.25, y: -0.05, z: -5 },
+          title: 'The Hub',
+          description: 'The Hub is your go-to destination for all things enrolment and qualifications!\n\nOur team can help you with:\n\n• Enrollments and registration\n• Requirements for certificates, diplomas, and postgraduate diplomas\n• Bachelor\'s degree information and prerequisites\n• Overview of all qualifications available at Ara\n• Course selection and programme planning\n• Entry requirements and pathways\n\nWhether you\'re just starting your journey or looking to advance your qualifications, The Hub team are here to guide you through your options and help you make informed decisions about your future study.'
+        },
+        {
+          direction: 'information',
+          position: { x: -6.5, y: -0.125, z: 2.85 },
+          title: 'Information Desk',
+          description: 'Welcome to the Information Desk! Our friendly staff are here to help you with:\n\n• Campus directions and room locations\n• General inquiries about Ara services and facilities\n• Event information and campus activities\n• Visitor assistance\n• Quick questions about student services\n\nIf you\'re new to campus or need help finding your way around, stop by and say hello. We\'re here to make your campus experience as smooth as possible!'
+        }
+      ],
       nearbyRooms: [
         {
           roomNumber: 'L103 - Student Support',
@@ -235,7 +297,27 @@ export const xBlockFloor1Area: Area = {
       directions: {
         forward: { connection: 'x-f1-west-10' },
         back: { connection: 'x-f1-mid-8' }
-      }
+      },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -5.5, y: -0.125, z: 2.75 },
+          title: 'L103 - Student Support',
+          description: 'Student Support delivers holistic assistance to help you succeed:\n\n• Academic planning, policy navigation, advocacy for course or tutor issues, disability services, and assessment accommodations\n• Practical help with housing, finances, and Government agencies (StudyLink, Work and Income NZ)\n• Referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources\n• Culturally grounded guidance for Māori and Pacific learners\n• International student advice\n\nOur comprehensive student services are designed to enhance your study success and support your wellbeing. In addition to the services listed above, you can talk to your tutor or any member of the Student Support team if you ever need advice or guidance. If they can\'t directly help, they\'ll connect you to someone who can.\n\nWe want you to enjoy your time at Ara and achieve your study goals. It\'s an investment in your future, and we\'ll do whatever we can to help you get the most out of it.'
+        },
+        {
+          direction: 'information',
+          position: { x: -3.5, y: 0, z: -5 },
+          title: 'The Hub',
+          description: 'The Hub is your go-to destination for all things enrolment and qualifications!\n\nOur team can help you with:\n\n• Enrollments and registration\n• Requirements for certificates, diplomas, and postgraduate diplomas\n• Bachelor\'s degree information and prerequisites\n• Overview of all qualifications available at Ara\n• Course selection and programme planning\n• Entry requirements and pathways\n\nWhether you\'re just starting your journey or looking to advance your qualifications, The Hub team are here to guide you through your options and help you make informed decisions about your future study.'
+        },
+        {
+          direction: 'information',
+          position: { x: 3.575, y: -0.125, z: -5.75 },
+          title: 'X110 - Student Finance',
+          description: 'Student Finance is here to help you with all your financial needs at Ara.\n\nOur team can assist you with:\n\n• Student metro card applications and top-ups\n• Gym fee payments (for gym members)\n• Financial questions while studying at Ara\n• Course fee payments\n\nOur friendly team is here to guide you through the process and answer your questions.'
+        }
+      ]
     },
     {
       id: 'x-f1-west-10',
@@ -244,6 +326,26 @@ export const xBlockFloor1Area: Area = {
         forward: { connection: 'x-f1-west-11' },
         back: { connection: 'x-f1-west-9' }
       },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -0.55, y: -0.125, z: -5 },
+          title: 'X110 - Student Finance',
+          description: 'Student Finance is here to help you with all your financial needs at Ara.\n\nOur team can assist you with:\n\n• Student metro card applications and top-ups\n• Gym fee payments (for gym members)\n• Financial questions while studying at Ara\n• Course fee payments\n\nOur friendly team is here to guide you through the process and answer your questions.'
+        },
+        {
+          direction: 'information',
+          position: { x: 3.5, y: -0.15, z: -2.55 },
+          title: 'X108 - Careers & Employment',
+          description: 'Need help with your next move?\n\nIf you need career advice, we recommend the [Tahatū Career Navigator](https://tahatu.govt.nz/) website. It\'s packed with great tools and tips to help plan your next steps.\n\nYou can also:\n\n• Book a chat with a careers advisor (call 0800 222733)\n• Email Student Support at learnersupport@ara.ac.nz if you\'re not sure where to start\n\nPlease note: There may be a wait for a 1:1 appointment with a careers advisor.'
+        },
+        {
+          direction: 'information',
+          position: { x: 6.75, y: -0.175, z: 0 },
+          title: 'Ara Connect',
+          description: 'Ara Connect offers self-paced computer skills training perfect for job seekers or anyone looking to improve their digital skills.\n\nWhat we offer:\n\n• Free computing courses from beginner to advanced\n• Word, Excel, PowerPoint, and more\n• Self-paced learning - drop in when it suits you\n• Evening and Saturday hours available\n• Friendly staff to help when you need it\n• Courses can lead to formal qualifications\n\nWhether you\'re job hunting or want to build your skills, Ara Connect is here to help you succeed!'
+        }
+      ],
       nearbyRooms: [
         {
           roomNumber: 'X110 - Student Finance',
@@ -263,6 +365,20 @@ export const xBlockFloor1Area: Area = {
         back: { connection: 'x-f1-west-10' },
         forward: { connection: 'x-f1-west-12' }
       },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -2.45, y: -0.05, z: -2.5 },
+          title: 'X108 - Careers & Employment',
+          description: 'Need help with your next move?\n\nIf you need career advice, we recommend the [Tahatū Career Navigator](https://tahatu.govt.nz/) website. It\'s packed with great tools and tips to help plan your next steps.\n\nYou can also:\n\n• Book a chat with a careers advisor (call 0800 222733)\n• Email Student Support at learnersupport@ara.ac.nz if you\'re not sure where to start\n\nPlease note: There may be a wait for a 1:1 appointment with a careers advisor.'
+        },
+        {
+          direction: 'information',
+          position: { x: 2.85, y: -0.125, z: -1.75 },
+          title: 'Ara Connect',
+          description: 'Ara Connect offers self-paced computer skills training perfect for job seekers or anyone looking to improve their digital skills.\n\nWhat we offer:\n\n• Free computing courses from beginner to advanced\n• Word, Excel, PowerPoint, and more\n• Self-paced learning - drop in when it suits you\n• Evening and Saturday hours available\n• Friendly staff to help when you need it\n• Courses can lead to formal qualifications\n\nWhether you\'re job hunting or want to build your skills, Ara Connect is here to help you succeed!'
+        }
+      ],
       nearbyRooms: [
         {
           roomNumber: 'Ara Connect',
