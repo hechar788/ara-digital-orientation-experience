@@ -41,6 +41,7 @@ export interface NavigationState {
 
 interface InternalState extends NavigationState {
   pendingPath: string[]
+  finalOrientation?: number
 }
 
 /**
@@ -59,7 +60,7 @@ interface InternalState extends NavigationState {
  */
 export interface UseRouteNavigationReturn {
   navigationState: NavigationState
-  startNavigation: (path: string[]) => void
+  startNavigation: (path: string[], finalOrientation?: number) => void
   skipToEnd: () => Promise<void>
   cancelNavigation: () => void
   setSpeed: (speed: NavigationSpeed) => void
@@ -76,12 +77,15 @@ export interface UseRouteNavigationReturn {
  * @property isSequential - Indicates the navigation request originated from the sequential navigator
  * @property stepIndex - Zero-based index for the step being executed
  * @property totalSteps - Total number of steps within the active path
+ * @property nextPhotoId - Photo ID of the next step in the path (if available)
+ * @property finalOrientation - Absolute camera angle to face at the final destination (if configured)
  */
 export interface RouteNavigationHandlerOptions {
   isSequential?: boolean
   stepIndex?: number
   totalSteps?: number
   nextPhotoId?: string
+  finalOrientation?: number
 }
 
 type TimeoutHandle = ReturnType<typeof setTimeout> | null
@@ -114,7 +118,8 @@ export function useRouteNavigation(
     totalSteps: 0,
     currentPhotoId: null,
     path: [],
-    pendingPath: []
+    pendingPath: [],
+    finalOrientation: undefined
   })
   const timeoutRef = useRef<TimeoutHandle>(null)
   const stateRef = useRef(state)
@@ -165,14 +170,17 @@ export function useRouteNavigation(
 
       const nextPhotoId = path[nextIndex]
       const upcomingPhotoId = nextIndex + 1 < path.length ? path[nextIndex + 1] : undefined
+      const isLastStep = nextIndex === path.length - 1
+      const latestState = stateRef.current
+      
       await onNavigate(nextPhotoId, {
         isSequential: true,
         stepIndex: nextIndex,
         totalSteps: path.length,
-        nextPhotoId: upcomingPhotoId
+        nextPhotoId: upcomingPhotoId,
+        finalOrientation: isLastStep ? latestState.finalOrientation : undefined
       })
 
-      const latestState = stateRef.current
       const navigationStillActive = latestState.isNavigating
       const pausedDuringStep = latestState.isPaused
       const shouldMaintainPending = navigationStillActive || pausedDuringStep
@@ -201,7 +209,7 @@ export function useRouteNavigation(
   )
 
   const startNavigation = useCallback(
-    (path: string[]) => {
+    (path: string[], finalOrientation?: number) => {
       const cleanedPath = path.filter((value): value is string => typeof value === 'string' && value.length > 0)
       if (cleanedPath.length === 0) {
         return
@@ -214,7 +222,8 @@ export function useRouteNavigation(
         totalSteps: cleanedPath.length,
         currentPhotoId: null,
         path: cleanedPath,
-        pendingPath: cleanedPath
+        pendingPath: cleanedPath,
+        finalOrientation
       })
       timeoutRef.current = setTimeout(() => {
         void advanceToNextStep(cleanedPath, 0)
@@ -233,7 +242,8 @@ export function useRouteNavigation(
       isSequential: true,
       stepIndex: state.path.length - 1,
       totalSteps: state.path.length,
-      nextPhotoId: undefined
+      nextPhotoId: undefined,
+      finalOrientation: stateRef.current.finalOrientation
     })
     setState(prev => ({
       ...prev,

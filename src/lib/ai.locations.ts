@@ -8,6 +8,7 @@ interface VectorStoreLocation {
     areaName?: string
     synonyms?: string[]
     roomNumbers?: string[]
+    finalOrientation?: number
   }
 }
 
@@ -291,4 +292,26 @@ export function matchLocationByKeywords(text: string | null | undefined): string
   }
 
   return bestMatch?.photoId ?? null
+}
+
+/**
+ * Retrieves the final camera orientation for a specific location
+ *
+ * Returns the absolute camera angle in degrees that should be used when
+ * navigation completes at this destination. Used by AI pathfinding to
+ * smoothly rotate the camera to face important landmarks or entrances.
+ *
+ * @param photoId - Location identifier to query
+ * @returns Camera angle in degrees (0-360) or undefined if no final orientation is configured
+ *
+ * @example
+ * ```typescript
+ * import { getFinalOrientation } from './ai.locations'
+ * const angle = getFinalOrientation('x-f1-east-4')
+ * // angle === 325 (faces Coffee Infusion entrance)
+ * ```
+ */
+export function getFinalOrientation(photoId: string): number | undefined {
+  const location = vectorStoreLocations.find(loc => loc.id === photoId)
+  return location?.metadata?.finalOrientation
 }

@@ -89,6 +89,12 @@ export const wBlockFloor1Area: Area = {
           direction: 'door',
           position: { x: -8, y: -0.5, z: -1.85 },
           destination: 'w-gym-entry'
+        },
+        {
+          direction: 'information',
+          position: { x: 3, y: 0.125, z: -3 },
+          title: 'Ara Gym',
+          description: 'The Ara gym offers a modern, well-equipped fitness center and personal training services.\n\nThe facilities are located at the City Campus in the Whareora building and are open to students, staff, and the community. Gym membership applications are available for students, staff, and the public.\n\nPersonal training services include individualized training sessions and coaching programs that can be purchased.'
         }
       ]
     },

@@ -2,7 +2,7 @@
 
 import OpenAI, { APIError } from 'openai'
 import type { Response as OpenAIResponse, ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses'
-import { matchLocationByKeywords, VALID_LOCATION_ID_SET } from './ai.locations'
+import { matchLocationByKeywords, VALID_LOCATION_ID_SET, getFinalOrientation } from './ai.locations'
 import { buildSystemPrompt, NAVIGATION_TOOL, SUMMARISATION_SYSTEM_PROMPT } from './ai.prompts'
 import { findPath, getRouteDescription, validatePath } from './pathfinding'
 
@@ -17,7 +17,8 @@ const VIRTUAL_LOCATION_MAP: Record<string, string> = {
   'outside-s-east-5-visions': 'outside-s-east-5',
   'outside-s-east-5-pantry': 'outside-s-east-5',
   'x-f1-west-10-finance': 'x-f1-west-10',
-  'x-f1-west-10-careers': 'x-f1-west-10'
+  'x-f1-west-10-careers': 'x-f1-west-10',
+  'library-f1-6-pod': 'library-f1-6'
 }
 
 /**
@@ -126,6 +127,7 @@ export interface FunctionCall {
     path?: string[]
     distance?: number
     routeDescription?: string
+    finalOrientation?: number
     error?: string
   }
 }
@@ -452,12 +454,14 @@ function augmentFunctionCallWithPath(
   }
 
   const routeDescription = getRouteDescription(pathResult)
+  const finalOrientation = getFinalOrientation(destinationId)
 
   console.info('[AI] Pathfinding succeeded', {
     from: currentLocation,
     to: destinationId,
     steps: pathResult.distance,
-    path: pathResult.path
+    path: pathResult.path,
+    finalOrientation
   })
 
   return {
@@ -466,7 +470,8 @@ function augmentFunctionCallWithPath(
       photoId: resolvedDestinationId,
       path: pathResult.path,
       distance: pathResult.distance,
-      routeDescription
+      routeDescription,
+      finalOrientation
     }
   }
 }

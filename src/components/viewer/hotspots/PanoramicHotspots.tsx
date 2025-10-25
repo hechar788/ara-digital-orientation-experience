@@ -113,7 +113,8 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const hotspots = currentPhoto?.hotspots || []
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null)
   const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
-  const [pendingInformation, setPendingInformation] = useState<{ title: string, description: string } | null>(null)
+  const [pendingInformation, setPendingInformation] = useState<{ title?: string, description?: string, tabs?: { title: string, description: string }[] } | null>(null)
+  const hoveredHotspotRef = useRef<THREE.Object3D | null>(null)
 
   // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
   const hiddenLocationsForPhoto = useMemo(() => {
@@ -256,6 +257,7 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
               destination: destination,
               title: hotspot.title,
               description: hotspot.description,
+              tabs: hotspot.tabs,
               index,
               originalPosition: position.clone()
             }
@@ -339,6 +341,14 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   }, [updateHotspotDisplay])
 
   /**
+   * Reset hover state when photo changes
+   */
+  useEffect(() => {
+    // Reset hover state when photo changes
+    hoveredHotspotRef.current = null
+  }, [currentPhoto?.id])
+
+  /**
    * Handle mouse move events to change cursor on hotspot hover
    */
   const handleCanvasMouseMove = useCallback((event: MouseEvent) => {
@@ -362,9 +372,41 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     const visibleHotspots = hotspotsGroupRef.current.children.filter(child => child.visible)
     const intersects = raycaster.intersectObjects(visibleHotspots, true)
 
-    // Change cursor based on hover
+    // Reset previous hovered hotspot color
+    if (hoveredHotspotRef.current) {
+      const prevHotspot = hoveredHotspotRef.current
+      if (prevHotspot.userData.type === 'information') {
+        // Reset to original color for information hotspots
+        if (prevHotspot instanceof THREE.Group) {
+          const sphereMesh = prevHotspot.children.find(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry)
+          if (sphereMesh && sphereMesh instanceof THREE.Mesh && sphereMesh.material instanceof THREE.MeshBasicMaterial) {
+            sphereMesh.material.color.setHex(0x0C586E) // Original AI chat header color
+          }
+        }
+      }
+      hoveredHotspotRef.current = null
+    }
+
+    // Change cursor and apply hover effect based on intersection
     if (intersects.length > 0) {
       canvas.style.cursor = 'pointer'
+      
+      // Find the parent hotspot object
+      let hotspotObject = intersects[0].object
+      while (hotspotObject && !hotspotObject.userData.type && hotspotObject.parent) {
+        hotspotObject = hotspotObject.parent
+      }
+
+      // Apply hover effect to information hotspots
+      if (hotspotObject && hotspotObject.userData.type === 'information') {
+        hoveredHotspotRef.current = hotspotObject
+        if (hotspotObject instanceof THREE.Group) {
+          const sphereMesh = hotspotObject.children.find(child => child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry)
+          if (sphereMesh && sphereMesh instanceof THREE.Mesh && sphereMesh.material instanceof THREE.MeshBasicMaterial) {
+            sphereMesh.material.color.setHex(0x10708A) // Lighter shade for hover
+          }
+        }
+      }
     } else {
       canvas.style.cursor = 'grab'
     }
@@ -443,12 +485,14 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
         else if (hotspotType === 'information') {
           const title = hotspotObject.userData.title
           const description = hotspotObject.userData.description
+          const tabs = hotspotObject.userData.tabs
 
-          if (title && description) {
+          if (tabs || (title && description)) {
             // Show information popup
             setPendingInformation({
               title,
-              description
+              description,
+              tabs
             })
           }
         }
@@ -647,8 +691,9 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
 
       <InfoHotspotPopup
         isOpen={!!pendingInformation}
-        title={pendingInformation?.title || ''}
-        description={pendingInformation?.description || ''}
+        title={pendingInformation?.title}
+        description={pendingInformation?.description}
+        tabs={pendingInformation?.tabs}
         onClose={() => setPendingInformation(null)}
       />
     </>

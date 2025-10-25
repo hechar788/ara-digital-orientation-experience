@@ -425,19 +425,52 @@
         "fitness lounge",
         "viewing deck",
         "sports viewing area"
-      ]
+      ],
+      "finalOrientation": 90
     },
-    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. The Zone is a Sports Science and Wellness Centre offering body scans, nutrition clinics, and fitness testing in a purpose-built facility at Ara’s W Block on the 2nd floor."
+    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. The Zone is a Sports Science and Wellness Centre located at Ara's City campus in W Block on the 2nd floor. The Zone's health, wellbeing and sports performance services are available to all humans, including athletes of all levels, community groups and organisations. Services include body composition analysis, nutrition consultations, fitness testing and assessments, sports performance analysis, and personalised wellness programs. The Zone is a teaching clinic where Bachelor of Applied Science students gain real-life work experience while supporting individuals with their health and nutrition goals."
   },
   {
     "id": "w-gym-entry",
     "metadata": {
       "areaId": "w-block-gym-floor-1",
-      "areaName": "W Block Gym Entrance",
+      "areaName": "W Block Recreation Centre Entrance",
       "buildingBlock": "w",
       "floorLevel": 1,
       "roomNumbers": [
-        "W200 - Gym Entrance"
+        "W200 - Recreation Centre Entrance"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "city campus recreation centre",
+        "sport and recreation centre",
+        "recreation centre",
+        "sports hall",
+        "social sports",
+        "recreation entrance",
+        "badminton",
+        "basketball",
+        "volleyball",
+        "netball",
+        "futsal",
+        "indoor touch",
+        "kiorahi",
+        "group fitness classes"
+      ]
+    },
+    "text": "The City Campus Sport and Recreation Centre entry is visible from photo w-gym-entry. The Recreation Centre offers social sports such as badminton, basketball, volleyball, netball, futsal, indoor touch, and kiorahi, plus free group fitness classes—including yoga, tai chi, Zumba, boxing, and HIIT—so students can stay active or unwind with friends in W Block on floor 1."
+  },
+  {
+    "id": "w-f1-main-2",
+    "metadata": {
+      "areaId": "w-block-gym-floor-1",
+      "areaName": "Ara Gym",
+      "buildingBlock": "w",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "Ara Gym"
       ],
       "roomTypes": [
         "facility"
@@ -445,15 +478,27 @@
       "synonyms": [
         "gym",
         "campus gym",
-        "city campus recreation centre",
-        "sport and recreation centre",
-        "recreation centre",
-        "sports hall",
+        "fitness center",
+        "fitness centre",
         "student gym",
-        "gym entrance"
-      ]
+        "ara gym",
+        "workout",
+        "weights",
+        "training",
+        "personal training",
+        "gym membership",
+        "fitness facilities",
+        "weight training",
+        "cardio",
+        "exercise",
+        "fitness equipment",
+        "gym services",
+        "personal trainer",
+        "coaching"
+      ],
+      "finalOrientation": 310
     },
-    "text": "The main gymnasium entry is visible from photo w-gym-entry. The City Campus Sport and Recreation Centre offers a gym, social sports such as badminton, basketball, volleyball, netball, futsal, indoor touch, and kiorahi, plus free group fitness classes—including yoga, tai chi, Zumba, boxing, and HIIT—so students can stay active or unwind with friends in W Block on floor 1."
+    "text": "The Ara Gym is visible from photo w-f1-main-2. The Ara gym offers a modern, well-equipped fitness center and personal training services. The facilities are located at the City Campus in the Whareora building and are open to students, staff, and the community. Gym membership applications are available for students, staff, and the public. Personal training services include individualized training sessions and coaching programs that can be purchased. Located in W Block (building W), floor 1."
   },
   {
     "id": "inside-student-lounge",
@@ -499,7 +544,8 @@
         "coffee bar",
         "student cafe",
         "grab a coffee"
-      ]
+      ],
+      "finalOrientation": 325
     },
     "text": "Coffee Infusion is visible from photo x-f1-east-4. It sits in X Block (building X), floor 1."
   },
@@ -531,8 +577,8 @@
     "id": "library-f1-entrance",
     "metadata": {
       "areaId": "library-floor-1-main",
-      "areaName": "Library",
-      "buildingBlock": "library",
+      "areaName": "A Block",
+      "buildingBlock": "A",
       "floorLevel": 1,
       "roomNumbers": [
         "The Library Entrance"
@@ -554,7 +600,7 @@
     "text": "The Library entrance is visible from photo library-f1-entrance. It sits in the Library building, floor 1."
   },
   {
-    "id": "library-f1-5",
+    "id": "library-f1-6",
     "metadata": {
       "areaId": "library-floor-1-main",
       "areaName": "Library",
@@ -574,9 +620,41 @@
         "quick questions hub",
         "pass study group",
         "learning support centre"
-      ]
+      ],
+      "finalOrientation": 360
     },
-    "text": "Learning Services is visible from photo library-f1-5. It sits in the Library building, floor 1. The advisors coach students to manage their study independently, strengthening academic writing and maths skills through one-on-one guidance and tutor referrals. StudySmart on MyAra, along with on-campus print resources, offers self-paced study tools, while regular workshops, Quick Question sessions, and PASS peer-assisted study groups provide collaborative learning opportunities. Timetables for these sessions are available at the City campus Library or via the Explore MyAra tile in MyAra. The team shares strategies for last-minute revision, exam preparation, and stress management, and maintains Māori and Pacific learning spaces staffed by specialist advisors—open seven days a week from 7am until midnight. Communications about these services are delivered as calm, plain sentences without extra emphasis to keep the tone consistent and accessible."
+    "text": "Learning Services is visible from photo library-f1-6. It sits in the Library building, floor 1. The advisors coach students to manage their study independently, strengthening academic writing and maths skills through one-on-one guidance and tutor referrals. StudySmart on MyAra, along with on-campus print resources, offers self-paced study tools, while regular workshops, Quick Question sessions, and PASS peer-assisted study groups provide collaborative learning opportunities. Timetables for these sessions are available at the City campus Library or via the Explore MyAra tile in MyAra. The team shares strategies for last-minute revision, exam preparation, and stress management, and maintains Māori and Pacific learning spaces staffed by specialist advisors—open seven days a week from 7am until midnight. Communications about these services are delivered as calm, plain sentences without extra emphasis to keep the tone consistent and accessible."
+  },
+  {
+    "id": "library-f1-6-pod",
+    "metadata": {
+      "areaId": "library-floor-1-main",
+      "areaName": "Library",
+      "buildingBlock": "library",
+      "floorLevel": 1,
+      "roomNumbers": [
+        "L130 - The POD"
+      ],
+      "roomTypes": [
+        "facility"
+      ],
+      "synonyms": [
+        "the pod",
+        "pod",
+        "library pod",
+        "24 hour computer suite",
+        "24/7 computer suite",
+        "24 hour computers",
+        "24/7 computers",
+        "after hours computers",
+        "l130",
+        "computer lab",
+        "24 hour lab",
+        "computing suite"
+      ],
+      "finalOrientation": 160
+    },
+    "text": "L130 - The POD is visible from photo library-f1-6. The POD is a 24-hour computing suite located in the Library building at Ara's Christchurch City campus in the Rakaia Centre, floor 1. It provides 24/7 access to computer stations for students. To access The POD computers outside of normal library hours, you will need your current Student ID card for swipe card access on the door locks. Students must abide by the after-hours regulations found in the Code of Conduct for ICT users when using the facility outside regular hours."
   },
   {
     "id": "x-f1-mid-7",
@@ -985,7 +1063,8 @@
         "quick service",
         "takeaway",
         "bakery cafe"
-      ]
+      ],
+      "finalOrientation": 215
     },
     "text": "The Pantry is visible from photo outside-s-east-5. The Pantry on Campus is a cafe where food is prepared and packed to sell by chef and bakery students. They offer great value food for snacks and lunches and make coffee to go. As The Pantry is used as part of teaching, you will find different choices each day. Come in and see what they have to offer. Located in U Block (building U), floor 1."
   },

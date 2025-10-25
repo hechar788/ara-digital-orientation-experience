@@ -63,9 +63,10 @@ export const RouteNavigationStatus: React.FC<RouteNavigationStatusProps> = ({
     return null
   }
 
-  const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1
+  const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex : 0
+  const displayTotalSteps = totalSteps > 0 ? totalSteps - 1 : 0
   const progressPercent =
-    totalSteps > 0 ? Math.min(100, Math.max(0, (currentStepNumber / totalSteps) * 100)) : 0
+    displayTotalSteps > 0 ? Math.min(100, Math.max(0, (currentStepNumber / displayTotalSteps) * 100)) : 0
   const isAtFirstStep = currentStepIndex <= 0
   const isAtLastStep = currentStepIndex >= totalSteps - 1
 
@@ -81,7 +82,7 @@ export const RouteNavigationStatus: React.FC<RouteNavigationStatusProps> = ({
     >
       <div className="relative mb-1">
         <p className="text-center text-base font-semibold">
-          Step {Math.min(currentStepNumber, totalSteps)} of {totalSteps}
+          Step {Math.min(currentStepNumber, displayTotalSteps)} of {displayTotalSteps}
         </p>
         <button
           type="button"

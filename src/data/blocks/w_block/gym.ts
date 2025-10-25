@@ -53,6 +53,12 @@ export const wBlockGymFloor1Area: Area = {
           direction: 'up',
           position: { x: -0.65, y: 0, z: -4 },
           destination: 'w-gym-overlook'
+        },
+        {
+          direction: 'information',
+          position: { x: -3, y: 0.75, z: -2.5 },
+          title: 'City Campus Sport and Recreation Centre',
+          description: 'The City Campus Sport and Recreation Centre offers opportunities for students to stay active or unwind with friends in W Block on floor 1.\n\nSocial Sports:\n• Badminton\n• Basketball\n• Volleyball\n• Netball\n• Futsal\n• Indoor Touch\n• Kiorahi\n\nFree Group Fitness Classes:\n• Yoga\n• Tai Chi\n• Zumba\n• Boxing\n• HIIT'
         }
       ],
       buildingContext: {
@@ -132,6 +138,12 @@ export const wBlockGymFloor2Area: Area = {
           direction: 'down',
           position: { x: -7, y: -0.5, z: -1.5 },
           destination: 'w-gym-entry'
+        },
+        {
+          direction: 'information',
+          position: { x: 1.1, y: 0.05, z: 2.5 },
+          title: 'W220 - The Zone: Sports Science and Wellness Centre',
+          description: 'The Zone\'s health, wellbeing and sports performance services have the power to transform lives!\n\nFeeling good and functioning well are key components for optimising our personal wellbeing and performance. The Zone offers specific services to all humans, including athletes of all levels, community groups and organisations, in a purpose-built sports science facility at Ara\'s City campus.\n\nServices include:\n• Body composition analysis\n• Nutrition consultations\n• Fitness testing and assessments\n• Sports performance analysis\n• Personalised wellness programs\n\nAbout Our Teaching Clinic:\nThe Zone supports individuals with their health and nutrition goals while providing Bachelor of Applied Science students real-life work experience. Students observe and assist practitioners with service delivery throughout their second and third years, building reflective practice portfolios.\n\nTalk with us about your goals – we\'re happy to provide advice on suitable services and packages to help you achieve your objectives.'
         }
       ],
       nearbyRooms: [
