@@ -282,7 +282,7 @@ export const outsideArea: Area = {
       hotspots: [
         {
           direction: 'information',
-          position: { x: -4, y: -0.2, z: -3 },
+          position: { x: -5.25, y: -0.25, z: -0.9 },
           title: 'ICT Service Desk',
           description: 'The ICT Service Desk provides technical support and assistance for all your computing needs at Ara.\n\nServices include:\n\n• Computer and device troubleshooting\n• Software installation and support\n• Network and Wi-Fi connectivity help\n• Password resets and account access\n• Printing and scanning assistance\n• Student ID card programming for building access\n• MyAra portal support\n• Email and Microsoft 365 help\n\nOur friendly ICT team is here to help you stay connected and make the most of Ara\'s technology resources. Visit us in T Block or contact the service desk for technical assistance.'
         }
@@ -299,7 +299,7 @@ export const outsideArea: Area = {
       hotspots: [
         {
           direction: 'information',
-          position: { x: -4, y: -0.2, z: -3 },
+          position: { x: 2.5, y: -0.2, z: 2.5 },
           title: 'ICT Service Desk',
           description: 'The ICT Service Desk provides technical support and assistance for all your computing needs at Ara.\n\nServices include:\n\n• Computer and device troubleshooting\n• Software installation and support\n• Network and Wi-Fi connectivity help\n• Password resets and account access\n• Printing and scanning assistance\n• Student ID card programming for building access\n• MyAra portal support\n• Email and Microsoft 365 help\n\nOur friendly ICT team is here to help you stay connected and make the most of Ara\'s technology resources. Visit us in T Block or contact the service desk for technical assistance.'
         }

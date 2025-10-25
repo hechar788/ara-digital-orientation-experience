@@ -43,7 +43,8 @@
         "certification testing",
         "testing room",
         "assessment centre"
-      ]
+      ],
+      "finalOrientation": 120
     },
     "text": "Pearson Vue Testing Centre is visible from photo a-f2-north-stairs-entrance. It sits in A Block (building A), floor 2."
   },
@@ -522,7 +523,7 @@
         "student hangout"
       ]
     },
-    "text": "Student Lounge is visible from photo inside-student-lounge. It offers social seating and study spaces on the ground floor near the main corridor."
+    "text": "Student Lounge is visible from photo inside-student-lounge. The Student Lounge is a welcoming social space in C Block where students can relax between classes, enjoy meals with friends, or take a break from studying. The lounge features comfortable seating areas and practical facilities including microwaves to heat up your food and hot water available for making hot drinks. It's the perfect spot to unwind, socialize, or grab a quick bite during your busy day on campus."
   },
   {
     "id": "x-f1-east-4",
@@ -955,7 +956,7 @@
     "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3. Other rooms in view: X305."
   },
   {
-    "id": "outside-t-mid-1",
+    "id": "outside-t-mid-2",
     "metadata": {
       "areaId": "t-block-floor-1-main",
       "areaName": "T Block",
@@ -987,9 +988,10 @@
         "tech support",
         "device support",
         "connection issues"
-      ]
+      ],
+      "finalOrientation": 40
     },
-    "text": "ICT Service Desk is visible from photo outside-t-mid-1. The ICT service desk is available via phone or email (ictservicedesk@ara.ac.nz, 940 8800) 8 am-4 pm Monday-Friday. Please contact them with any issues including challenges connecting to Ara services with personal equipment and using home devices to access your machine on campus remotely. Our Capability team has resources to support you to work from home – the page on Waituhi will be continuously updated. Located in T Block (building T), floor 1."
+    "text": "ICT Service Desk is visible from photo outside-t-mid-2. The ICT service desk is available via phone or email (ictservicedesk@ara.ac.nz, 940 8800) 8 am-4 pm Monday-Friday. Please contact them with any issues including challenges connecting to Ara services with personal equipment and using home devices to access your machine on campus remotely. Our Capability team has resources to support you to work from home – the page on Waituhi will be continuously updated. Located in T Block (building T), floor 1."
   },
   {
     "id": "outside-s-east-5-visions",

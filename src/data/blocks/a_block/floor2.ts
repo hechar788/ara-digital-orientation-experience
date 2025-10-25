@@ -45,6 +45,12 @@ export const aBlockFloor2Area: Area = {
         {
           direction: 'down',
           position: { x: 3.75, y: -1.15, z: -0.85 }
+        },
+        {
+          direction: 'information',
+          position: { x: -3.775, y: -0.125, z: 4 },
+          title: 'Pearson Vue Testing Centre',
+          description: 'The Pearson Vue Testing Centre at Ara provides a professional testing environment for certification exams and assessments.\n\nThis secure testing facility offers:\n\n• Computer-based testing for industry certifications\n• Professional exam environment\n• Secure testing protocols\n• Proctored assessments\n• IT and professional certification exams\n\nWhether you\'re pursuing industry certifications in IT, healthcare, finance, or other professional fields, the Pearson Vue Testing Centre provides a convenient on-campus location for taking your certification exams. The centre maintains strict security standards to ensure the integrity of all examinations.\n\nLocated in A Block, Floor 2.'
         }
       ],
       nearbyRooms: [
