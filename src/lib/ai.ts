@@ -410,6 +410,122 @@ function extractPendingDestinationId(
   return null
 }
 
+/**
+ * Validates that a matched location exists and is routable
+ *
+ * Checks the vector store to ensure the location has proper metadata and is navigable.
+ * Also verifies pathfinding data exists so we can actually route to this location.
+ * This prevents the fallback system from making up information about non-existent locations.
+ *
+ * @param photoId - Location identifier to validate
+ * @param currentLocation - Current user location for pathfinding validation
+ * @returns Location metadata if valid and routable, null otherwise
+ */
+function validateAndGetLocationMetadata(photoId: string, currentLocation?: string): {
+  roomNumbers: string[]
+  areaName: string
+  floorLevel: number
+  buildingBlock: string
+} | null {
+  // First check if this is a valid location ID
+  if (!VALID_LOCATION_ID_SET.has(photoId)) {
+    console.warn('[AI] PhotoId not in valid location set', { photoId })
+    return null
+  }
+  
+  // Import vector store data
+  const vectorStoreLocations = require('../data/locations-vector-store.json')
+  
+  if (!Array.isArray(vectorStoreLocations)) {
+    console.error('[AI] Vector store data is malformed')
+    return null
+  }
+  
+  const location = vectorStoreLocations.find((loc: any) => loc.id === photoId)
+  
+  if (!location || !location.metadata) {
+    console.warn('[AI] Location not found in vector store', { photoId })
+    return null
+  }
+  
+  const { metadata } = location
+  
+  // Validate required fields for routable classroom locations
+  if (!metadata.roomNumbers || !metadata.areaName || metadata.floorLevel === undefined || !metadata.buildingBlock) {
+    console.warn('[AI] Location missing required metadata fields', { 
+      photoId,
+      hasRoomNumbers: !!metadata.roomNumbers,
+      hasAreaName: !!metadata.areaName,
+      hasFloorLevel: metadata.floorLevel !== undefined,
+      hasBuildingBlock: !!metadata.buildingBlock
+    })
+    return null
+  }
+  
+  // If current location provided, validate pathfinding is possible
+  if (currentLocation) {
+    const resolvedDestination = resolvePhotoId(photoId)
+    const pathResult = findPath(currentLocation, resolvedDestination)
+    
+    if (!pathResult || !validatePath(pathResult)) {
+      console.warn('[AI] No valid path found to location', {
+        from: currentLocation,
+        to: photoId,
+        resolved: resolvedDestination,
+        hasPath: !!pathResult
+      })
+      return null
+    }
+  }
+  
+  return {
+    roomNumbers: metadata.roomNumbers,
+    areaName: metadata.areaName,
+    floorLevel: metadata.floorLevel,
+    buildingBlock: metadata.buildingBlock
+  }
+}
+
+/**
+ * Generates a natural fallback response when vector store search fails but keyword matching succeeds
+ *
+ * Extracts location metadata from the vector store JSON to create a helpful confirmation message
+ * that maintains the two-step navigation workflow. Only generates fallback if location is validated
+ * and pathfinding to the location is possible.
+ *
+ * @param photoId - Matched location identifier from keyword system
+ * @param currentLocation - Current user location for pathfinding validation
+ * @returns Natural language response offering navigation, or null if location cannot be validated
+ */
+function generateFallbackLocationResponse(photoId: string, currentLocation?: string): string | null {
+  // Validate location exists and is routable using vector store data
+  const locationData = validateAndGetLocationMetadata(photoId, currentLocation)
+  
+  if (!locationData) {
+    return null
+  }
+  
+  const { roomNumbers, buildingBlock, floorLevel } = locationData
+  
+  const floorNames: Record<number, string> = {
+    1: 'first floor',
+    2: 'second floor',
+    3: 'third floor',
+    4: 'fourth floor'
+  }
+  
+  const floorText = floorNames[floorLevel] || `floor ${floorLevel}`
+  const block = buildingBlock.toUpperCase()
+  
+  // Use the actual room number from vector store metadata
+  if (roomNumbers && roomNumbers.length > 0) {
+    const primaryRoom = roomNumbers[0]
+    return `${primaryRoom} is located in ${block} Block on the ${floorText}.\n\nWould you like me to show you how to get there?`
+  }
+  
+  return `This location is in ${block} Block on the ${floorText}.\n\nWould you like me to show you how to get there?`
+}
+
 function gatherOverrideSources(
   messages: ChatMessage[],
   assistantMessage: string | null
@@ -430,8 +546,9 @@ function gatherOverrideSources(
 function applyKeywordOverrides(
   originalCall: FunctionCall | null,
   assistantMessage: string | null,
-  messages: ChatMessage[]
-): { call: FunctionCall | null; overridden: boolean } {
+  messages: ChatMessage[],
+  currentLocation?: string
+): { call: FunctionCall | null; overridden: boolean; fallbackMessage?: string } {
   const sources = gatherOverrideSources(messages, assistantMessage)
 
   for (const source of sources) {
@@ -476,7 +593,38 @@ function applyKeywordOverrides(
       }
     }
 
-    // No existing tool call: respect confirmation workflow and do not create one.
+    // PROACTIVE OVERRIDE: If AI explicitly failed + we have strong keyword match, provide fallback
+    const isVectorStoreFailure = 
+      assistantMessage?.includes("don't have any information regarding that specific location") ||
+      assistantMessage?.includes("don't have information about that specific location")
+
+    if (isVectorStoreFailure && source.role === 'user') {
+      const fallbackMessage = generateFallbackLocationResponse(matchedPhotoId, currentLocation)
+      
+      // Only provide fallback if location was successfully validated AND is routable
+      if (fallbackMessage) {
+        console.warn('[AI] Vector store search failed but keyword match found and validated; providing proactive fallback', {
+          userQuery: source.content.slice(0, 120),
+          matchedPhotoId,
+          currentLocation,
+          source: 'keyword-override-validated'
+        })
+
+        return {
+          call: null,
+          overridden: true,
+          fallbackMessage
+        }
+      } else {
+        console.warn('[AI] Keyword match found but location validation/pathfinding failed; cannot provide fallback', {
+          userQuery: source.content.slice(0, 120),
+          matchedPhotoId,
+          currentLocation
+        })
+      }
+    }
+
+    // No existing tool call and no failure: respect confirmation workflow and do not create one.
     console.info('[AI] Keyword match found but no tool call present; awaiting user confirmation')
     return {
       call: null,
@@ -808,10 +956,11 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
     )
     const functionCall = parseFunctionCall(response.output)
 
-    const { call: intentAwareFunctionCall, overridden } = applyKeywordOverrides(
+    const { call: intentAwareFunctionCall, overridden, fallbackMessage } = applyKeywordOverrides(
       functionCall,
       message,
-      messages
+      messages,
+      currentLocation
     )
     let pathAwareFunctionCall = augmentFunctionCallWithPath(intentAwareFunctionCall, currentLocation)
 
@@ -823,15 +972,19 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
       pathAwareFunctionCall = augmentFunctionCallWithPath(functionCall, currentLocation)
     }
 
+    // Use fallback message if provided (when vector store fails but keyword matching succeeds)
+    const finalMessage = fallbackMessage || message
+
     console.info('[AI] OpenAI response summary', {
-      hasMessage: !!message,
+      hasMessage: !!finalMessage,
       hasFunctionCall: !!pathAwareFunctionCall,
+      usedFallback: !!fallbackMessage,
       pathStepCount: pathAwareFunctionCall?.arguments.path?.length ?? 0,
       pathError: pathAwareFunctionCall?.arguments.error ?? null
     })
 
     return {
-      message,
+      message: finalMessage,
       functionCall: pathAwareFunctionCall
     }
   } catch (error) {
