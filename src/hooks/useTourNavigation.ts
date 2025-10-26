@@ -20,7 +20,7 @@ import {
  * This is the default location where users begin their tour and where
  * they are reset to when starting/restarting The Amazing Race.
  */
-export const TOUR_START_PHOTO_ID = 'a-f1-north-entrance'
+export const TOUR_START_PHOTO_ID = 'x-f3-west-2'
 // OUTSIDE BY THE GYM export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
 // export const TOUR_START_PHOTO_ID = 'w-gym-overlook'
 
@@ -562,7 +562,17 @@ const ORIENTATION_OVERRIDES: OrientationOverride[] = [
     matches: (current, destination) =>
       current.id === 'w-gym-overlook' && destination.id === 'w-f2-3',
     offsetDegrees: 70
-  }  
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f3-east-7' && destination.id === 'x-f3-east-8',
+    offsetDegrees: 150
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f3-east-8' && destination.id === 'x-f3-east-7',
+    offsetDegrees: 140
+  }
 ]
 
 
