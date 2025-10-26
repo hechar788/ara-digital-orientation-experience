@@ -8,6 +8,7 @@ import {
 import '../styles.css'
 import type { QueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 
 /**
  * Defines the per-request router context shared across TanStack routes.
@@ -107,12 +108,34 @@ function NotFound() {
  * ```
  */
 function RootDocument({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    const preventBrowserZoom = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && (event.key === '+' || event.key === '-' || event.key === '0' || event.key === '=')) {
+        event.preventDefault()
+      }
+    }
+
+    const preventCtrlWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+      }
+    }
+
+    document.addEventListener('keydown', preventBrowserZoom)
+    document.addEventListener('wheel', preventCtrlWheel, { passive: false })
+
+    return () => {
+      document.removeEventListener('keydown', preventBrowserZoom)
+      document.removeEventListener('wheel', preventCtrlWheel)
+    }
+  }, [])
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body className="overflow-hidden">
+      <body className="overflow-hidden touch-manipulation">
         {children}
         <Scripts />
       </body>
