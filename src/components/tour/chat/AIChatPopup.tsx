@@ -433,7 +433,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       let navigationAction: (() => void) | undefined
 
       if (result.response.functionCall) {
-        const { photoId, path, distance, routeDescription, error } =
+        const { photoId, path, distance, routeDescription, finalOrientation, error } =
           result.response.functionCall.arguments
 
         const pathArray = Array.isArray(path) ? path : []
@@ -444,6 +444,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           pathLength: pathArray.length,
           distance,
           routeDescription,
+          finalOrientation,
           error,
           path: pathArray
         })
@@ -459,7 +460,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
         if (!error) {
           if (hasRoute && routeNavigation) {
             routeNavigation.cancelNavigation()
-            navigationAction = () => routeNavigation.startNavigation(pathArray)
+            navigationAction = () => routeNavigation.startNavigation(pathArray, finalOrientation)
           } else if (onNavigate) {
             routeNavigation?.cancelNavigation()
             navigationAction = () => {

@@ -36,6 +36,12 @@ export const sandysOfficeArea: Area = {
           direction: 'door',
           position: { x: -3.5, y: -0.45, z: 0.5 },
           destination: 'n-f1-west-9'
+        },
+        {
+          direction: 'information',
+          position: { x: 4.0, y: -0.75, z: -2.55 },
+          title: "Sandy's Office - Computing Administrator",
+          description: "Sandy is the Computing Administrator who helps students with:\n\n• Timetable clashes and schedule conflicts\n• Course enrollments and registration\n• Picking electives for your degree\n• Cross-crediting and transfer credits\n• Administrative matters for computing courses\n\nSandy can also assist in liaising with lecturers, finding lecturer offices, checking if lecturers are on campus, and finding out when they might be available.\n\nLocation: N Block, Floor 1, West Wing"
         }
       ],
       buildingContext: {

@@ -216,4 +216,32 @@ describe('executeChatWithSummaries', () => {
     })
     expect(result.response.message).toBe('The cafe offers coffee, snacks, and comfortable seating.')
   })
+
+  it('synthesises a navigation tool call when confirmation is detected but missing from the model response', async () => {
+    executeChatSpy.mockResolvedValueOnce({
+      message: 'The Library entrance is on the first floor near the atrium. Would you like me to show you how to get there?',
+      functionCall: null
+    })
+
+    const baseMessages = [
+      { role: 'user', content: 'Take me to the library entrance' },
+      {
+        role: 'assistant',
+        content: 'The Library entrance is on the first floor near the atrium. Would you like me to show you how to get there?'
+      }
+    ]
+
+    const result = await aiModule.executeChatWithSummaries({
+      state: { summary: null, messages: baseMessages },
+      nextMessage: { role: 'user', content: 'Yes' },
+      currentLocation: 'a-f1-north-entrance'
+    })
+
+    expect(executeChatSpy).toHaveBeenCalledTimes(1)
+    expect(result.response.functionCall).not.toBeNull()
+    expect(result.response.message).toBeNull()
+    expect(result.response.functionCall?.arguments.photoId).toBe('library-f1-entrance')
+    expect(result.response.functionCall?.arguments.path?.[0]).toBe('a-f1-north-entrance')
+    expect(result.state.messages[result.state.messages.length - 1]?.content).toContain('Route found:')
+  })
 })

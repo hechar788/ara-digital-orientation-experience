@@ -107,6 +107,17 @@ export interface NearbyRoom {
 }
 
 /**
+ * Represents a single tab in a tabbed information hotspot
+ *
+ * @property title - Tab title displayed in the tab header
+ * @property description - Content displayed when this tab is active
+ */
+export interface InfoHotspotTab {
+  title: string
+  description: string
+}
+
+/**
  * Represents a clickable hotspot in a 360° photo for vertical navigation or information display.
  * Used for stairs/elevators/doors where users need to click specific areas in the image,
  * and for information hotspots that display contextual details.
@@ -117,8 +128,9 @@ export interface NearbyRoom {
  * @property position.y - Y coordinate in 3D space
  * @property position.z - Z coordinate in 3D space
  * @property destination - Optional specific photo ID for this hotspot (overrides direction-based lookup)
- * @property title - Title for information hotspots (required when direction is 'information')
- * @property description - Description text for information hotspots (required when direction is 'information')
+ * @property title - Title for information hotspots (required when direction is 'information' without tabs)
+ * @property description - Description text for information hotspots (required when direction is 'information' without tabs)
+ * @property tabs - Array of tabs for multi-tabbed information hotspots (alternative to single title/description)
  */
 export interface NavigationHotspot {
   direction: 'up' | 'down' | 'elevator' | 'door' | 'information'
@@ -130,6 +142,7 @@ export interface NavigationHotspot {
   destination?: string  // Specific photo ID this hotspot leads to
   title?: string  // Title for information hotspots
   description?: string  // Description for information hotspots
+  tabs?: InfoHotspotTab[]  // Multiple tabs for information hotspots
 }
 
 /**

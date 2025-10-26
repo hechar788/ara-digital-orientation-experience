@@ -77,7 +77,8 @@ export const Tour: React.FC<TourProps> = ({
           ? {
               previewDirection: true,
               previewDelayMs: 1350,
-              nextPhotoId: options?.nextPhotoId
+              nextPhotoId: options?.nextPhotoId,
+              finalOrientation: options?.finalOrientation
             }
           : undefined
         await onNavigateToPhoto(photoId, jumpOptions)

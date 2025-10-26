@@ -43,6 +43,12 @@ export const studentLoungeArea: Area = {
           direction: 'door',
           position: { x: 4.5, y: -0.25, z: -0.15 },
           destination: 'outside-cafeteria-3'
+        },
+        {
+          direction: 'information',
+          position: { x: 0.5, y: 0, z: -7 },
+          title: 'Student Lounge',
+          description: 'The Student Lounge is a welcoming social space in C Block where students can relax between classes, enjoy meals with friends, or take a break from studying.\n\nThe lounge features:\n\n• Comfortable seating areas for socializing\n• Microwaves to heat up your food\n• Hot water available for making hot drinks\n• Study and collaboration spaces\n• A relaxed atmosphere to unwind\n\nIt\'s the perfect spot to grab a quick bite, catch up with friends, or take a breather during your busy day on campus. Whether you\'re looking for a place to eat your lunch or just need a comfortable space to relax, the Student Lounge welcomes you!'
         }
       ],
       buildingContext: {

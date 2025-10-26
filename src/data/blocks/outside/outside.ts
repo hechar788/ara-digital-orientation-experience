@@ -278,7 +278,15 @@ export const outsideArea: Area = {
       directions: {
         forward: { connection: 'outside-t-mid-2' },
         back: { connection: 'outside-u-mid-5' }
-      }
+      },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -5.25, y: -0.25, z: -0.9 },
+          title: 'ICT Service Desk',
+          description: 'The ICT Service Desk provides technical support and assistance for all your computing needs at Ara.\n\nServices include:\n\n• Computer and device troubleshooting\n• Software installation and support\n• Network and Wi-Fi connectivity help\n• Password resets and account access\n• Printing and scanning assistance\n• Student ID card programming for building access\n• MyAra portal support\n• Email and Microsoft 365 help\n\nOur friendly ICT team is here to help you stay connected and make the most of Ara\'s technology resources. Visit us in T Block or contact the service desk for technical assistance.'
+        }
+      ]
     },
     {
       id: 'outside-t-mid-2',
@@ -287,7 +295,15 @@ export const outsideArea: Area = {
       directions: {
         forward: { connection: 'outside-t-mid-3' },
         back: { connection: 'outside-t-mid-1' }
-      }
+      },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: 2.5, y: -0.2, z: 2.5 },
+          title: 'ICT Service Desk',
+          description: 'The ICT Service Desk provides technical support and assistance for all your computing needs at Ara.\n\nServices include:\n\n• Computer and device troubleshooting\n• Software installation and support\n• Network and Wi-Fi connectivity help\n• Password resets and account access\n• Printing and scanning assistance\n• Student ID card programming for building access\n• MyAra portal support\n• Email and Microsoft 365 help\n\nOur friendly ICT team is here to help you stay connected and make the most of Ara\'s technology resources. Visit us in T Block or contact the service desk for technical assistance.'
+        }
+      ]
     },
     {
       id: 'outside-t-mid-3',
@@ -690,7 +706,23 @@ export const outsideArea: Area = {
       directions: {
         forward: { connection: 'outside-s-east-6' },
         back: { connection: 'outside-s-north-4' }
-      }
+      },
+      hotspots: [
+        {
+          direction: 'information',
+          position: { x: -4.35, y: -0.075, z: -3.7 },
+          tabs: [
+            {
+              title: 'The Pantry',
+              description: 'The Pantry on Campus is a café where food is prepared and packed to sell by chef and bakery students.\n\nThey offer great value food for snacks and lunches and make coffee to go. As The Pantry is used as part of teaching, you will find different choices each day.\n\nCome in and see what they have to offer!'
+            },
+            {
+              title: 'Visions Restaurant',
+              description: 'Visions is a fully licensed restaurant at the City campus where you can enjoy a unique dining experience provided by up-and-coming hospitality professionals.\n\nStudents studying cookery, hospitality and hospitality management programmes are involved in all aspects of your dining experience, from preparing and serving your meal to managing the restaurant and operating the bar with its substantial wine and beverage list.\n\nThe restaurant offers vegetarian, vegan and gluten-free options, with menus that may change throughout the year based on the season and teaching requirements.\n\nIt\'s an ideal place to dine with family, friends or colleagues and to celebrate special occasions.'
+            }
+          ]
+        }
+      ]
     },
     {
       id: 'outside-s-east-6',
