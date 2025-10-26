@@ -285,9 +285,16 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     const singleLineHeight = lineHeight + paddingTop + paddingBottom
     const doubleLineHeight = lineHeight * 2 + paddingTop + paddingBottom
 
-    target.style.height = 'auto'
     target.style.minHeight = `${singleLineHeight}px`
     target.style.maxHeight = `${doubleLineHeight}px`
+
+    if (target.value.trim() === '') {
+      target.style.height = `${singleLineHeight}px`
+      target.style.overflowY = 'hidden'
+      return
+    }
+
+    target.style.height = `${singleLineHeight}px`
     const constrainedHeight = Math.min(Math.max(target.scrollHeight, singleLineHeight), doubleLineHeight)
     target.style.height = `${constrainedHeight}px`
     target.style.overflowY = target.scrollHeight > doubleLineHeight ? 'auto' : 'hidden'
@@ -522,7 +529,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E]"
+            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E] cursor-pointer"
             aria-label="Close chat"
           >
             <X className="h-4 w-4" />
@@ -631,7 +638,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-blue-600 transition-colors hover:text-blue-500 disabled:text-gray-400"
+                className="absolute right-2 top-[calc(50%-1.5px)] -translate-y-1/2 rounded-lg p-2 text-blue-600 transition-colors hover:text-blue-500 disabled:text-gray-400 cursor-pointer disabled:cursor-not-allowed"
                 aria-label="Send message"
               >
                 <Send className="h-4 w-4" />
