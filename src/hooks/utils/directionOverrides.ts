@@ -33,6 +33,6 @@ export const ARROW_OVERRIDES: ArrowOverride[] = [
   {
     matches: (photo, direction) =>
       photo.id === 'w-gym-entry' && direction === 'forward',
-    angle: 0
+    angle: 220
   }
 ]

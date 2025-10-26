@@ -252,11 +252,13 @@ function getHotspotHeading(
  * @property previewDirection - When true, rotates the camera toward the outgoing direction before moving
  * @property previewDelayMs - Duration to wait after the preview rotation before navigating (defaults to 1000 ms)
  * @property nextPhotoId - Optional upcoming photo ID used to pre-orient the camera after arrival
+ * @property finalOrientation - Absolute camera angle in degrees to face after arrival (overrides calculated orientation)
  */
 export interface JumpToPhotoOptions {
   previewDirection?: boolean
   previewDelayMs?: number
   nextPhotoId?: string
+  finalOrientation?: number
 }
 
 function normalizeAngle(angle: number): number {
@@ -270,37 +272,47 @@ function normalizeAngle(angle: number): number {
 /**
  * Resolve the camera orientation to apply immediately after arriving at a destination photo.
  *
- * Maintains the heading used during the movement whenever available so the user
- * keeps facing the travelled direction. Falls back to the upcoming orientation
- * suggestion when the movement heading cannot be determined, and finally to the
- * provided fallback angle (typically the photo's starting angle or current camera heading).
+ * Prioritizes a final orientation override (for AI pathfinding destinations), then maintains
+ * the heading used during the movement whenever available so the user keeps facing the
+ * travelled direction. Falls back to the upcoming orientation suggestion when the movement
+ * heading cannot be determined, and finally to the provided fallback angle (typically the
+ * photo's starting angle or current camera heading).
  *
- * @param movementAngle - Angle used while travelling to the destination (0-360 degrees)
+ * @param finalOrientation - Absolute orientation override for pathfinding destinations (0-360 degrees)
+ * @param navigationAngle - Calculated navigation angle to maintain directional flow (0-360 degrees)
  * @param postArrivalAngle - Optional suggested angle for the next movement (0-360 degrees)
+ * @param movementAngle - Angle used while travelling to the destination (0-360 degrees)
  * @param fallbackAngle - Angle to use when no other data is available (0-360 degrees)
  * @returns Normalized absolute angle in degrees (0-360) to apply after arrival
  *
  * @example
  * ```typescript
  * const arrival = resolveArrivalOrientation({
+ *   finalOrientation: 325,
  *   movementAngle: 180,
  *   postArrivalAngle: 90,
  *   fallbackAngle: 0
  * })
- * // arrival === 180
+ * // arrival === 325 (finalOrientation takes priority)
  * ```
  */
 export function resolveArrivalOrientation({
+  finalOrientation,
   navigationAngle,
   postArrivalAngle,
   movementAngle,
   fallbackAngle
 }: {
+  finalOrientation?: number
   navigationAngle?: number
   postArrivalAngle?: number
   movementAngle?: number
   fallbackAngle: number
 }): number {
+  if (typeof finalOrientation === 'number') {
+    return normalizeAngle(finalOrientation)
+  }
+
   if (typeof navigationAngle === 'number') {
     return normalizeAngle(navigationAngle)
   }
@@ -520,8 +532,20 @@ const ORIENTATION_OVERRIDES: OrientationOverride[] = [
     matches: (current, destination) =>
       current.id === 'outside-x-north-1' && destination.id === 'outside-x-north-2',
     offsetDegrees: 90
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'library-f1-5' && destination.id === 'library-f1-6',
+    offsetDegrees: -90
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'library-f1-6' && destination.id === 'library-f1-7',
+    offsetDegrees: 0
   }
 ]
+
+
 
 /**
  * Analyzes navigation context to determine orientation handling approach
@@ -1053,16 +1077,22 @@ export function useTourNavigation() {
           setCurrentPhotoImage(img)
           setCurrentPhotoId(photoId)
 
-          const normalizedFinal = resolveArrivalOrientation({
+          const normalizedArrival = resolveArrivalOrientation({
             navigationAngle: navigationArrivalAngle,
             postArrivalAngle,
             movementAngle,
             fallbackAngle: targetPhoto.startingAngle ?? activeCameraLon
           })
 
-          setCalculatedCameraAngle(normalizedFinal)
-          issueCameraOrientation(normalizedFinal, 0)
+          setCalculatedCameraAngle(normalizedArrival)
+          issueCameraOrientation(normalizedArrival, 0)
           isLoadingRef.current = false
+
+          if (options?.finalOrientation !== undefined) {
+            setTimeout(() => {
+              issueCameraOrientation(options.finalOrientation!, 0)
+            }, 800)
+          }
 
           resolve()
         }
