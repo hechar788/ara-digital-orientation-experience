@@ -405,7 +405,7 @@
       "synonyms": [],
       "finalOrientation": 110
     },
-    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4. Other rooms in view: S455, S458."
+    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4."
   },
   {
     "id": "s-f4-north-8-s455",
@@ -438,7 +438,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 90
     },
     "text": "W209 is visible from photo w-f2-4. It sits in W Block (building W), floor 2."
   },
@@ -455,7 +456,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 145
     },
     "text": "W210 is visible from photo w-f2-5. It sits in W Block (building W), floor 2."
   },
@@ -472,7 +474,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 95
     },
     "text": "W211 is visible from photo w-f2-6. It sits in W Block (building W), floor 2."
   },
@@ -489,7 +492,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 152.5
     },
     "text": "W212 is visible from photo w-f2-7. It sits in W Block (building W), floor 2."
   },
@@ -871,22 +875,39 @@
     "text": "Ara Connect is visible from photo x-f1-west-11. Ara Connect offers free, self-paced computing courses for job seekers and anyone looking to improve their computer skills. Courses range from fundamentals for beginners to advanced skills in programs like Word, Excel, and PowerPoint. Learning is flexible - you can drop in at times that suit you, including evenings and Saturdays. Friendly staff provide personal help when needed, and courses can lead to formal qualifications for employment. Perfect for building competitive job-seeking skills or enhancing existing computer knowledge. Located in X Block (building X), floor 1."
   },
   {
-    "id": "x-f2-north-9-aside",
+    "id": "x-f2-north-9-aside-l202",
     "metadata": {
       "areaId": "x-block-floor-2-main",
-      "areaName": "X Block",
-      "buildingBlock": "x",
+      "areaName": "L Block",
+      "buildingBlock": "L",
       "floorLevel": 2,
       "roomNumbers": [
-        "L202",
-        "L203"
+        "L202"
       ],
       "roomTypes": [
         "classroom"
       ],
       "synonyms": []
     },
-    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in X Block (building X), floor 2. Other rooms in view: L203."
+    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in L Block (building L), floor 2."
+  },
+  {
+    "id": "x-f2-north-9-aside-l203",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "L Block",
+      "buildingBlock": "L",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "L203"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 210
+    },
+    "text": "L203 is visible from photo x-f2-north-9-aside. It sits in L Block (building L), floor 2."
   },
   {
     "id": "x-f2-west-2",
@@ -901,63 +922,100 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 60
     },
     "text": "X202 is visible from photo x-f2-west-2. It sits in X Block (building X), floor 2."
   },
   {
-    "id": "x-f2-west-3-aside",
+    "id": "x-f2-west-3-aside-x203",
     "metadata": {
       "areaId": "x-block-floor-2-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 2,
       "roomNumbers": [
-        "X203",
-        "X205"
+        "X203"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 195
     },
-    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2. Other rooms in view: X205."
+    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2."
   },
   {
-    "id": "x-f2-west-4",
+    "id": "x-f2-west-4-x204",
     "metadata": {
       "areaId": "x-block-floor-2-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 2,
       "roomNumbers": [
-        "X204",
+        "X204"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 100
+    },
+    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2."
+  },
+  {
+    "id": "x-f2-west-4-x206",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
         "X206"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 50
     },
-    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2. Other rooms in view: X206."
+    "text": "X206 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2."
   },
   {
-    "id": "x-f2-west-5-aside",
+    "id": "x-f2-west-5-aside-x205",
     "metadata": {
       "areaId": "x-block-floor-2-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 2,
       "roomNumbers": [
-        "X205",
+        "X205"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 205
+    },
+    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2."
+  },
+  {
+    "id": "x-f2-west-5-aside-x210",
+    "metadata": {
+      "areaId": "x-block-floor-2-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 2,
+      "roomNumbers": [
         "X210"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 147.5
     },
-    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2. Other rooms in view: X210."
+    "text": "X210 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2."
   },
   {
     "id": "x-f2-west-6",
@@ -972,19 +1030,36 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 60
     },
     "text": "X208 is visible from photo x-f2-west-6. It sits in X Block (building X), floor 2."
   },
   {
-    "id": "x-f3-east-6",
+    "id": "x-f3-east-6-x306",
     "metadata": {
       "areaId": "x-block-floor-3-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 3,
       "roomNumbers": [
-        "X306",
+        "X306"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3."
+  },
+  {
+    "id": "x-f3-east-6-x308",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
         "X308"
       ],
       "roomTypes": [
@@ -992,7 +1067,7 @@
       ],
       "synonyms": []
     },
-    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3. Other rooms in view: X308."
+    "text": "X308 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3."
   },
   {
     "id": "x-f3-east-8",
@@ -1012,14 +1087,30 @@
     "text": "X313 is visible from photo x-f3-east-8. It sits in X Block (building X), floor 3."
   },
   {
-    "id": "x-f3-west-1",
+    "id": "x-f3-west-1-x302",
     "metadata": {
       "areaId": "x-block-floor-3-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 3,
       "roomNumbers": [
-        "X302",
+        "X302"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3."
+  },
+  {
+    "id": "x-f3-west-1-x304",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
         "X304"
       ],
       "roomTypes": [
@@ -1027,17 +1118,33 @@
       ],
       "synonyms": []
     },
-    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3. Other rooms in view: X304."
+    "text": "X304 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3."
   },
   {
-    "id": "x-f3-west-1-aside",
+    "id": "x-f3-west-1-aside-x303",
     "metadata": {
       "areaId": "x-block-floor-3-main",
       "areaName": "X Block",
       "buildingBlock": "x",
       "floorLevel": 3,
       "roomNumbers": [
-        "X303",
+        "X303"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": []
+    },
+    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3."
+  },
+  {
+    "id": "x-f3-west-1-aside-x305",
+    "metadata": {
+      "areaId": "x-block-floor-3-main",
+      "areaName": "X Block",
+      "buildingBlock": "x",
+      "floorLevel": 3,
+      "roomNumbers": [
         "X305"
       ],
       "roomTypes": [
@@ -1045,7 +1152,7 @@
       ],
       "synonyms": []
     },
-    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3. Other rooms in view: X305."
+    "text": "X305 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3."
   },
   {
     "id": "outside-t-mid-2",

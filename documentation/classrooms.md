@@ -33,23 +33,23 @@ This document lists all classrooms accessible through the virtual campus tour, o
 ## W Block
 
 ### Floor 2
-- **W209** - Main corridor
-- **W210** - Main corridor
-- **W211** - Main corridor
-- **W212** - Main corridor
+- **W209** - Main corridor - **DONE**
+- **W210** - Main corridor - **DONE**
+- **W211** - Main corridor - **DONE**
+- **W212** - Main corridor - **DONE**
 
 ## X Block
 
 ### Floor 2
-- **L202** - North wing
-- **L203** - North wing
-- **X202** - West wing
-- **X203** - West wing
-- **X204** - West wing
-- **X205** - West wing
-- **X206** - West wing
-- **X208** - West wing
-- **X210** - West wing
+- **L202** - North wing - **DONE**
+- **L203** - North wing - **DONE**
+- **X202** - West wing - **DONE**
+- **X203** - West wing - **DONE**
+- **X204** - West wing - **DONE**
+- **X205** - West wing - **DONE**
+- **X206** - West wing - **DONE**
+- **X208** - West wing - **DONE**
+- **X210** - West wing - **DONE**
 
 ### Floor 3
 - **X302** - West wing
@@ -60,6 +60,10 @@ This document lists all classrooms accessible through the virtual campus tour, o
 - **X308** - East wing
 - **X313** - East wing
 
+
+
+
+S171, S170 - **NOT DONE**.
 ---
 
 **Note:** Classrooms marked as "accessible via door" require navigating through a door hotspot to enter. All other classrooms are visible from the main corridors.
