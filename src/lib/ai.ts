@@ -27,7 +27,20 @@ const VIRTUAL_LOCATION_MAP: Record<string, string> = {
   's-f2-south-7-s264': 's-f2-south-7',
   's-f2-south-7-s262': 's-f2-south-7',
   's-f4-north-8-s454': 's-f4-north-8',
-  's-f4-north-8-s455': 's-f4-north-8'
+  's-f4-north-8-s455': 's-f4-north-8',
+  'x-f2-north-9-aside-l202': 'x-f2-north-9-aside',
+  'x-f2-north-9-aside-l203': 'x-f2-north-9-aside',
+  'x-f2-west-3-aside-x203': 'x-f2-west-3-aside',
+  'x-f2-west-4-x204': 'x-f2-west-4',
+  'x-f2-west-4-x206': 'x-f2-west-4',
+  'x-f2-west-5-aside-x205': 'x-f2-west-5-aside',
+  'x-f2-west-5-aside-x210': 'x-f2-west-5-aside',
+  'x-f3-east-6-x306': 'x-f3-east-6',
+  'x-f3-east-6-x308': 'x-f3-east-6',
+  'x-f3-west-1-x302': 'x-f3-west-1',
+  'x-f3-west-1-x304': 'x-f3-west-1',
+  'x-f3-west-1-aside-x303': 'x-f3-west-1-aside',
+  'x-f3-west-1-aside-x305': 'x-f3-west-1-aside'
 }
 
 /**
