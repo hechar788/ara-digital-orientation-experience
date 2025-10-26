@@ -61,7 +61,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 62.5
     },
     "text": "N104 is visible from photo n-f1-east-south-4. It sits in N Block (building N), floor 1."
   },
@@ -132,7 +133,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 135
     },
     "text": "S169 is visible from photo s-f1-mid-3. It sits in S Block (building S), floor 1."
   },
@@ -155,23 +157,40 @@
     "text": "S171 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170."
   },
   {
-    "id": "s-f1-south-2",
+    "id": "s-f1-south-2-s154",
     "metadata": {
       "areaId": "s-block-floor-1-main",
       "areaName": "S Block",
       "buildingBlock": "s",
       "floorLevel": 1,
       "roomNumbers": [
-        "S154",
+        "S154"
+      ],
+      "roomTypes": [
+        "office"
+      ],
+      "synonyms": [],
+      "finalOrientation": 245
+    },
+    "text": "S154 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1."
+  },
+  {
+    "id": "s-f1-south-2-s156",
+    "metadata": {
+      "areaId": "s-block-floor-1-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 1,
+      "roomNumbers": [
         "S156"
       ],
       "roomTypes": [
-        "office",
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 20
     },
-    "text": "S154 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1. Other rooms in view: S156."
+    "text": "S156 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1."
   },
   {
     "id": "s-f1-south-entrance",
@@ -186,7 +205,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 255
     },
     "text": "S157 is visible from photo s-f1-south-entrance. It sits in S Block (building S), floor 1."
   },
@@ -225,23 +245,40 @@
     "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2."
   },
   {
-    "id": "s-f2-south-5",
+    "id": "s-f2-south-5-s265",
     "metadata": {
       "areaId": "s-block-floor-2-main",
       "areaName": "S Block",
       "buildingBlock": "s",
       "floorLevel": 2,
       "roomNumbers": [
-        "S265",
+        "S265"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 80
+    },
+    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2."
+  },
+  {
+    "id": "s-f2-south-5-s254",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
         "S254"
       ],
       "roomTypes": [
-        "classroom",
         "facility"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": -95
     },
-    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2. Other rooms in view: S254."
+    "text": "S254 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2."
   },
   {
     "id": "s-f2-south-6",
@@ -256,28 +293,64 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 235
     },
     "text": "S255 is visible from photo s-f2-south-6. It sits in S Block (building S), floor 2."
   },
   {
-    "id": "s-f2-south-7",
+    "id": "s-f2-south-7-s256",
     "metadata": {
       "areaId": "s-block-floor-2-main",
       "areaName": "S Block",
       "buildingBlock": "s",
       "floorLevel": 2,
       "roomNumbers": [
-        "S256",
-        "S264",
+        "S256"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 235
+    },
+    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
+  },
+  {
+    "id": "s-f2-south-7-s264",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
+        "S264"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 105
+    },
+    "text": "S264 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
+  },
+  {
+    "id": "s-f2-south-7-s262",
+    "metadata": {
+      "areaId": "s-block-floor-2-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 2,
+      "roomNumbers": [
         "S262"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 45
     },
-    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2. Other rooms in view: S264, S262."
+    "text": "S262 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
   },
   {
     "id": "s-f4-mid-4",

@@ -112,7 +112,14 @@ export const VALID_LOCATION_ID_SET = new Set<string>([
   'outside-s-east-5-visions',
   'outside-s-east-5-pantry',
   'x-f1-west-10-finance',
-  'x-f1-west-10-careers'
+  'x-f1-west-10-careers',
+  's-f1-south-2-s154',
+  's-f1-south-2-s156',
+  's-f2-south-5-s265',
+  's-f2-south-5-s254',
+  's-f2-south-7-s256',
+  's-f2-south-7-s264',
+  's-f2-south-7-s262'
 ])
 
 /**

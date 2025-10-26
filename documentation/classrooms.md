@@ -5,20 +5,22 @@ This document lists all classrooms accessible through the virtual campus tour, o
 ## N Block
 
 ### Floor 1
-- **N104** - East South corridor
+- **N104** - East South corridor - **DONE**
 
 ## S Block
 
 ### Floor 1
-- **S156** - South section
-- **S157** - South entrance
-- **S169** - Middle section
+- **S154** - South section - **DONE**
+- **S156** - South section - **DONE**
+- **S157** - South entrance - **DONE**
+- **S169** - Middle section - **DONE**
 
 ### Floor 2
-- **S255** - South wing
-- **S256** - South wing
-- **S262** - South wing
-- **S264** - South wing
+- **S254** - South wing - **DONE**
+- **S255** - South wing - **DONE**
+- **S256** - South wing - **DONE**
+- **S262** - South wing - **DONE**
+- **S264** - South wing - **DONE**
 - **S265** - South wing
 - **S267** - Middle section
 - **S268** - Middle section

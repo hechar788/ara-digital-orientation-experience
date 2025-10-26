@@ -18,7 +18,14 @@ const VIRTUAL_LOCATION_MAP: Record<string, string> = {
   'outside-s-east-5-pantry': 'outside-s-east-5',
   'x-f1-west-10-finance': 'x-f1-west-10',
   'x-f1-west-10-careers': 'x-f1-west-10',
-  'library-f1-6-pod': 'library-f1-6'
+  'library-f1-6-pod': 'library-f1-6',
+  's-f1-south-2-s154': 's-f1-south-2',
+  's-f1-south-2-s156': 's-f1-south-2',
+  's-f2-south-5-s265': 's-f2-south-5',
+  's-f2-south-5-s254': 's-f2-south-5',
+  's-f2-south-7-s256': 's-f2-south-7',
+  's-f2-south-7-s264': 's-f2-south-7',
+  's-f2-south-7-s262': 's-f2-south-7'
 }
 
 /**
@@ -241,7 +248,26 @@ const MAX_MESSAGE_COUNT = 20
 const MAX_TOTAL_CHARACTERS = 5000
 const SUMMARY_TRIGGER_THRESHOLD = 10
 const SUMMARY_CHARACTER_THRESHOLD = 3500
-const SUMMARY_TAIL_MESSAGE_COUNT = 6
+const SUMMARY_TAIL_MESSAGE_COUNT = 8
+const NAVIGATION_PROMPT_PHRASES = [
+  'would you like me to show you how to get there',
+  'would you like directions',
+  'would you like me to guide you',
+  'shall i show you'
+]
+const AFFIRMATIVE_SINGLE_WORDS = [
+  'yes',
+  'yeah',
+  'yep',
+  'yup',
+  'sure',
+  'ok',
+  'okay',
+  'please',
+  'absolutely',
+  'definitely'
+]
+const AFFIRMATIVE_MULTI_WORD_PHRASES = ['go ahead', 'take me', 'show me', 'sounds good', 'do it']
 
 function parseResponseText(output: GeneratedResponse['output']): string | null {
   const parts: string[] = []
@@ -304,6 +330,69 @@ function sanitiseAssistantMessage(text: string | null): string | null {
   processedText = processedText.trim()
 
   return processedText
+}
+
+function isNavigationOffer(text: string | null | undefined): boolean {
+  if (!text) {
+    return false
+  }
+  const lowerCased = text.toLowerCase()
+  return NAVIGATION_PROMPT_PHRASES.some(phrase => lowerCased.includes(phrase))
+}
+
+function isAffirmativeUserResponse(message: string): boolean {
+  const normalised = message.trim().toLowerCase()
+  if (!normalised) {
+    return false
+  }
+  const cleaned = normalised.replace(/[.,!?]/g, ' ').replace(/\s+/g, ' ').trim()
+  if (!cleaned) {
+    return false
+  }
+  if (
+    AFFIRMATIVE_SINGLE_WORDS.some(
+      word => cleaned === word || cleaned.startsWith(`${word} `) || cleaned.endsWith(` ${word}`)
+    )
+  ) {
+    return true
+  }
+  return AFFIRMATIVE_MULTI_WORD_PHRASES.some(
+    phrase => cleaned === phrase || cleaned.includes(`${phrase} `) || cleaned.includes(` ${phrase}`) || cleaned.endsWith(phrase)
+  )
+}
+
+function extractPendingDestinationId(
+  lastAssistantMessage: ChatMessage | undefined,
+  messages: ChatMessage[]
+): string | null {
+  if (!lastAssistantMessage?.content || !isNavigationOffer(lastAssistantMessage.content)) {
+    return null
+  }
+
+  const candidateSources: string[] = [lastAssistantMessage.content]
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const message = messages[index]
+    if (!message.content || message === lastAssistantMessage) {
+      continue
+    }
+    if (message.role === 'user') {
+      candidateSources.push(message.content)
+    } else if (message.role === 'assistant' && isNavigationOffer(message.content)) {
+      candidateSources.push(message.content)
+    }
+    if (candidateSources.length >= 5) {
+      break
+    }
+  }
+
+  for (const content of candidateSources) {
+    const matchedPhotoId = matchLocationByKeywords(content)
+    if (matchedPhotoId && VALID_LOCATION_ID_SET.has(matchedPhotoId)) {
+      return matchedPhotoId
+    }
+  }
+
+  return null
 }
 
 function gatherOverrideSources(
@@ -694,7 +783,7 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
           vector_store_ids: [vectorStoreId]
         }
       ],
-      temperature: 0.2,
+      temperature: 0.0,
       max_output_tokens: 250
     } satisfies ResponseCreateParamsNonStreaming)
     const response = ensureNonStreamingResponse(rawResponse)
@@ -799,9 +888,25 @@ export async function executeChatWithSummaries({
   let workingSummary = baseState.summary
   let workingMessages = combinedMessages
 
+  // Check if we're in a confirmation state - if last assistant message asks for navigation
+  const lastAssistantMessage = [...baseState.messages].reverse().find(message => message.role === 'assistant')
+  const isPendingConfirmation = isNavigationOffer(lastAssistantMessage?.content)
+  const pendingConfirmationPhotoId = isPendingConfirmation
+    ? extractPendingDestinationId(lastAssistantMessage, baseState.messages)
+    : null
+  const userConfirmedNavigation = isPendingConfirmation && isAffirmativeUserResponse(normalisedNextMessage.content)
+
   const needsSummarisation =
+    !isPendingConfirmation &&
     shouldSummariseConversation(combinedMessages.length, totalCharacters) &&
     combinedMessages.length > SUMMARY_TAIL_MESSAGE_COUNT
+
+  if (isPendingConfirmation && shouldSummariseConversation(combinedMessages.length, totalCharacters)) {
+    console.info('[AI] Summarization skipped - awaiting navigation confirmation', {
+      messageCount: combinedMessages.length,
+      lastAssistantMessagePreview: lastAssistantMessage?.content?.slice(-80)
+    })
+  }
 
   if (needsSummarisation) {
     const sliceIndex = Math.max(combinedMessages.length - SUMMARY_TAIL_MESSAGE_COUNT, 0)
@@ -848,10 +953,33 @@ export async function executeChatWithSummaries({
     ]
   }
 
-  const response = await executeChat({
+  let response = await executeChat({
     messages: messagesForRequest,
     currentLocation
   })
+
+  if (userConfirmedNavigation && !response.functionCall && pendingConfirmationPhotoId) {
+    console.warn('[AI] Confirmation detected but tool call missing. Synthesizing navigation command.', {
+      destination: pendingConfirmationPhotoId
+    })
+    const fallbackCall = augmentFunctionCallWithPath(
+      {
+        name: 'navigate_to',
+        arguments: { photoId: pendingConfirmationPhotoId }
+      },
+      currentLocation
+    )
+    if (fallbackCall) {
+      response = {
+        message: null,
+        functionCall: fallbackCall
+      }
+    } else {
+      console.error('[AI] Failed to synthesise navigation command after confirmation', {
+        destination: pendingConfirmationPhotoId
+      })
+    }
+  }
 
   const sanitisedMessage = sanitiseAssistantMessage(response.message)
   const routeDescriptionFallback = response.functionCall?.arguments.routeDescription
