@@ -223,7 +223,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 100
     },
     "text": "S268 is visible from photo s-f2-mid-3. It sits in S Block (building S), floor 2."
   },
@@ -240,7 +241,8 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 160
     },
     "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2."
   },
@@ -377,34 +379,51 @@
       "buildingBlock": "s",
       "floorLevel": 4,
       "roomNumbers": [
-        "S453",
-        "S460"
+        "S453"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 120
     },
-    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4. Other rooms in view: S460."
+    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4."
   },
   {
-    "id": "s-f4-north-8",
+    "id": "s-f4-north-8-s454",
     "metadata": {
       "areaId": "s-block-floor-4-main",
       "areaName": "S Block",
       "buildingBlock": "s",
       "floorLevel": 4,
       "roomNumbers": [
-        "S454",
-        "S455",
-        "S458"
+        "S454"
       ],
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [],
+      "finalOrientation": 110
     },
     "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4. Other rooms in view: S455, S458."
+  },
+  {
+    "id": "s-f4-north-8-s455",
+    "metadata": {
+      "areaId": "s-block-floor-4-main",
+      "areaName": "S Block",
+      "buildingBlock": "s",
+      "floorLevel": 4,
+      "roomNumbers": [
+        "S455"
+      ],
+      "roomTypes": [
+        "classroom"
+      ],
+      "synonyms": [],
+      "finalOrientation": 150
+    },
+    "text": "S455 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4."
   },
   {
     "id": "w-f2-4",

@@ -119,7 +119,9 @@ export const VALID_LOCATION_ID_SET = new Set<string>([
   's-f2-south-5-s254',
   's-f2-south-7-s256',
   's-f2-south-7-s264',
-  's-f2-south-7-s262'
+  's-f2-south-7-s262',
+  's-f4-north-8-s454',
+  's-f4-north-8-s455'
 ])
 
 /**

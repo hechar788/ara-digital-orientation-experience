@@ -21,16 +21,14 @@ This document lists all classrooms accessible through the virtual campus tour, o
 - **S256** - South wing - **DONE**
 - **S262** - South wing - **DONE**
 - **S264** - South wing - **DONE**
-- **S265** - South wing
-- **S267** - Middle section
-- **S268** - Middle section
+- **S265** - South wing - **DONE**
+- **S267** - Middle section - **DONE**
+- **S268** - Middle section - **DONE**
 
 ### Floor 4
-- **S453** - North wing (accessible via door)
-- **S454** - North wing
-- **S455** - North wing
-- **S458** - North wing
-- **S460** - North wing
+- **S453** - North wing (accessible via door) - **DONE**
+- **S454** - North wing - **DONE**
+- **S455** - North wing - **DONE**
 
 ## W Block
 
