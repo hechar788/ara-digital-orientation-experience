@@ -52,13 +52,13 @@ This document lists all classrooms accessible through the virtual campus tour, o
 - **X210** - West wing - **DONE**
 
 ### Floor 3
-- **X302** - West wing
-- **X303** - West wing (accessible via door)
-- **X304** - West wing
-- **X305** - West wing
-- **X306** - East wing
-- **X308** - East wing
-- **X313** - East wing
+- **X302** - West wing - **DONE**
+- **X303** - West wing (accessible via door) - **DONE**
+- **X304** - West wing - **DONE**
+- **X305** - West wing - **DONE**
+- **X306** - East wing - **DONE**
+- **X308** - East wing - **DONE**
+- **X313** - East wing - **DONE**
 
 
 
