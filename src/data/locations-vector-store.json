@@ -61,10 +61,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "N104",
+        "N-104",
+        "N 104",
+        "classroom 104",
+        "room 104",
+        "class N104",
+        "teaching room N104"
+      ],
       "finalOrientation": 62.5
     },
-    "text": "N104 is visible from photo n-f1-east-south-4. It sits in N Block (building N), floor 1."
+    "text": "N104 is a teaching classroom located in N Block on the first floor. This classroom is available for lectures and coursework, visible from photo n-f1-east-south-4 in the east south corridor."
   },
   {
     "id": "n-f1-west-9",
@@ -133,10 +141,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S169",
+        "S-169",
+        "S 169",
+        "classroom 169",
+        "room 169",
+        "class S169",
+        "teaching room S169"
+      ],
       "finalOrientation": 135
     },
-    "text": "S169 is visible from photo s-f1-mid-3. It sits in S Block (building S), floor 1."
+    "text": "S169 is a teaching classroom located in S Block on the first floor. This classroom is available for lectures and coursework, visible from photo s-f1-mid-3 in the middle section."
   },
   {
     "id": "s-f1-north-4",
@@ -187,10 +203,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S156",
+        "S-156",
+        "S 156",
+        "classroom 156",
+        "room 156",
+        "class S156",
+        "teaching room S156"
+      ],
       "finalOrientation": 20
     },
-    "text": "S156 is visible from photo s-f1-south-2. It sits in S Block (building S), floor 1."
+    "text": "S156 is a teaching classroom located in S Block on the first floor. This classroom is available for lectures and coursework, visible from photo s-f1-south-2 in the south section."
   },
   {
     "id": "s-f1-south-entrance",
@@ -205,10 +229,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S157",
+        "S-157",
+        "S 157",
+        "classroom 157",
+        "room 157",
+        "class S157",
+        "teaching room S157"
+      ],
       "finalOrientation": 255
     },
-    "text": "S157 is visible from photo s-f1-south-entrance. It sits in S Block (building S), floor 1."
+    "text": "S157 is a teaching classroom located in S Block on the first floor. This classroom is available for lectures and coursework, visible from photo s-f1-south-entrance at the south entrance."
   },
   {
     "id": "s-f2-mid-3",
@@ -223,10 +255,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S268",
+        "S-268",
+        "S 268",
+        "classroom 268",
+        "room 268",
+        "class S268",
+        "teaching room S268"
+      ],
       "finalOrientation": 100
     },
-    "text": "S268 is visible from photo s-f2-mid-3. It sits in S Block (building S), floor 2."
+    "text": "S268 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-mid-3 in the middle section."
   },
   {
     "id": "s-f2-mid-4",
@@ -241,10 +281,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S267",
+        "S-267",
+        "S 267",
+        "classroom 267",
+        "room 267",
+        "class S267",
+        "teaching room S267"
+      ],
       "finalOrientation": 160
     },
-    "text": "S267 is visible from photo s-f2-mid-4. It sits in S Block (building S), floor 2."
+    "text": "S267 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-mid-4 in the middle section."
   },
   {
     "id": "s-f2-south-5-s265",
@@ -259,10 +307,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S265",
+        "S-265",
+        "S 265",
+        "classroom 265",
+        "room 265",
+        "class S265",
+        "teaching room S265"
+      ],
       "finalOrientation": 80
     },
-    "text": "S265 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2."
+    "text": "S265 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-5 in the south wing."
   },
   {
     "id": "s-f2-south-5-s254",
@@ -295,10 +351,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S255",
+        "S-255",
+        "S 255",
+        "classroom 255",
+        "room 255",
+        "class S255",
+        "teaching room S255"
+      ],
       "finalOrientation": 235
     },
-    "text": "S255 is visible from photo s-f2-south-6. It sits in S Block (building S), floor 2."
+    "text": "S255 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-6 in the south wing."
   },
   {
     "id": "s-f2-south-7-s256",
@@ -313,10 +377,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S256",
+        "S-256",
+        "S 256",
+        "classroom 256",
+        "room 256",
+        "class S256",
+        "teaching room S256"
+      ],
       "finalOrientation": 235
     },
-    "text": "S256 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
+    "text": "S256 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-7 in the south wing."
   },
   {
     "id": "s-f2-south-7-s264",
@@ -331,10 +403,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S264",
+        "S-264",
+        "S 264",
+        "classroom 264",
+        "room 264",
+        "class S264",
+        "teaching room S264"
+      ],
       "finalOrientation": 105
     },
-    "text": "S264 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
+    "text": "S264 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-7 in the south wing."
   },
   {
     "id": "s-f2-south-7-s262",
@@ -349,10 +429,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S262",
+        "S-262",
+        "S 262",
+        "classroom 262",
+        "room 262",
+        "class S262",
+        "teaching room S262"
+      ],
       "finalOrientation": 45
     },
-    "text": "S262 is visible from photo s-f2-south-7. It sits in S Block (building S), floor 2."
+    "text": "S262 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-7 in the south wing."
   },
   {
     "id": "s-f4-mid-4",
@@ -384,10 +472,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S453",
+        "S-453",
+        "S 453",
+        "classroom 453",
+        "room 453",
+        "class S453",
+        "teaching room S453"
+      ],
       "finalOrientation": 120
     },
-    "text": "S453 is visible from photo s-f4-north-7. It sits in S Block (building S), floor 4."
+    "text": "S453 is a teaching classroom located in S Block on the fourth floor. This classroom is available for lectures and coursework, visible from photo s-f4-north-7 in the north wing."
   },
   {
     "id": "s-f4-north-8-s454",
@@ -402,10 +498,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S454",
+        "S-454",
+        "S 454",
+        "classroom 454",
+        "room 454",
+        "class S454",
+        "teaching room S454"
+      ],
       "finalOrientation": 110
     },
-    "text": "S454 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4."
+    "text": "S454 is a teaching classroom located in S Block on the fourth floor. This classroom is available for lectures and coursework, visible from photo s-f4-north-8 in the north wing."
   },
   {
     "id": "s-f4-north-8-s455",
@@ -420,10 +524,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "S455",
+        "S-455",
+        "S 455",
+        "classroom 455",
+        "room 455",
+        "class S455",
+        "teaching room S455"
+      ],
       "finalOrientation": 150
     },
-    "text": "S455 is visible from photo s-f4-north-8. It sits in S Block (building S), floor 4."
+    "text": "S455 is a teaching classroom located in S Block on the fourth floor. This classroom is available for lectures and coursework, visible from photo s-f4-north-8 in the north wing."
   },
   {
     "id": "w-f2-4",
@@ -438,10 +550,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "W209",
+        "W-209",
+        "W 209",
+        "classroom 209",
+        "room 209",
+        "class W209",
+        "teaching room W209"
+      ],
       "finalOrientation": 90
     },
-    "text": "W209 is visible from photo w-f2-4. It sits in W Block (building W), floor 2."
+    "text": "W209 is a teaching classroom located in W Block on the second floor. This classroom is available for lectures and coursework, visible from photo w-f2-4 in the main corridor."
   },
   {
     "id": "w-f2-5",
@@ -456,10 +576,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "W210",
+        "W-210",
+        "W 210",
+        "classroom 210",
+        "room 210",
+        "class W210",
+        "teaching room W210"
+      ],
       "finalOrientation": 145
     },
-    "text": "W210 is visible from photo w-f2-5. It sits in W Block (building W), floor 2."
+    "text": "W210 is a teaching classroom located in W Block on the second floor. This classroom is available for lectures and coursework, visible from photo w-f2-5 in the main corridor."
   },
   {
     "id": "w-f2-6",
@@ -474,10 +602,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "W211",
+        "W-211",
+        "W 211",
+        "classroom 211",
+        "room 211",
+        "class W211",
+        "teaching room W211"
+      ],
       "finalOrientation": 95
     },
-    "text": "W211 is visible from photo w-f2-6. It sits in W Block (building W), floor 2."
+    "text": "W211 is a teaching classroom located in W Block on the second floor. This classroom is available for lectures and coursework, visible from photo w-f2-6 in the main corridor."
   },
   {
     "id": "w-f2-7",
@@ -492,10 +628,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "W212",
+        "W-212",
+        "W 212",
+        "classroom 212",
+        "room 212",
+        "class W212",
+        "teaching room W212"
+      ],
       "finalOrientation": 152.5
     },
-    "text": "W212 is visible from photo w-f2-7. It sits in W Block (building W), floor 2."
+    "text": "W212 is a teaching classroom located in W Block on the second floor. This classroom is available for lectures and coursework, visible from photo w-f2-7 in the main corridor."
   },
   {
     "id": "w-gym-overlook-1",
@@ -887,9 +1031,17 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "L202",
+        "L-202",
+        "L 202",
+        "classroom 202",
+        "room 202",
+        "class L202",
+        "teaching room L202"
+      ]
     },
-    "text": "L202 is visible from photo x-f2-north-9-aside. It sits in L Block (building L), floor 2."
+    "text": "L202 is a teaching classroom located in L Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-north-9-aside in the north wing."
   },
   {
     "id": "x-f2-north-9-aside-l203",
@@ -904,10 +1056,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "L203",
+        "L-203",
+        "L 203",
+        "classroom 203",
+        "room 203",
+        "class L203",
+        "teaching room L203"
+      ],
       "finalOrientation": 210
     },
-    "text": "L203 is visible from photo x-f2-north-9-aside. It sits in L Block (building L), floor 2."
+    "text": "L203 is a teaching classroom located in L Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-north-9-aside in the north wing."
   },
   {
     "id": "x-f2-west-2",
@@ -922,10 +1082,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X202",
+        "X-202",
+        "X 202",
+        "classroom 202",
+        "room 202",
+        "class X202",
+        "teaching room X202"
+      ],
       "finalOrientation": 60
     },
-    "text": "X202 is visible from photo x-f2-west-2. It sits in X Block (building X), floor 2."
+    "text": "X202 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-2 in the west wing."
   },
   {
     "id": "x-f2-west-3-aside-x203",
@@ -940,10 +1108,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X203",
+        "X-203",
+        "X 203",
+        "classroom 203",
+        "room 203",
+        "class X203",
+        "teaching room X203"
+      ],
       "finalOrientation": 195
     },
-    "text": "X203 is visible from photo x-f2-west-3-aside. It sits in X Block (building X), floor 2."
+    "text": "X203 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-3-aside in the west wing."
   },
   {
     "id": "x-f2-west-4-x204",
@@ -958,10 +1134,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X204",
+        "X-204",
+        "X 204",
+        "classroom 204",
+        "room 204",
+        "class X204",
+        "teaching room X204"
+      ],
       "finalOrientation": 100
     },
-    "text": "X204 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2."
+    "text": "X204 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-4 in the west wing."
   },
   {
     "id": "x-f2-west-4-x206",
@@ -976,10 +1160,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X206",
+        "X-206",
+        "X 206",
+        "classroom 206",
+        "room 206",
+        "class X206",
+        "teaching room X206"
+      ],
       "finalOrientation": 50
     },
-    "text": "X206 is visible from photo x-f2-west-4. It sits in X Block (building X), floor 2."
+    "text": "X206 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-4 in the west wing."
   },
   {
     "id": "x-f2-west-5-aside-x205",
@@ -994,10 +1186,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X205",
+        "X-205",
+        "X 205",
+        "classroom 205",
+        "room 205",
+        "class X205",
+        "teaching room X205"
+      ],
       "finalOrientation": 205
     },
-    "text": "X205 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2."
+    "text": "X205 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-5-aside in the west wing."
   },
   {
     "id": "x-f2-west-5-aside-x210",
@@ -1012,10 +1212,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X210",
+        "X-210",
+        "X 210",
+        "classroom 210",
+        "room 210",
+        "class X210",
+        "teaching room X210"
+      ],
       "finalOrientation": 147.5
     },
-    "text": "X210 is visible from photo x-f2-west-5-aside. It sits in X Block (building X), floor 2."
+    "text": "X210 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-5-aside in the west wing."
   },
   {
     "id": "x-f2-west-6",
@@ -1030,10 +1238,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": [],
+      "synonyms": [
+        "X208",
+        "X-208",
+        "X 208",
+        "classroom 208",
+        "room 208",
+        "class X208",
+        "teaching room X208"
+      ],
       "finalOrientation": 60
     },
-    "text": "X208 is visible from photo x-f2-west-6. It sits in X Block (building X), floor 2."
+    "text": "X208 is a teaching classroom located in X Block on the second floor. This classroom is available for lectures and coursework, visible from photo x-f2-west-6 in the west wing."
   },
   {
     "id": "x-f3-east-6-x306",
@@ -1048,9 +1264,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X306",
+        "X-306",
+        "X 306",
+        "classroom 306",
+        "room 306",
+        "class X306",
+        "teaching room X306"
+      ],
+      "finalOrientation": 335
     },
-    "text": "X306 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3."
+    "text": "X306 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-east-6 in the east wing."
   },
   {
     "id": "x-f3-east-6-x308",
@@ -1065,9 +1290,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X308",
+        "X-308",
+        "X 308",
+        "classroom 308",
+        "room 308",
+        "class X308",
+        "teaching room X308"
+      ],
+      "finalOrientation": 215
     },
-    "text": "X308 is visible from photo x-f3-east-6. It sits in X Block (building X), floor 3."
+    "text": "X308 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-east-6 in the east wing."
   },
   {
     "id": "x-f3-east-8",
@@ -1082,9 +1316,17 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X313",
+        "X-313",
+        "X 313",
+        "classroom 313",
+        "room 313",
+        "class X313",
+        "teaching room X313"
+      ]
     },
-    "text": "X313 is visible from photo x-f3-east-8. It sits in X Block (building X), floor 3."
+    "text": "X313 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-east-8 in the east wing."
   },
   {
     "id": "x-f3-west-1-x302",
@@ -1099,9 +1341,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X302",
+        "X-302",
+        "X 302",
+        "classroom 302",
+        "room 302",
+        "class X302",
+        "teaching room X302"
+      ],
+      "finalOrientation": 340
     },
-    "text": "X302 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3."
+    "text": "X302 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-west-1 in the west wing."
   },
   {
     "id": "x-f3-west-1-x304",
@@ -1116,9 +1367,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X304",
+        "X-304",
+        "X 304",
+        "classroom 304",
+        "room 304",
+        "class X304",
+        "teaching room X304"
+      ],
+      "finalOrientation": 213.5
     },
-    "text": "X304 is visible from photo x-f3-west-1. It sits in X Block (building X), floor 3."
+    "text": "X304 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-west-1 in the west wing."
   },
   {
     "id": "x-f3-west-1-aside-x303",
@@ -1133,9 +1393,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X303",
+        "X-303",
+        "X 303",
+        "classroom 303",
+        "room 303",
+        "class X303",
+        "teaching room X303"
+      ],
+      "finalOrientation": 15
     },
-    "text": "X303 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3."
+    "text": "X303 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-west-1-aside in the west wing."
   },
   {
     "id": "x-f3-west-1-aside-x305",
@@ -1150,9 +1419,18 @@
       "roomTypes": [
         "classroom"
       ],
-      "synonyms": []
+      "synonyms": [
+        "X305",
+        "X-305",
+        "X 305",
+        "classroom 305",
+        "room 305",
+        "class X305",
+        "teaching room X305"
+      ],
+      "finalOrientation": -17.5
     },
-    "text": "X305 is visible from photo x-f3-west-1-aside. It sits in X Block (building X), floor 3."
+    "text": "X305 is a teaching classroom located in X Block on the third floor. This classroom is available for lectures and coursework, visible from photo x-f3-west-1-aside in the west wing."
   },
   {
     "id": "outside-t-mid-2",

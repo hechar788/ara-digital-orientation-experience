@@ -8,7 +8,7 @@ Information hotspots are clickable spheres in the panoramic viewer that display 
 - **Interactive**: Clickable hotspots that open a modal popup
 - **User-Friendly**: Simple popup with title, description, and close button
 
-## Adding Information Hotspots to Photos
+## Adding Information Hotspot to Photos
 
 To add an information hotspot to a photo, include it in the `hotspots` array of your `Photo` object:
 
