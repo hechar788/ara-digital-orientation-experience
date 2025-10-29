@@ -69,7 +69,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
     <>
       {/* Map and Navigation Info */}
       <OnboardingHighlight targetId="minimap">
-        <div className="flex flex-col gap-1.5 items-end">
+        <div className="flex flex-col gap-1.5 items-end touch-none">
           {/* Campus Map */}
           {isMinimapOpen ? (
           <div className="w-[11.55rem] lg:w-62 h-44 lg:h-62 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
@@ -136,7 +136,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
       <Dialog open={expandedMap.isOpen} onOpenChange={expandedMap.close}>
         <DialogContent
           showCloseButton={false}
-          className="w-[95vw] max-w-[95vw] sm:w-auto sm:max-w-[900px] max-h-[95vh] p-0 overflow-hidden bg-background flex flex-col"
+          className="w-[95vw] max-w-[95vw] sm:w-auto sm:max-w-[900px] max-h-[95vh] p-0 overflow-hidden bg-background flex flex-col touch-pan-y"
         >
           <DialogClose className="absolute top-2 sm:top-1 right-2 sm:right-1 z-50 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
             <span className="sr-only">Close map</span>

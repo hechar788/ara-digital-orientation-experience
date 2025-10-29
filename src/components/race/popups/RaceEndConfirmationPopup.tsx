@@ -56,7 +56,7 @@ export const RaceEndConfirmationPopup: React.FC<RaceEndConfirmationPopupProps> =
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md pt-8 pb-6">
+      <DialogContent className="sm:max-w-md pt-8 pb-6 touch-none">
         <DialogHeader>
           <DialogTitle className="text-xl text-left">Finish The Amazing Race?</DialogTitle>
           <DialogDescription className="text-base pb-6 text-left">

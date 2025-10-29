@@ -190,7 +190,7 @@ export const AvailableClassroomsPopup: React.FC<AvailableClassroomsPopupProps> =
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="max-w-md w-[90vw] p-0 gap-0 border-0 max-h-[85vh] flex flex-col" 
+        className="max-w-md w-[90vw] p-0 gap-0 border-0 max-h-[85vh] flex flex-col touch-pan-y" 
         showCloseButton={false} 
         aria-describedby={undefined}
       >

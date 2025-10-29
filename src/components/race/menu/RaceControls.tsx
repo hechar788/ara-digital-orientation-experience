@@ -92,7 +92,7 @@ export const RaceControls: React.FC<RaceControlsProps> = ({
   return (
     <TooltipProvider>
       <div
-        className={`h-14 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none`}
+        className={`h-14 lg:h-16 bg-gray-800/90 backdrop-blur-sm shadow-lg ${className} flex items-center justify-center w-auto max-w-[96vw] lg:max-w-none touch-none`}
         style={{
           clipPath: 'polygon(4% 0%, 100% 0%, 96% 100%, 0% 100%)',
           ...style
