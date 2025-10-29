@@ -271,7 +271,7 @@ function MinimapMapImage({
               <g key={segment.id}>
                 <path
                   d={segment.d}
-                  stroke="rgba(56,189,248,0.32)"
+                  stroke="rgba(250,204,21,0.5)"
                   strokeWidth={haloWidth}
                   fill="none"
                   strokeLinecap="round"
@@ -279,7 +279,7 @@ function MinimapMapImage({
                 />
                 <path
                   d={segment.d}
-                  stroke="#38bdf8"
+                  stroke="#facc15"
                   strokeWidth={strokeWidth}
                   fill="none"
                   strokeLinecap="round"
@@ -339,7 +339,11 @@ function MinimapMapImage({
  * />
  * ```
  */
-export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: MinimapProps) {
+export function Minimap({
+  currentArea,
+  currentPhotoId,
+  isRaceMode = false
+}: MinimapProps) {
   const minimapStore = useMinimapStore()
   const expandedMap = usePopup()
   const orientation = useOrientationStore()
@@ -476,12 +480,12 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
                       </span>
                     </div>
                     <div className="flex flex-col items-start text-s text-black sm:hidden gap-1 mt-2">
-                      <span className="w-full text-left truncate">Current Photo: {currentPhotoId}</span>
+                      <span className="w-full text-left truncate">Current Area: {currentAreaName}</span>
                       <span className="w-full text-left">Areas Discovered: {areasDiscoveredLabel}</span>
                     </div>
                   </div>
                   <div className="hidden sm:flex flex-col gap-1 text-right text-s text-black">
-                    <span className="text-right">Current Photo: {currentPhotoId}</span>
+                    <span className="text-right">Current Area: {currentAreaName}</span>
                     <span className="text-right">Areas Discovered: {areasDiscoveredLabel}</span>
                   </div>
                 </div>

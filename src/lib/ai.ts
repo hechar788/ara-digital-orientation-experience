@@ -299,6 +299,8 @@ const AVAILABLE_LOCATIONS_REQUEST_PATTERNS = [
   'show me the locations you can help me find',
   'show me available locations',
   'list available locations',
+  'where can you take me',
+  'where can you take me?',
   'list the locations you can take me to',
   'list the locations you can help me find'
 ]
