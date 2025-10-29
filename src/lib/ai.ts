@@ -286,6 +286,22 @@ const DOCUMENTS_PROMPT_PHRASES = [
   'would you like to see the documents',
   'shall i show you the documents'
 ]
+const AVAILABLE_LOCATIONS_REQUEST_PATTERNS = [
+  'what locations can you take me to',
+  'what locations can you help me find',
+  'what locations can you show me',
+  'what locations do you have',
+  'what facilities can you take me to',
+  'what facilities can you help me find',
+  'what classrooms can you take me to',
+  'what classrooms can you help me find',
+  'show me the locations you can take me to',
+  'show me the locations you can help me find',
+  'show me available locations',
+  'list available locations',
+  'list the locations you can take me to',
+  'list the locations you can help me find'
+]
 const AFFIRMATIVE_SINGLE_WORDS = [
   'yes',
   'yeah',
@@ -299,6 +315,37 @@ const AFFIRMATIVE_SINGLE_WORDS = [
   'definitely'
 ]
 const AFFIRMATIVE_MULTI_WORD_PHRASES = ['go ahead', 'take me', 'show me', 'sounds good', 'do it']
+
+function normaliseMessageForMatching(message: string): string {
+  return message
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function isAvailableLocationsRequest(message: string): boolean {
+  const normalised = normaliseMessageForMatching(message)
+  if (!normalised) {
+    return false
+  }
+
+  if (AVAILABLE_LOCATIONS_REQUEST_PATTERNS.some(pattern => normalised.includes(pattern))) {
+    return true
+  }
+
+  const hasLocationKeyword = /\b(locations?|classrooms?|facilities?)\b/.test(normalised)
+  if (!hasLocationKeyword) {
+    return false
+  }
+
+  const hasListingIntent =
+    /\b(available|list|which|what)\b/.test(normalised) || normalised.includes('show me')
+  const hasAssistanceIntent =
+    /\b(can you|help me|take me|show me|do you have|tell me)\b/.test(normalised)
+
+  return hasListingIntent && hasAssistanceIntent
+}
 
 function parseResponseText(output: GeneratedResponse['output']): string | null {
   const parts: string[] = []
@@ -1201,6 +1248,23 @@ export async function executeChatWithSummaries({
       message: null,
       functionCall: {
         name: 'show_campus_documents',
+        arguments: {}
+      }
+    }
+  }
+
+  const userRequestedAvailableLocations = isAvailableLocationsRequest(normalisedNextMessage.content)
+  if (
+    userRequestedAvailableLocations &&
+    (!response.functionCall || response.functionCall.name !== 'show_available_locations')
+  ) {
+    console.info('[AI] Synthesizing available locations command based on user request.', {
+      userMessage: normalisedNextMessage.content
+    })
+    response = {
+      message: null,
+      functionCall: {
+        name: 'show_available_locations',
         arguments: {}
       }
     }

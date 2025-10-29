@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import { Map } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from '../ui/dialog'
@@ -7,8 +7,11 @@ import { usePopup } from '../../hooks/usePopup'
 import { useOrientationStore } from '../../hooks/useOrientationStore'
 import { useRaceStore } from '../../hooks/useRaceStore'
 import { useMinimapStore } from '../../hooks/useMinimapStore'
+import { resolveMinimapCoordinate, type MinimapCoordinate } from '../../data/minimap/minimapUtils'
 import { TOTAL_TOUR_AREAS } from '../../data/blockUtils'
 import type { Area } from '../../types/tour'
+import type { MinimapPathNode } from '../../stores/minimapStore'
+import clsx from 'clsx'
 
 /**
  * Props for the Minimap component
@@ -24,6 +27,293 @@ export interface MinimapProps {
   currentArea: Area | null
   currentPhotoId: string
   isRaceMode?: boolean
+}
+
+interface MinimapMapImageProps {
+  coordinate: MinimapCoordinate | null
+  path?: MinimapPathNode[]
+  src: string
+  alt: string
+  markerVariant: 'compact' | 'expanded'
+  containerClassName?: string
+  imageClassName?: string
+  disablePointerEvents?: boolean
+  fit?: 'contain' | 'cover'
+}
+
+interface RenderMetrics {
+  containerWidth: number
+  containerHeight: number
+  renderedWidth: number
+  renderedHeight: number
+  offsetX: number
+  offsetY: number
+}
+
+function MinimapMapImage({
+  coordinate,
+  path = [],
+  src,
+  alt,
+  markerVariant,
+  containerClassName,
+  imageClassName,
+  disablePointerEvents = false,
+  fit = 'contain'
+}: MinimapMapImageProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const imageRef = useRef<HTMLImageElement | null>(null)
+  const [metrics, setMetrics] = useState<RenderMetrics | null>(null)
+
+  const updateRenderMetrics = useCallback(() => {
+    const container = containerRef.current
+    const image = imageRef.current
+
+    if (!container || !image) {
+      setMetrics(null)
+      return
+    }
+
+    const containerWidth = container.clientWidth
+    const containerHeight = container.clientHeight
+    const naturalWidth = image.naturalWidth
+    const naturalHeight = image.naturalHeight
+
+    if (!containerWidth || !containerHeight || !naturalWidth || !naturalHeight) {
+      setMetrics(null)
+      return
+    }
+
+    let renderedWidth: number
+    let renderedHeight: number
+    let offsetX = 0
+    let offsetY = 0
+
+    if (fit === 'cover') {
+      const scale = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight)
+      renderedWidth = naturalWidth * scale
+      renderedHeight = naturalHeight * scale
+      offsetX = (containerWidth - renderedWidth) / 2
+      offsetY = (containerHeight - renderedHeight) / 2
+    } else {
+      const imageRatio = naturalWidth / naturalHeight
+      const containerRatio = containerWidth / containerHeight
+
+      if (containerRatio > imageRatio) {
+        renderedHeight = containerHeight
+        renderedWidth = renderedHeight * imageRatio
+        offsetX = (containerWidth - renderedWidth) / 2
+      } else {
+        renderedWidth = containerWidth
+        renderedHeight = renderedWidth / imageRatio
+        offsetY = (containerHeight - renderedHeight) / 2
+      }
+    }
+
+    setMetrics({
+      containerWidth,
+      containerHeight,
+      renderedWidth,
+      renderedHeight,
+      offsetX,
+      offsetY
+    })
+  }, [fit])
+
+  useEffect(() => {
+    updateRenderMetrics()
+  }, [updateRenderMetrics])
+
+  useEffect(() => {
+    const image = imageRef.current
+    if (!image) {
+      return
+    }
+
+    const handleLoad = () => {
+      updateRenderMetrics()
+    }
+
+    if (image.complete) {
+      updateRenderMetrics()
+    } else {
+      image.addEventListener('load', handleLoad)
+    }
+
+    return () => {
+      image.removeEventListener('load', handleLoad)
+    }
+  }, [updateRenderMetrics])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const container = containerRef.current
+
+    if (container && typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(() => {
+        updateRenderMetrics()
+      })
+      observer.observe(container)
+      return () => {
+        observer.disconnect()
+      }
+    }
+
+    const handleResize = () => {
+      updateRenderMetrics()
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [updateRenderMetrics])
+
+  const computePosition = useCallback(
+    (value: MinimapCoordinate | null) => {
+      if (!metrics || !value || value.x === null || value.y === null) {
+        return null
+      }
+      const left = metrics.offsetX + value.x * metrics.renderedWidth
+      const top = metrics.offsetY + value.y * metrics.renderedHeight
+      return { left, top }
+    },
+    [metrics]
+  )
+
+  const markerPosition = useMemo(() => computePosition(coordinate), [computePosition, coordinate])
+
+  const pathSegments = useMemo(() => {
+    if (!metrics || !path || path.length === 0) {
+      return []
+    }
+
+    const segments: Array<{ id: string; d: string }> = []
+    let commands: string[] = []
+    let hasStarted = false
+    let segmentIndex = 0
+
+    path.forEach(node => {
+      const position = computePosition(node.coordinate)
+      if (!position) {
+        if (commands.length >= 2) {
+          segments.push({
+            id: `segment-${segmentIndex}`,
+            d: commands.join(' ')
+          })
+          segmentIndex += 1
+        }
+        commands = []
+        hasStarted = false
+        return
+      }
+
+      const prefix = hasStarted ? 'L' : 'M'
+      commands.push(`${prefix} ${position.left} ${position.top}`)
+      hasStarted = true
+    })
+
+    if (commands.length >= 2) {
+      segments.push({
+        id: `segment-${segmentIndex}`,
+        d: commands.join(' ')
+      })
+    }
+
+    return segments
+  }, [computePosition, metrics, path])
+
+  const viewBox = useMemo(() => {
+    if (!metrics) {
+      return null
+    }
+    return `0 0 ${metrics.containerWidth} ${metrics.containerHeight}`
+  }, [metrics])
+
+  const dotClassName =
+    markerVariant === 'expanded'
+      ? 'h-4 w-4 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.9)]'
+      : 'h-3 w-3 rounded-full bg-sky-500 shadow-[0_0_6px_rgba(56,189,248,0.85)]'
+
+  const ringClassName =
+    markerVariant === 'expanded'
+      ? 'h-10 w-10 rounded-full border border-sky-300/70'
+      : 'h-6 w-6 rounded-full border border-sky-400/60'
+
+  const strokeWidth = markerVariant === 'expanded' ? 4 : 3
+  const haloWidth = markerVariant === 'expanded' ? 9 : 6
+
+  return (
+    <div ref={containerRef} className={clsx('relative', containerClassName)}>
+      <img
+        ref={imageRef}
+        src={src}
+        alt={alt}
+        className={clsx(
+          'select-none',
+          fit === 'cover' ? 'object-cover' : 'object-contain',
+          disablePointerEvents && 'pointer-events-none',
+          imageClassName
+        )}
+        draggable={false}
+      />
+      <div className="pointer-events-none absolute inset-0">
+        {viewBox && pathSegments.length > 0 ? (
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox={viewBox}
+            preserveAspectRatio="none"
+          >
+            {pathSegments.map(segment => (
+              <g key={segment.id}>
+                <path
+                  d={segment.d}
+                  stroke="rgba(56,189,248,0.32)"
+                  strokeWidth={haloWidth}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d={segment.d}
+                  stroke="#38bdf8"
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+            ))}
+          </svg>
+        ) : null}
+        {markerPosition ? (
+          <>
+            <span
+              className={clsx('absolute block', dotClassName)}
+              style={{
+                left: `${markerPosition.left}px`,
+                top: `${markerPosition.top}px`,
+                transform: 'translate(-50%, -50%)'
+              }}
+              aria-hidden="true"
+            />
+            <span
+              className={clsx('absolute', ringClassName)}
+              style={{
+                left: `${markerPosition.left}px`,
+                top: `${markerPosition.top}px`,
+                transform: 'translate(-50%, -50%)'
+              }}
+              aria-hidden="true"
+            />
+          </>
+        ) : null}
+      </div>
+    </div>
+  )
 }
 
 /**
@@ -54,6 +344,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
   const expandedMap = usePopup()
   const orientation = useOrientationStore()
   const race = useRaceStore()
+  const { setActive, activeCoordinate, pathNodes } = minimapStore
 
   const currentAreaName = currentArea?.name ?? 'Unknown Area'
 
@@ -65,6 +356,23 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
   const isMinimapOpen = minimapStore.isOpen
   const setIsMinimapOpen = minimapStore.setOpen
 
+  useEffect(() => {
+    if (!currentPhotoId) {
+      setActive(null, null)
+      return
+    }
+
+    const { coordinate } = resolveMinimapCoordinate(currentPhotoId)
+
+    if (!coordinate) {
+      console.warn(`[Minimap] Missing minimap coordinate for photo "${currentPhotoId}".`)
+    }
+
+    setActive(currentPhotoId, coordinate)
+  }, [currentPhotoId, setActive])
+
+  const minimapImageSrc = '/campus_map/map.webp'
+
   return (
     <>
       {/* Map and Navigation Info */}
@@ -72,7 +380,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
         <div className="flex flex-col gap-1.5 items-end touch-none">
           {/* Campus Map */}
           {isMinimapOpen ? (
-          <div className="w-[11.55rem] lg:w-62 h-44 lg:h-62 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
+          <div className="w-[12.7rem] lg:w-[17.05rem] h-44 lg:h-62 bg-gray-800/90 border-2 border-gray-600 rounded-lg overflow-hidden relative">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -80,10 +388,16 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
                   className="w-full h-full cursor-pointer p-0 border-0 bg-transparent"
                   aria-label="Expand map"
                 >
-                  <img
-                    src="/campus_map/chch-official-campusmap-only.svg"
+                  <MinimapMapImage
+                    coordinate={activeCoordinate}
+                    path={pathNodes}
+                    src={minimapImageSrc}
                     alt="Campus Map"
-                    className="w-full h-full object-cover cursor-pointer"
+                    markerVariant="compact"
+                    containerClassName="h-full w-full"
+                    imageClassName="h-full w-full"
+                    fit="cover"
+                    disablePointerEvents
                   />
                 </button>
               </TooltipTrigger>
@@ -116,7 +430,7 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setIsMinimapOpen(true)}
-                  className="w-[11.55rem] lg:w-62 h-11 bg-gray-800/90 px-4 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
+                  className="w-[12.7rem] lg:w-[17.05rem] h-11 bg-gray-800/90 px-4 rounded-lg border border-gray-600 flex items-center justify-between hover:bg-gray-700/90 text-white transition-colors cursor-pointer"
                   aria-label="Open map"
                 >
                   <span className="text-white text-sm font-medium">Minimap</span>
@@ -181,10 +495,14 @@ export function Minimap({ currentArea, currentPhotoId, isRaceMode = false }: Min
 
             <div className="flex-1 flex items-center justify-center py-3 sm:px-10 sm:py-3">
               <div className="mx-auto w-full">
-                <img
-                  src="/campus_map/minimap.jpg"
+                <MinimapMapImage
+                  coordinate={activeCoordinate}
+                  path={pathNodes}
+                  src={minimapImageSrc}
                   alt="Campus Map - Full View"
-                  className="h-auto w-full max-h-[calc(95vh-130px)] sm:max-h-[calc(95vh-120px)] object-contain object-center"
+                  markerVariant="expanded"
+                  containerClassName="relative w-full"
+                  imageClassName="h-auto w-full max-h-[calc(95vh-130px)] sm:max-h-[calc(95vh-120px)] object-contain object-center"
                 />
               </div>
             </div>

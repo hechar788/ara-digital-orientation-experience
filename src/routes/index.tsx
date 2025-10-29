@@ -74,7 +74,7 @@ function App() {
           <PanoramicZoomSlider
             currentFov={currentFov}
             onZoomChange={setCurrentFov}
-            className="w-[11.55rem] lg:w-62 !py-1.5"
+            className="w-[12.7rem] lg:w-[17.05rem] !py-1.5"
             defaultFov={defaultFov}
           />
 

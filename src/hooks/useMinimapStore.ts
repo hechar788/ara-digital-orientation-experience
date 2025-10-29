@@ -11,8 +11,13 @@ import { useStore } from '@tanstack/react-store'
 import {
   minimapStore,
   setMinimapOpen,
-  getMinimapOpen
+  getMinimapOpen,
+  setMinimapActive,
+  setMinimapPath,
+  clearMinimapPath,
+  type MinimapPathNode
 } from '../stores/minimapStore'
+import type { MinimapCoordinate } from '../data/minimap/minimapUtils'
 
 /**
  * Return type for the useMinimapStore hook
@@ -23,11 +28,23 @@ import {
  * @property isOpen - Whether the minimap is currently open (expanded)
  * @property setOpen - Function to update minimap open/closed state
  * @property getOpen - Function to get current open state
+ * @property activePhotoId - Photo ID currently highlighted on the minimap
+ * @property activeCoordinate - Coordinate of the active photo, null when unavailable
+ * @property setActive - Function to update the active minimap photo and coordinate
+ * @property pathNodes - Ordered nodes representing the current navigation route
+ * @property setPath - Function to replace the active minimap navigation path
+ * @property clearPath - Function to clear the active minimap navigation path
  */
 export interface UseMinimapStoreReturn {
   isOpen: boolean
   setOpen: (isOpen: boolean) => void
   getOpen: () => boolean
+  activePhotoId: string | null
+  activeCoordinate: MinimapCoordinate | null
+  setActive: (photoId: string | null, coordinate: MinimapCoordinate | null) => void
+  pathNodes: MinimapPathNode[]
+  setPath: (photoIds: string[]) => void
+  clearPath: () => void
 }
 
 /**
@@ -64,6 +81,12 @@ export function useMinimapStore(): UseMinimapStoreReturn {
   return {
     isOpen: state.isOpen,
     setOpen: setMinimapOpen,
-    getOpen: getMinimapOpen
+    getOpen: getMinimapOpen,
+    activePhotoId: state.activePhotoId,
+    activeCoordinate: state.activeCoordinate,
+    setActive: setMinimapActive,
+    pathNodes: state.pathNodes,
+    setPath: setMinimapPath,
+    clearPath: clearMinimapPath
   }
 }
