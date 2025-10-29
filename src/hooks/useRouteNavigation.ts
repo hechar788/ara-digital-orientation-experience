@@ -43,6 +43,8 @@ export interface NavigationState {
 interface InternalState extends NavigationState {
   pendingPath: string[]
   finalOrientation?: number
+  originPhotoId: string | null
+  restartPending: boolean
 }
 
 /**
@@ -58,6 +60,7 @@ interface InternalState extends NavigationState {
  * @property resumeNavigation - Resumes navigation from the next pending step
  * @property stepBackward - Moves the viewer back to the previous step in the current path
  * @property stepForward - Advances the viewer to the next step in the current path
+ * @property restartNavigation - Restarts the active path from the beginning while keeping it paused
  */
 export interface UseRouteNavigationReturn {
   navigationState: NavigationState
@@ -70,6 +73,7 @@ export interface UseRouteNavigationReturn {
   resumeNavigation: () => void
   stepBackward: () => void
   stepForward: () => void
+  restartNavigation: () => void
 }
 
 /**
@@ -80,6 +84,7 @@ export interface UseRouteNavigationReturn {
  * @property totalSteps - Total number of steps within the active path
  * @property nextPhotoId - Photo ID of the next step in the path (if available)
  * @property finalOrientation - Absolute camera angle to face at the final destination (if configured)
+ * @property forceJump - When true, bypasses preview logic and forces an immediate jump to the supplied photo
  */
 export interface RouteNavigationHandlerOptions {
   isSequential?: boolean
@@ -87,6 +92,7 @@ export interface RouteNavigationHandlerOptions {
   totalSteps?: number
   nextPhotoId?: string
   finalOrientation?: number
+  forceJump?: boolean
 }
 
 type TimeoutHandle = ReturnType<typeof setTimeout> | null
@@ -120,7 +126,9 @@ export function useRouteNavigation(
     currentPhotoId: null,
     path: [],
     pendingPath: [],
-    finalOrientation: undefined
+    finalOrientation: undefined,
+    originPhotoId: null,
+    restartPending: false
   })
   const timeoutRef = useRef<TimeoutHandle>(null)
   const stateRef = useRef(state)
@@ -235,17 +243,34 @@ export function useRouteNavigation(
         clearMinimapPath()
       }
 
+      const originPhotoId = cleanedPath[0] ?? null
+      const shouldAutoStart = !stateRef.current.restartPending
+
       clearScheduledStep()
-      setState({
+      const nextState: InternalState = {
         isNavigating: true,
-        isPaused: true,
+        isPaused: !shouldAutoStart,
         currentStepIndex: -1,
         totalSteps: cleanedPath.length,
-        currentPhotoId: null,
+        currentPhotoId: originPhotoId,
         path: cleanedPath,
         pendingPath: cleanedPath,
-        finalOrientation
-      })
+        finalOrientation,
+        originPhotoId,
+        restartPending: false
+      }
+      setState(nextState)
+      stateRef.current = nextState
+
+      if (shouldAutoStart) {
+        timeoutRef.current = setTimeout(() => {
+          const latest = stateRef.current
+          if (!latest.isNavigating || latest.path.length === 0 || latest.isPaused) {
+            return
+          }
+          void advanceToNextStep(latest.path, 0)
+        }, 2000)
+      }
     },
     [advanceToNextStep, clearScheduledStep]
   )
@@ -420,6 +445,56 @@ export function useRouteNavigation(
 
   useEffect(() => () => clearScheduledStep(), [clearScheduledStep])
 
+  const restartNavigation = useCallback(() => {
+    const snapshot = stateRef.current
+    if (snapshot.path.length === 0) {
+      return
+    }
+
+    const restartPath = [...snapshot.path]
+    const originPhotoId = snapshot.originPhotoId ?? restartPath[0] ?? null
+
+    if (!originPhotoId) {
+      return
+    }
+
+    clearScheduledStep()
+
+    void (async () => {
+    await onNavigate(originPhotoId, {
+      isSequential: true,
+      stepIndex: 0,
+      totalSteps: restartPath.length,
+      nextPhotoId: restartPath.length > 1 ? restartPath[1] : undefined,
+      finalOrientation: snapshot.finalOrientation,
+      forceJump: true,
+      preserveOrientation: true
+    })
+
+      if (restartPath.length > 1) {
+        setMinimapPath(restartPath)
+      } else {
+        clearMinimapPath()
+      }
+
+      const nextState: InternalState = {
+        isNavigating: true,
+        isPaused: true,
+        currentStepIndex: -1,
+        totalSteps: restartPath.length,
+        currentPhotoId: originPhotoId,
+        path: restartPath,
+        pendingPath: restartPath,
+        finalOrientation: snapshot.finalOrientation,
+        originPhotoId,
+        restartPending: true
+      }
+
+      setState(nextState)
+      stateRef.current = nextState
+    })()
+  }, [clearMinimapPath, clearScheduledStep, onNavigate, setMinimapPath])
+
   return {
     navigationState,
     startNavigation,
@@ -430,6 +505,7 @@ export function useRouteNavigation(
     pauseNavigation,
     resumeNavigation,
     stepBackward,
-    stepForward
+    stepForward,
+    restartNavigation
   }
 }

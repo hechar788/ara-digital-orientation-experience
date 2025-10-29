@@ -253,12 +253,16 @@ function getHotspotHeading(
  * @property previewDelayMs - Duration to wait after the preview rotation before navigating (defaults to 1000 ms)
  * @property nextPhotoId - Optional upcoming photo ID used to pre-orient the camera after arrival
  * @property finalOrientation - Absolute camera angle in degrees to face after arrival (overrides calculated orientation)
+ * @property forceImmediate - When true, skips preview logic and performs an immediate jump to the destination
+ * @property preserveOrientation - When true, keeps the current camera orientation instead of applying navigation orientation
  */
 export interface JumpToPhotoOptions {
   previewDirection?: boolean
   previewDelayMs?: number
   nextPhotoId?: string
   finalOrientation?: number
+  forceImmediate?: boolean
+  preserveOrientation?: boolean
 }
 
 function normalizeAngle(angle: number): number {
@@ -1058,7 +1062,7 @@ export function useTourNavigation() {
     const activeCurrentPhotoId = currentPhotoIdRef.current ?? currentPhotoId
     const activeCameraLon = cameraLonRef.current ?? cameraLon
 
-    if (isProcessingRef.current || isLoadingRef.current || photoId === activeCurrentPhotoId) {
+    if (!options?.forceImmediate && (isProcessingRef.current || isLoadingRef.current || photoId === activeCurrentPhotoId)) {
       return
     }
     isProcessingRef.current = true
@@ -1105,7 +1109,11 @@ export function useTourNavigation() {
       }
     }
 
-    if (options?.previewDirection) {
+    if (options?.preserveOrientation) {
+      movementAngle = undefined
+    } else if (options?.forceImmediate) {
+      movementAngle = targetPhoto.startingAngle ?? activeCameraLon
+    } else if (options?.previewDirection) {
       const currentFacing = normalizeAngle(activeCameraLon)
       const targetAngleCandidate = movementAngle ?? targetPhoto.startingAngle ?? activeCameraLon
       const normalizedTarget = normalizeAngle(targetAngleCandidate)
@@ -1121,7 +1129,9 @@ export function useTourNavigation() {
       movementAngle = targetPhoto.startingAngle ?? activeCameraLon
     }
 
-    setIsLoading(true)
+    if (!options?.forceImmediate) {
+      setIsLoading(true)
+    }
     isLoadingRef.current = true
 
     const navigationArrivalAngle =
@@ -1150,11 +1160,15 @@ export function useTourNavigation() {
             fallbackAngle: targetPhoto.startingAngle ?? activeCameraLon
           })
 
-          setCalculatedCameraAngle(normalizedArrival)
-          issueCameraOrientation(normalizedArrival, 0)
+          if (!options?.preserveOrientation) {
+            setCalculatedCameraAngle(normalizedArrival)
+            issueCameraOrientation(normalizedArrival, 0)
+          } else {
+            setCalculatedCameraAngle(undefined)
+          }
           isLoadingRef.current = false
 
-          if (options?.finalOrientation !== undefined) {
+          if (!options?.preserveOrientation && options?.finalOrientation !== undefined) {
             setTimeout(() => {
               issueCameraOrientation(options.finalOrientation!, 0)
             }, 800)
