@@ -112,7 +112,34 @@ const EXAMPLE_CONVERSATIONS = [
   'You: "I don\'t have any information regarding that specific location. Can I help you with anything else?"',
   '',
   'User: "No thanks"',
-  'You: "No problem! Let me know if you need directions to another location around campus."'
+  'You: "No problem! Let me know if you need directions to another location around campus."',
+  '',
+  'User: "Can I see the campus map?"',
+  'You: "The full campus map is available in the Information section under Documents.\n\nWould you like me to pull it up for you?"',
+  '',
+  'User: "yes"',
+  'You: [IMMEDIATELY call show_campus_documents function - NO TEXT]',
+  '',
+  'User: "Where can I find the student handbook?"',
+  'You: "The Computing Student Handbook is available in the Information section under Documents. It contains important information about your programme, academic policies, and student services.\n\nWould you like me to pull it up for you?"',
+  '',
+  'User: "sure"',
+  'You: [IMMEDIATELY call show_campus_documents function - NO TEXT]',
+  '',
+  'User: "I need campus policies regarding assignments"',
+  'You: "Assignment policies, including submission guidelines, deadlines, and academic requirements, can be found in the Computing Student Handbook available in the Information section under Documents.\n\nWould you like me to pull it up for you?"',
+  '',
+  'User: "yes please"',
+  'You: [IMMEDIATELY call show_campus_documents function - NO TEXT]',
+  '',
+  'User: "What locations can you take me to?"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT] (This is an informational request, show the list immediately)',
+  '',
+  'User: "Show me all the classrooms"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT]',
+  '',
+  'User: "What places are on campus?"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT]'
 ].join('\n')
 
 /**
@@ -144,6 +171,62 @@ export const NAVIGATION_TOOL = {
       }
     },
     required: ['photoId'],
+    additionalProperties: false
+  },
+  strict: true
+}
+
+/**
+ * Function tool definition for displaying campus documents to users
+ *
+ * Provides access to important campus resources like handbooks, maps, and support
+ * information when users request specific documents or when the AI cannot answer
+ * questions that require document references.
+ *
+ * @returns Object schema compatible with the Responses `tools` parameter
+ *
+ * @example
+ * ```typescript
+ * import { DOCUMENTS_TOOL } from './ai.prompts'
+ * const tools = [NAVIGATION_TOOL, DOCUMENTS_TOOL]
+ * ```
+ */
+export const DOCUMENTS_TOOL = {
+  type: 'function' as const,
+  name: 'show_campus_documents',
+  description:
+    'Display the campus documents section to the user. WHEN TO CALL: After offering to show documents and user confirms with affirmative response (yes/yeah/sure/ok/okay/please/absolutely/take me/show me). DO NOT call on first request - offer first, wait for confirmation, then call. Similar to navigate_to confirmation workflow.',
+  parameters: {
+    type: 'object',
+    properties: {},
+    additionalProperties: false
+  },
+  strict: true
+}
+
+/**
+ * Function tool definition for displaying available campus locations
+ *
+ * Provides a comprehensive list of all navigable facilities and classrooms when
+ * users ask about what locations are available or want to see all options. The
+ * popup displays locations in two tabs: facilities/cafes and classrooms.
+ *
+ * @returns Object schema compatible with the Responses `tools` parameter
+ *
+ * @example
+ * ```typescript
+ * import { AVAILABLE_LOCATIONS_TOOL } from './ai.prompts'
+ * const tools = [NAVIGATION_TOOL, DOCUMENTS_TOOL, AVAILABLE_LOCATIONS_TOOL]
+ * ```
+ */
+export const AVAILABLE_LOCATIONS_TOOL = {
+  type: 'function' as const,
+  name: 'show_available_locations',
+  description:
+    'Display the available locations popup showing all facilities, cafes, and classrooms that can be navigated to. WHEN TO CALL: When user asks about what locations are available, what places they can visit, or wants to see all options. Examples: "What locations can you take me to?", "Show me all available classrooms", "What places are on campus?". Call immediately when user asks - no confirmation needed for this informational tool.',
+  parameters: {
+    type: 'object',
+    properties: {},
     additionalProperties: false
   },
   strict: true
@@ -215,17 +298,31 @@ export function buildSystemPrompt(currentLocation: string): string {
     '4. Provide concise, friendly directions from the current location.',
     '5. Ask whether the user would like automatic navigation to the relevant location.',
     '6. When the user confirms with ANY affirmative phrase (yes, yeah, sure, ok, okay, please, etc.), IMMEDIATELY call the navigate_to tool without ANY text response. Function call only.',
+    '7. When users request campus documents (map, handbook, policies) or ask questions requiring document references, call the show_campus_documents tool WITH a brief text explanation.',
     '',
     'Response types:',
     '- Text response: When providing information, answering questions, or asking for confirmation',
     '- Function call only (NO TEXT): When user confirms navigation after you asked',
-    '- Both text + function call: NEVER do this when user is confirming - function only',
+    '- Text + function call: When showing campus documents - provide brief explanation WITH show_campus_documents call',
+    '- Both text + navigate_to: NEVER do this when user is confirming - function only',
     '',
     'How to handle student needs:',
     '- When a student mentions a problem or need (timetable clashes, enrollment issues, finding lecturers, etc.), IMMEDIATELY search the vector store using relevant keywords',
     '- Present the specific office or service that can help them, explaining what they do',
     '- Offer to navigate them there',
     '- Examples: "timetable clashes" → search for administrators who handle schedules, "find lecturer" → search for administrative offices that liaise with staff',
+    '',
+    'When to use show_campus_documents:',
+    '- ONLY call this function AFTER you have offered to show documents AND user confirmed with affirmative response',
+    '- First mention: Explain what documents are available (handbook, maps, etc.) and ask "Would you like me to pull it up for you?"',
+    '- User confirms (yes/yeah/sure/ok/please/show me/etc.): IMMEDIATELY call show_campus_documents with NO text response',
+    '- This follows the SAME confirmation pattern as navigate_to',
+    '',
+    'When to OFFER documents (before calling function):',
+    '- User explicitly requests documents: "show me the campus map", "I need the student handbook", "where are the campus documents"',
+    '- User asks about policies, procedures, rules, regulations, or handbook information (assignments, grading, academic policies, etc.)',
+    '- User asks questions about official processes that require referring to documentation',
+    '- PRIORITY: Policy/handbook questions should show documents INSTEAD OF navigating to offices',
     '',
     'Conversation style:',
     '- Be approachable and clear.',
@@ -236,8 +333,14 @@ export function buildSystemPrompt(currentLocation: string): string {
     '- Users cannot upload files. Never mention uploads, attachments, or documents under any circumstance.',
     '',
     'CRITICAL CONVERSATION FLOW:',
+    'FLOW A - LOCATION NAVIGATION:',
     'Step 1: User asks about a location → You search vector store, provide info, ask "Would you like me to show you how to get there?"',
     'Step 2: User confirms (yes/yeah/sure/ok/okay/please/etc.) → You MUST call navigate_to with NO text response',
+    '',
+    'FLOW B - DOCUMENTS/POLICIES:',
+    'Step 1: User asks about policies, handbooks, maps, or official documents → Explain what documents are available, ask "Would you like me to pull it up for you?"',
+    'Step 2: User confirms (yes/yeah/sure/ok/please/etc.) → IMMEDIATELY call show_campus_documents with NO text response',
+    'NOTE: Do NOT offer to navigate to offices for policy questions - show documents instead',
     '',
     'DETECTING IF YOU ARE IN STEP 2:',
     '- Check last assistant message (YOUR previous response): Does it end with navigation offer?',

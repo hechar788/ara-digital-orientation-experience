@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { X } from 'lucide-react'
 import { type OnboardingInstructionLayout } from '@/components/tour/onboarding/OnboardingContext'
 import { useOnboarding } from '@/hooks/useOnboarding'
 import { useMinimapStore } from '@/hooks/useMinimapStore'
+import { usePopup } from '@/hooks/usePopup'
 import { SkipOnboardingPopup } from './SkipOnboardingPopup'
 import { cn } from '@/lib/utils'
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
@@ -112,7 +113,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     skipOnboarding,
     completeOnboarding
   } = useOnboarding()
-  const [isSkipPopupOpen, setIsSkipPopupOpen] = useState(false)
+  const skipPopup = usePopup()
   const isTouchDevice = useIsTouchDevice()
   const minimap = useMinimapStore()
 
@@ -167,17 +168,17 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   }
 
   const handleCloseClick = () => {
-    setIsSkipPopupOpen(true)
+    skipPopup.open()
   }
 
   const handleSkipConfirm = () => {
-    setIsSkipPopupOpen(false)
+    skipPopup.close()
     skipOnboarding()
     onSkip?.()
   }
 
   const handleSkipCancel = () => {
-    setIsSkipPopupOpen(false)
+    skipPopup.close()
   }
 
   if (!currentConfig || !isVisible) {
@@ -187,7 +188,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   return (
     <>
       {/* Instruction box - hidden when skip popup is open */}
-      {!isSkipPopupOpen && (
+      {!skipPopup.isOpen && (
         <div
           className={cn(
             layoutConfig.container,
@@ -265,7 +266,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       {/* Skip confirmation dialog */}
       <div className="relative z-[46]">
         <SkipOnboardingPopup
-          isOpen={isSkipPopupOpen}
+          isOpen={skipPopup.isOpen}
           onClose={handleSkipCancel}
           onConfirm={handleSkipConfirm}
         />

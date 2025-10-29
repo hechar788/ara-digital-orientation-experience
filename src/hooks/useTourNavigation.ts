@@ -20,7 +20,7 @@ import {
  * This is the default location where users begin their tour and where
  * they are reset to when starting/restarting The Amazing Race.
  */
-export const TOUR_START_PHOTO_ID = 'x-f3-west-2'
+export const TOUR_START_PHOTO_ID = 'x-f1-mid-6'
 // OUTSIDE BY THE GYM export const TOUR_START_PHOTO_ID = 'outside-a-east-1'
 // export const TOUR_START_PHOTO_ID = 'w-gym-overlook'
 

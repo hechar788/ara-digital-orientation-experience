@@ -68,6 +68,7 @@ export const Tour: React.FC<TourProps> = ({
 }) => {
   const aiChat = usePopup()
   const info = usePopup()
+  const [infoInitialSection, setInfoInitialSection] = React.useState(0)
   const { isVisible: isOnboardingVisible, startOnboarding, skipOnboarding } = useOnboarding()
 
   const handleRouteNavigation = useCallback(
@@ -105,6 +106,11 @@ export const Tour: React.FC<TourProps> = ({
     onStartRace?.()
   }
 
+  const handleShowDocuments = useCallback(() => {
+    setInfoInitialSection(1)
+    info.open()
+  }, [info])
+
   return (
     <>
       <RouteNavigationStatus
@@ -126,15 +132,20 @@ export const Tour: React.FC<TourProps> = ({
         currentPhotoId={currentPhotoId}
         onNavigate={handleRouteNavigation}
         routeNavigation={routeNavigation}
+        onShowDocuments={handleShowDocuments}
       />
 
       <TourInformationPopup
         isOpen={info.isOpen}
-        onClose={info.close}
+        onClose={() => {
+          info.close()
+          setInfoInitialSection(0)
+        }}
         onGetStarted={() => {
           info.close()
           startOnboarding()
         }}
+        initialSectionIndex={infoInitialSection}
       />
 
       {isOnboardingVisible && <OnboardingFlow />}

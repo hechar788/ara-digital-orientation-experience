@@ -160,7 +160,7 @@ export const xBlockFloor1Area: Area = {
           direction: 'information',
           position: { x: 1.5, y: -0.125, z: 5 },
           title: 'Information Desk',
-          description: 'Welcome to the Information Desk! Our friendly staff are here to help you with:\n\n• Campus directions and room locations\n• General inquiries about Ara services and facilities\n• Event information and campus activities\n• Visitor assistance\n• Quick questions about student services\n\nIf you\'re new to campus or need help finding your way around, stop by and say hello. We\'re here to make your campus experience as smooth as possible!'
+          description: 'Welcome to the Information Desk!\n\nOur friendly staff are here to help you with:\n\n• Campus directions and room locations\n• General inquiries about Ara services and facilities\n• Event information and campus activities\n• Visitor assistance\n• Quick questions about student services\n\nIf you\'re new to campus or need help finding your way around, stop by and say hello. We\'re here to make your campus experience as smooth as possible!'
         }
       ]
     },
