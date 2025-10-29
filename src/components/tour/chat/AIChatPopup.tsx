@@ -759,7 +759,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   return (
     <>
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 touch-none">
-      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[65vh] lg:w-[min(22rem,calc(100vw-2rem))] touch-pan-y">
+      <div className="flex w-[calc(92vw-1.5rem)] max-w-[24rem] h-[min(36rem,calc(100vh-3rem))] min-h-[19.6rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[65vh] lg:w-[min(22rem,calc(100vw-2rem))] touch-pan-y">
         <div className="flex items-center justify-between rounded-t-2xl bg-[#0C586E] px-4 py-3 text-white">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
