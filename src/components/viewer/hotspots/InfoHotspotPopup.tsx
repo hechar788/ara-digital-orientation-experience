@@ -99,7 +99,7 @@ export const InfoHotspotPopup: React.FC<InfoHotspotPopupProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md w-[90vw] p-0 gap-0 border-0" showCloseButton={false} aria-describedby={undefined}>
+      <DialogContent className="max-w-md w-[90vw] p-0 gap-0 border-0 touch-pan-y" showCloseButton={false} aria-describedby={undefined}>
         <div className="rounded-t-lg bg-[#0C586E]">
           {/* Header with tabs or single title */}
           {hasTabs ? (

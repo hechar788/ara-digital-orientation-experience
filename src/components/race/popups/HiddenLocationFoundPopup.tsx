@@ -69,7 +69,7 @@ export const HiddenLocationFoundPopup: React.FC<HiddenLocationFoundPopupProps> =
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md touch-none">
         <DialogHeader className="items-center gap-3 text-center sm:text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
             <Star className="h-10 w-10 text-yellow-600 fill-yellow-600" />

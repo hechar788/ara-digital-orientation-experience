@@ -57,7 +57,7 @@ export const SkipOnboardingPopup: React.FC<SkipOnboardingPopupProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md pt-8 pb-6">
+      <DialogContent className="sm:max-w-md pt-8 pb-6 touch-none">
         <DialogHeader>
           <DialogTitle className="text-xl text-left py-4 pb-6">Are you sure you want to skip the tutorial?</DialogTitle>
           <DialogDescription className="sr-only">

@@ -83,7 +83,7 @@ export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 max-h-[98.5vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-xl p-0 max-h-[98.5vh] overflow-y-auto touch-pan-y">
         <DialogTitle className="sr-only">Amazing Race Information</DialogTitle>
         <DialogDescription className="sr-only">
           Timed campus challenge information with navigation and instructions

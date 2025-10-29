@@ -122,7 +122,7 @@ export const HotspotConfirmationDialog: React.FC<HotspotConfirmationDialogProps>
       />
 
       <div
-        className="fixed z-50 w-[280px] rounded-lg border border-white/20 bg-black/90 p-4 shadow-2xl backdrop-blur-sm transition-all duration-150 animate-in fade-in zoom-in-95"
+        className="fixed z-50 w-[280px] rounded-lg border border-white/20 bg-black/90 p-4 shadow-2xl backdrop-blur-sm transition-all duration-150 animate-in fade-in zoom-in-95 touch-none"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
