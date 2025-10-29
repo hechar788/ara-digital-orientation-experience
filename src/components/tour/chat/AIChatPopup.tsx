@@ -490,17 +490,12 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
         } else if (result.response.functionCall.name === 'show_available_locations') {
           console.info('[AI Chat Popup] Available locations function call received')
           
-          const acknowledgements = [
-            'Here\'s a complete list of all the locations I can take you to.',
-            'Let me show you all the places you can visit.',
-            'Here are all the facilities and classrooms available.',
-            'Take a look at all the locations on campus.'
-          ]
-          const acknowledgement = acknowledgements[Math.floor(Math.random() * acknowledgements.length)]
-          appendAssistantMessage(acknowledgement)
+          appendAssistantMessage('I\'ll pull up a list of all the available facilities and classrooms for you.')
           setIsLoading(false)
-          // Show popup immediately without closing the chat
-          setShowAvailableLocationsPopup(true)
+          // Show popup after a short delay for better UX
+          setTimeout(() => {
+            setShowAvailableLocationsPopup(true)
+          }, 1250)
           return
         } else if (result.response.functionCall.name === 'navigate_to') {
           const { photoId, path, distance, routeDescription, finalOrientation, error } =
@@ -578,6 +573,16 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     }
   }
 
+  const handleTextareaBlur = () => {
+    // Force viewport reset when keyboard is dismissed on iOS
+    // This prevents the zoom-in issue that can occur after keyboard dismissal
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0)
+      // Force a reflow to ensure viewport resets
+      document.body.scrollTop = 0
+    }
+  }
+
   const handleMinimize = () => {
     onClose()
   }
@@ -621,7 +626,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   return (
     <>
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 touch-none">
-      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[82.5vh] lg:w-[min(22rem,calc(100vw-2rem))] touch-pan-y">
+      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[70vh] lg:w-[min(22rem,calc(100vw-2rem))] touch-pan-y">
         <div className="flex items-center justify-between rounded-t-2xl bg-[#0C586E] px-4 py-3 text-white">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
@@ -659,7 +664,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
               return (
                 <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs sm:text-sm shadow-sm ${
                       isUser
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-900'
@@ -716,14 +721,14 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
 
             {messages.length === 1 && !isLoading && (
               <div className="flex flex-col gap-2 px-1 mt-6">
-                <p className="text-sm text-gray-500 px-1 pb-1">Try asking:</p>
+                <p className="text-xs sm:text-sm text-gray-500 px-1 pb-1">Try asking:</p>
                 <div className="flex flex-col gap-2">
                   {EXAMPLE_PROMPTS.map((prompt, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => handleExamplePromptClick(prompt)}
-                      className="text-left text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl px-3 py-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      className="text-left text-xs sm:text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl px-3 py-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                     >
                       {prompt}
                     </button>
@@ -733,7 +738,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
             )}
 
             {isLoading && (
-              <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2 text-sm text-gray-700 shadow-sm">
+              <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2 text-xs sm:text-sm text-gray-700 shadow-sm">
                 <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                 Thinking…
               </div>
@@ -756,10 +761,12 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
               <textarea
                 ref={textareaRef}
                 value={input}
-                placeholder="Ask me about campus locations…"
+                placeholder="Ask me questions about campus..."
                 onChange={event => setInput(event.target.value)}
                 onKeyDown={handleTextareaKeyDown}
-                className="w-full resize-none overflow-y-auto rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-gray-100"
+                onBlur={handleTextareaBlur}
+                className="w-full resize-none overflow-y-auto rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-10 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:bg-gray-100"
+                style={{ fontSize: '14px' }}
                 disabled={isLoading}
                 maxLength={500}
                 onInput={event => adjustTextareaHeight(event.currentTarget)}
@@ -773,7 +780,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
                 <Send className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-1 text-[11px] text-gray-500">Enter to send • Shift+Enter for a new line</p>
+            <p className="mt-1 text-gray-500" style={{ fontSize: '11px' }}>Enter to send • Shift+Enter for a new line</p>
           </form>
         </div>
 
