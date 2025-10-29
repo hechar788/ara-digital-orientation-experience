@@ -1,18 +1,20 @@
 import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from 'react'
-import { Send, X, MapPin, AlertCircle, Loader2 } from 'lucide-react'
+import { Send, X, Minus, MapPin, AlertCircle, Loader2 } from 'lucide-react'
 import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
 import type { UseRouteNavigationReturn, RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
+import { usePopup } from '@/hooks/usePopup'
 import { formatLocationId } from './locationFormat'
 
 /**
  * Props for the AIChatPopup component
  *
  * @property isOpen - Whether the popup is currently visible
- * @property onClose - Callback invoked when the popup should be dismissed
+ * @property onClose - Callback invoked when the popup should be dismissed (minimized)
  * @property currentPhotoId - The ID of the location currently displayed in the viewer
  * @property onNavigate - Handler that jumps the viewer to the supplied destination photo
  * @property routeNavigation - Sequential navigation controller used to walk through AI-provided routes
+ * @property onShowDocuments - Handler invoked when AI wants to show campus documents
  */
 interface AIChatPopupProps {
   isOpen: boolean
@@ -20,6 +22,7 @@ interface AIChatPopupProps {
   currentPhotoId: string
   onNavigate?: (photoId: string, options?: RouteNavigationHandlerOptions) => Promise<void> | void
   routeNavigation?: UseRouteNavigationReturn
+  onShowDocuments?: () => void
 }
 
 /**
@@ -232,6 +235,20 @@ function pickAffirmativeResponse(): string {
 }
 
 /**
+ * Example prompts to help users start a conversation with the AI
+ * 
+ * Displayed when the user first opens the chat to provide guidance
+ * on what questions they can ask.
+ */
+const EXAMPLE_PROMPTS = [
+  'Show me how to get to The Library',
+  'I need a coffee',
+  'I need assignment support',
+  'What locations can you take me to?',
+  'I need to find my classroom'
+] as const
+
+/**
  * AI chat popup that connects the UI to the campus navigation server function
  *
  * Displays the ongoing conversation, handles user input, and forwards requests
@@ -250,7 +267,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   onClose,
   currentPhotoId,
   onNavigate,
-  routeNavigation
+  routeNavigation,
+  onShowDocuments
 }) => {
   const [messages, setMessages] = useState<ChatMessageDisplay[]>([])
   const [input, setInput] = useState('')
@@ -260,6 +278,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     summary: null,
     messages: []
   })
+  const closeConfirmation = usePopup()
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -385,8 +404,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     ])
   }
 
-  const processMessage = async () => {
-    const trimmed = input.trim()
+  const processMessage = async (messageOverride?: string) => {
+    const trimmed = messageOverride?.trim() ?? input.trim()
     if (!trimmed || isLoading) {
       return
     }
@@ -433,55 +452,81 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
       const resolvedMessage =
         result.response.message ??
         (result.response.functionCall
-          ? `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
+          ? result.response.functionCall.name === 'show_campus_documents'
+            ? 'Opening campus documents section.'
+            : `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
           : 'I\'m here if you need directions around campus!')
 
       let navigationData: ChatMessageDisplay['navigationData'] | undefined
       let navigationAction: (() => void) | undefined
 
       if (result.response.functionCall) {
-        const { photoId, path, distance, routeDescription, finalOrientation, error } =
-          result.response.functionCall.arguments
-
-        const pathArray = Array.isArray(path) ? path : []
-        const hasRoute = pathArray.length > 0
-
-        console.info('[AI Chat Popup] Navigation payload', {
-          destination: photoId,
-          pathLength: pathArray.length,
-          distance,
-          routeDescription,
-          finalOrientation,
-          error,
-          path: pathArray
-        })
-
-        navigationData = {
-          photoId,
-          path: pathArray,
-          distance,
-          routeDescription,
-          error
-        }
-
-        if (!error) {
-          if (hasRoute && routeNavigation) {
-            routeNavigation.cancelNavigation()
-            navigationAction = () => routeNavigation.startNavigation(pathArray, finalOrientation)
-          } else if (onNavigate) {
-            routeNavigation?.cancelNavigation()
-            navigationAction = () => {
-              onNavigate(photoId)
-            }
+        if (result.response.functionCall.name === 'show_campus_documents') {
+          console.info('[AI Chat Popup] Documents function call received')
+          
+          if (onShowDocuments) {
+            const acknowledgements = [
+              'Opening the campus documents for you now.',
+              'Sure thing! Opening the documents section.',
+              'Got it! Pulling up the campus documents.',
+              'Opening that for you now.'
+            ]
+            const acknowledgement = acknowledgements[Math.floor(Math.random() * acknowledgements.length)]
+            appendAssistantMessage(acknowledgement)
+            setIsLoading(false)
+            scheduleClose(() => {
+              onShowDocuments()
+            })
+            return
           } else {
-            navigationData.error = 'Navigation handler is unavailable.'
+            console.warn('[AI Chat Popup] onShowDocuments handler not provided')
+            appendAssistantMessage('I can help you find campus documents, but the documents popup is not available right now.')
+            return
+          }
+        } else if (result.response.functionCall.name === 'navigate_to') {
+          const { photoId, path, distance, routeDescription, finalOrientation, error } =
+            result.response.functionCall.arguments
+
+          const pathArray = Array.isArray(path) ? path : []
+          const hasRoute = pathArray.length > 0
+
+          console.info('[AI Chat Popup] Navigation payload', {
+            destination: photoId,
+            pathLength: pathArray.length,
+            distance,
+            routeDescription,
+            finalOrientation,
+            error,
+            path: pathArray
+          })
+
+          navigationData = {
+            photoId,
+            path: pathArray,
+            distance,
+            routeDescription,
+            error
           }
 
-          const acknowledgement = pickAffirmativeResponse()
-          appendAssistantMessage(acknowledgement)
-          setIsLoading(false)
-          scheduleClose(navigationAction)
-          return
+          if (!error) {
+            if (hasRoute && routeNavigation) {
+              routeNavigation.cancelNavigation()
+              navigationAction = () => routeNavigation.startNavigation(pathArray, finalOrientation)
+            } else if (onNavigate) {
+              routeNavigation?.cancelNavigation()
+              navigationAction = () => {
+                onNavigate(photoId)
+              }
+            } else {
+              navigationData.error = 'Navigation handler is unavailable.'
+            }
+
+            const acknowledgement = pickAffirmativeResponse()
+            appendAssistantMessage(acknowledgement)
+            setIsLoading(false)
+            scheduleClose(navigationAction)
+            return
+          }
         }
       }
 
@@ -514,26 +559,72 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
     }
   }
 
+  const handleMinimize = () => {
+    onClose()
+  }
+
+  const handleRequestClose = () => {
+    if (messages.length > 0) {
+      closeConfirmation.open()
+    } else {
+      onClose()
+    }
+  }
+
+  const handleConfirmClose = () => {
+    setMessages([])
+    setConversationState({
+      summary: null,
+      messages: []
+    })
+    setInput('')
+    setErrorMessage(null)
+    closeConfirmation.close()
+    onClose()
+  }
+
+  const handleCancelClose = () => {
+    closeConfirmation.close()
+  }
+
+  const handleExamplePromptClick = (prompt: string) => {
+    setInput(prompt)
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+      adjustTextareaHeight()
+    })
+  }
+
   if (!isOpen) {
     return null
   }
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[50vh] lg:w-[min(22rem,calc(100vw-2rem))]">
+      <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[82.5vh] lg:w-[min(22rem,calc(100vw-2rem))]">
         <div className="flex items-center justify-between rounded-t-2xl bg-[#0C586E] px-4 py-3 text-white">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <p className="text-sm font-semibold">Campus Assistant</p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E] cursor-pointer"
-            aria-label="Close chat"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handleMinimize}
+              className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E] cursor-pointer"
+              aria-label="Minimize chat"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleRequestClose}
+              className="rounded-md p-1 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white focus-visible:ring-offset-[#0C586E] cursor-pointer"
+              aria-label="Close chat"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
@@ -603,6 +694,24 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
               )
             })}
 
+            {messages.length === 1 && !isLoading && (
+              <div className="flex flex-col gap-2 px-1 mt-6">
+                <p className="text-sm text-gray-500 px-2">Try asking:</p>
+                <div className="flex flex-col gap-2">
+                  {EXAMPLE_PROMPTS.map((prompt, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleExamplePromptClick(prompt)}
+                      className="text-left text-sm text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl px-3 py-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {isLoading && (
               <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2 text-sm text-gray-700 shadow-sm">
                 <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
@@ -647,6 +756,36 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
             <p className="mt-1 text-[11px] text-gray-500">Enter to send • Shift+Enter for a new line</p>
           </form>
         </div>
+
+        {closeConfirmation.isOpen && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-2xl">
+            <div className="mx-4 w-full max-w-[18rem] rounded-xl bg-white p-4 shadow-xl">
+              <h3 className="text-base font-semibold text-gray-900">End Conversation?</h3>
+              <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                Are you sure you want to end this conversation?
+                <br />
+                <br />
+                It will not be saved.
+              </p>
+              <div className="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCancelClose}
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmClose}
+                  className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 cursor-pointer"
+                >
+                  End Chat
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   )
 }

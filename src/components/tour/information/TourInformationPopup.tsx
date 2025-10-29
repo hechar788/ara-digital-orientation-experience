@@ -12,11 +12,13 @@ import { OnboardingStartPopup } from '../onboarding/OnboardingStartPopup'
  * @property isOpen - Boolean flag (`true` to display the modal, `false` to hide it)
  * @property onClose - Function invoked when the popup requests to close; receives no arguments
  * @property onGetStarted - Function invoked when user clicks Get Started on the onboarding start popup; initiates onboarding flow
+ * @property initialSectionIndex - Optional zero-based index to open at a specific section (default: 0)
  */
 export interface TourInformationPopupProps {
   isOpen: boolean
   onClose: () => void
   onGetStarted: () => void
+  initialSectionIndex?: number
 }
 
 /**
@@ -28,6 +30,7 @@ export interface TourInformationPopupProps {
  * @param props.isOpen - Boolean flag indicating whether the popup is visible
  * @param props.onClose - Callback fired when the popup should close
  * @param props.onGetStarted - Callback fired when user starts the onboarding flow
+ * @param props.initialSectionIndex - Optional zero-based index to open at a specific section (default: 0)
  * @returns React.ReactElement representing the orientation information dialog
  *
  * @example
@@ -36,12 +39,14 @@ export interface TourInformationPopupProps {
  *   isOpen={isTourOpen}
  *   onClose={() => setTourOpen(false)}
  *   onGetStarted={() => setOnboardingActive(true)}
+ *   initialSectionIndex={1}
  * />
  * ```
  */
-export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOpen, onClose, onGetStarted }) => {
-  const [activeIndex, setActiveIndex] = React.useState(0)
+export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOpen, onClose, onGetStarted, initialSectionIndex = 0 }) => {
+  const [activeIndex, setActiveIndex] = React.useState(initialSectionIndex)
   const completionDialog = usePopup()
+  const prevIsOpenRef = React.useRef(isOpen)
   const sections = tourInformationSections
   const activeSection = sections[activeIndex]
   const isLastSection = activeIndex === sections.length - 1
@@ -63,11 +68,11 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
       : 'mb-3 sm:mb-2'
   const isRaceSection = activeSection.key === 'race'
   const mediaWrapperClass = isDocumentsSection
-    ? 'flex justify-center pt-1 sm:pt-6'
+    ? 'flex justify-center pt-1 sm:pt-4'
     : isRaceSection
-      ? 'flex justify-center -mt-3 sm:mt-1'
+      ? 'flex justify-center -mt-3 sm:mt-0'
       : isIntroductionSection
-        ? 'flex justify-center -mt-3 sm:mt-8.5'
+        ? 'flex justify-center -mt-3 sm:mt-4'
         : 'flex justify-center -mt-3 sm:-mt-3.5'
   const handleNext = () => {
     if (isLastSection) {
@@ -82,12 +87,15 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
   }
 
   React.useEffect(() => {
-    if (!isOpen) {
-      setActiveIndex(0)
-      return
+    // Only set initial section when popup transitions from closed to open
+    const wasClosedNowOpen = !prevIsOpenRef.current && isOpen
+    prevIsOpenRef.current = isOpen
+    
+    if (wasClosedNowOpen) {
+      setActiveIndex(initialSectionIndex)
+      completionDialog.close()
     }
-    completionDialog.close()
-  }, [isOpen, completionDialog])
+  }, [isOpen, initialSectionIndex])
 
   return (
     <>
@@ -97,7 +105,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
           <DialogDescription className="sr-only">
             Interactive campus tour with navigation and information sections
           </DialogDescription>
-          <div className="px-6 pt-6 pb-0 space-y-3 sm:pt-10 sm:pb-5 sm:space-y-4">
+          <div className="px-6 pt-6 pb-0 space-y-3 sm:pt-7 sm:pb-4 sm:space-y-3">
             <div className="space-y-1">
               <p className="text-xs text-foreground uppercase tracking-wide">
                 <span className="sm:hidden">ARA Institute of Canterbury - Computing</span>
@@ -106,7 +114,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
               <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Digital Orientation Experience</h2>
             </div>
             <hr className="border-t border-border" />
-            <nav aria-label="Tour sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-3">
+            <nav aria-label="Tour sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-2">
               {sections.map((section, index) => (
                 <button
                   key={section.key}
@@ -123,11 +131,11 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                 </button>
               ))}
             </nav>
-            <div className="space-y-3 sm:space-y-3.5">
+            <div className="space-y-3 sm:space-y-2.5">
               <h3 className="text-base font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
               {customContent ?? (
                 <>
-                  <div className="space-y-2.5 sm:space-y-3">
+                  <div className="space-y-2.5 sm:space-y-2">
                     {activeSection.paragraphs.map((paragraph: string) => (
                       <p key={paragraph} className="text-sm leading-relaxed text-foreground sm:text-base">
                         {paragraph}
@@ -140,7 +148,7 @@ export const TourInformationPopup: React.FC<TourInformationPopupProps> = ({ isOp
                         <p className="text-sm font-semibold leading-relaxed text-foreground sm:text-base">{listHeading}</p>
                       ) : null}
                       <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-foreground sm:text-base">
-                        {listItems.map(item => (
+                        {listItems.map((item: string) => (
                           <li key={item}>{item}</li>
                         ))}
                       </ul>
