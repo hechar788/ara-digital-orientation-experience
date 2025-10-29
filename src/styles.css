@@ -150,6 +150,19 @@ code {
       min-height: -webkit-fill-available;
     }
   }
+
+  /* Prevent touch zoom on all UI elements except the panoramic viewer */
+  button,
+  input,
+  textarea,
+  select,
+  a,
+  [role="button"],
+  [role="dialog"],
+  [data-slot="dialog-content"],
+  [data-slot="dialog-overlay"] {
+    touch-action: manipulation;
+  }
 }
 
 @layer utilities {

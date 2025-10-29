@@ -81,7 +81,7 @@ export const PanoramicZoomSlider: React.FC<PanoramicZoomSliderProps> = ({
     <OnboardingHighlight targetId="zoom">
       <div
         className={cn(
-          'flex gap-1 rounded-md bg-black/70 p-2 text-white',
+          'flex gap-1 rounded-md bg-black/70 p-2 text-white touch-none',
           className
         )}
       >

@@ -76,7 +76,7 @@ export const RaceResults: React.FC<RaceResultsProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md pt-8 pb-6">
+      <DialogContent className="sm:max-w-md pt-8 pb-6 touch-none">
         <DialogHeader className="pb-6 text-center">
           <DialogTitle className="text-3xl font-bold text-center">Results</DialogTitle>
           <DialogDescription className="sr-only">Race statistics and options to restart or return to orientation</DialogDescription>

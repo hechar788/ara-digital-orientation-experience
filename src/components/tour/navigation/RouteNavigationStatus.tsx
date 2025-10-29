@@ -73,7 +73,7 @@ export const RouteNavigationStatus: React.FC<RouteNavigationStatusProps> = ({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-blue-200 bg-white/90 p-5 shadow-xl text-sm text-blue-900 backdrop-blur-md',
+        'rounded-2xl border border-blue-200 bg-white/90 p-5 shadow-xl text-sm text-blue-900 backdrop-blur-md touch-none',
         'w-[min(27rem,calc(100vw-3rem))]',
         className
       )}

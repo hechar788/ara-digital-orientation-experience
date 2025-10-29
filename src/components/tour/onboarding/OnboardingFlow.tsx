@@ -195,7 +195,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             layoutConfig.position
           )}
         >
-          <div className="bg-background border-2 border-border rounded-lg shadow-2xl pt-2 px-6 pb-4 sm:pt-4 sm:px-8 sm:pb-6 max-w-md mx-auto sm:mx-0 relative">
+          <div className="bg-background border-2 border-border rounded-lg shadow-2xl pt-2 px-6 pb-4 sm:pt-4 sm:px-8 sm:pb-6 max-w-md mx-auto sm:mx-0 relative touch-none">
             {/* Close button */}
             <button
               onClick={handleCloseClick}
