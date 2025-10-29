@@ -3,7 +3,7 @@
 import OpenAI, { APIError } from 'openai'
 import type { Response as OpenAIResponse, ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses'
 import { matchLocationByKeywords, VALID_LOCATION_ID_SET, getFinalOrientation } from './ai.locations'
-import { buildSystemPrompt, NAVIGATION_TOOL, DOCUMENTS_TOOL, SUMMARISATION_SYSTEM_PROMPT } from './ai.prompts'
+import { buildSystemPrompt, NAVIGATION_TOOL, DOCUMENTS_TOOL, AVAILABLE_LOCATIONS_TOOL, SUMMARISATION_SYSTEM_PROMPT } from './ai.prompts'
 import { findPath, getRouteDescription, validatePath } from './pathfinding'
 
 /**
@@ -157,6 +157,10 @@ export type FunctionCall =
     }
   | {
       name: 'show_campus_documents'
+      arguments: Record<string, never>
+    }
+  | {
+      name: 'show_available_locations'
       arguments: Record<string, never>
     }
 
@@ -330,6 +334,11 @@ function parseFunctionCall(output: GeneratedResponse['output']): FunctionCall | 
       } else if (item.name === 'show_campus_documents') {
         return {
           name: 'show_campus_documents',
+          arguments: {}
+        }
+      } else if (item.name === 'show_available_locations') {
+        return {
+          name: 'show_available_locations',
           arguments: {}
         }
       }
@@ -974,6 +983,7 @@ export async function executeChat({ messages, currentLocation }: ExecuteChatInpu
       tools: [
         NAVIGATION_TOOL,
         DOCUMENTS_TOOL,
+        AVAILABLE_LOCATIONS_TOOL,
         {
           type: 'file_search' as const,
           vector_store_ids: [vectorStoreId]

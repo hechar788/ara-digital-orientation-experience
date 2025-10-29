@@ -130,7 +130,16 @@ const EXAMPLE_CONVERSATIONS = [
   'You: "Assignment policies, including submission guidelines, deadlines, and academic requirements, can be found in the Computing Student Handbook available in the Information section under Documents.\n\nWould you like me to pull it up for you?"',
   '',
   'User: "yes please"',
-  'You: [IMMEDIATELY call show_campus_documents function - NO TEXT]'
+  'You: [IMMEDIATELY call show_campus_documents function - NO TEXT]',
+  '',
+  'User: "What locations can you take me to?"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT] (This is an informational request, show the list immediately)',
+  '',
+  'User: "Show me all the classrooms"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT]',
+  '',
+  'User: "What places are on campus?"',
+  'You: [IMMEDIATELY call show_available_locations function - NO TEXT]'
 ].join('\n')
 
 /**
@@ -187,6 +196,34 @@ export const DOCUMENTS_TOOL = {
   name: 'show_campus_documents',
   description:
     'Display the campus documents section to the user. WHEN TO CALL: After offering to show documents and user confirms with affirmative response (yes/yeah/sure/ok/okay/please/absolutely/take me/show me). DO NOT call on first request - offer first, wait for confirmation, then call. Similar to navigate_to confirmation workflow.',
+  parameters: {
+    type: 'object',
+    properties: {},
+    additionalProperties: false
+  },
+  strict: true
+}
+
+/**
+ * Function tool definition for displaying available campus locations
+ *
+ * Provides a comprehensive list of all navigable facilities and classrooms when
+ * users ask about what locations are available or want to see all options. The
+ * popup displays locations in two tabs: facilities/cafes and classrooms.
+ *
+ * @returns Object schema compatible with the Responses `tools` parameter
+ *
+ * @example
+ * ```typescript
+ * import { AVAILABLE_LOCATIONS_TOOL } from './ai.prompts'
+ * const tools = [NAVIGATION_TOOL, DOCUMENTS_TOOL, AVAILABLE_LOCATIONS_TOOL]
+ * ```
+ */
+export const AVAILABLE_LOCATIONS_TOOL = {
+  type: 'function' as const,
+  name: 'show_available_locations',
+  description:
+    'Display the available locations popup showing all facilities, cafes, and classrooms that can be navigated to. WHEN TO CALL: When user asks about what locations are available, what places they can visit, or wants to see all options. Examples: "What locations can you take me to?", "Show me all available classrooms", "What places are on campus?". Call immediately when user asks - no confirmation needed for this informational tool.',
   parameters: {
     type: 'object',
     properties: {},

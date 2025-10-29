@@ -5,6 +5,7 @@ import { getChatResponse } from '@/lib/ai-client'
 import type { UseRouteNavigationReturn, RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
 import { usePopup } from '@/hooks/usePopup'
 import { formatLocationId } from './locationFormat'
+import { AvailableClassroomsPopup } from './AvailableClassroomsPopup'
 
 /**
  * Props for the AIChatPopup component
@@ -241,11 +242,11 @@ function pickAffirmativeResponse(): string {
  * on what questions they can ask.
  */
 const EXAMPLE_PROMPTS = [
-  'Show me how to get to The Library',
-  'I need a coffee',
-  'I need assignment support',
+  'Where can I find the campus map?',
+  'Where can I get support with my assignments and workload?',
   'What locations can you take me to?',
-  'I need to find my classroom'
+  'I need to find my classroom',
+  'I need a coffee'
 ] as const
 
 /**
@@ -280,6 +281,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   })
   const closeConfirmation = usePopup()
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [showAvailableLocationsPopup, setShowAvailableLocationsPopup] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -454,6 +456,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
         (result.response.functionCall
           ? result.response.functionCall.name === 'show_campus_documents'
             ? 'Opening campus documents section.'
+            : result.response.functionCall.name === 'show_available_locations'
+            ? 'Here are all the locations I can help you navigate to.'
             : `Starting navigation to ${result.response.functionCall.arguments.photoId}.`
           : 'I\'m here if you need directions around campus!')
 
@@ -483,6 +487,21 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
             appendAssistantMessage('I can help you find campus documents, but the documents popup is not available right now.')
             return
           }
+        } else if (result.response.functionCall.name === 'show_available_locations') {
+          console.info('[AI Chat Popup] Available locations function call received')
+          
+          const acknowledgements = [
+            'Here\'s a complete list of all the locations I can take you to.',
+            'Let me show you all the places you can visit.',
+            'Here are all the facilities and classrooms available.',
+            'Take a look at all the locations on campus.'
+          ]
+          const acknowledgement = acknowledgements[Math.floor(Math.random() * acknowledgements.length)]
+          appendAssistantMessage(acknowledgement)
+          setIsLoading(false)
+          // Show popup immediately without closing the chat
+          setShowAvailableLocationsPopup(true)
+          return
         } else if (result.response.functionCall.name === 'navigate_to') {
           const { photoId, path, distance, routeDescription, finalOrientation, error } =
             result.response.functionCall.arguments
@@ -600,6 +619,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   }
 
   return (
+    <>
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
       <div className="flex w-[calc(85vw-1.7rem)] max-w-[22rem] h-[min(28.8rem,calc(100vh-5.4rem))] min-h-[16.2rem] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl lg:h-[82.5vh] lg:w-[min(22rem,calc(100vw-2rem))]">
         <div className="flex items-center justify-between rounded-t-2xl bg-[#0C586E] px-4 py-3 text-white">
@@ -696,7 +716,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
 
             {messages.length === 1 && !isLoading && (
               <div className="flex flex-col gap-2 px-1 mt-6">
-                <p className="text-sm text-gray-500 px-2">Try asking:</p>
+                <p className="text-sm text-gray-500 px-1 pb-1">Try asking:</p>
                 <div className="flex flex-col gap-2">
                   {EXAMPLE_PROMPTS.map((prompt, index) => (
                     <button
@@ -787,5 +807,15 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           </div>
         )}
     </div>
+    
+    <AvailableClassroomsPopup
+      isOpen={showAvailableLocationsPopup}
+      onClose={() => setShowAvailableLocationsPopup(false)}
+      onSendMessage={(message) => {
+        setInput(message)
+        setShowAvailableLocationsPopup(false)
+      }}
+    />
+  </>
   )
 }
