@@ -458,6 +458,42 @@ interface OrientationOverride {
 const ORIENTATION_OVERRIDES: OrientationOverride[] = [
   {
     matches: (current, destination) =>
+      current.id === 'outside-s-north-1-aside-2' && destination.id === 'outside-u-mid-3',
+    offsetDegrees: 200
+  },
+  {
+    
+    matches: (current, destination) =>
+      current.id === 'outside-u-mid-3' && destination.id === 'outside-s-north-1-aside-2',
+    offsetDegrees: 145
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-n-north-1-aside-1' && destination.id === 'outside-n-north-1-aside-2',
+    offsetDegrees: 90
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'outside-g-mid-1' && destination.id === 'outside-n-north-1-aside-2',
+    offsetDegrees: 90
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-west-5-aside' && destination.id === 'x-f2-west-5',
+    offsetDegrees: 270
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-west-3-aside' && destination.id === 'x-f2-west-3',
+    offsetDegrees: 280
+  },
+  {
+    matches: (current, destination) =>
+      current.id === 'x-f2-east-13' && destination.id === 'a-f2-south-5',
+    offsetDegrees: 90
+  },
+  {
+    matches: (current, destination) =>
       current.id === 'n-f1-sandys-office' && destination.id === 'n-f1-west-9',
     offsetDegrees: -90
   },

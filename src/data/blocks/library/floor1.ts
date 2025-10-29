@@ -41,7 +41,7 @@ export const libraryFloor1Area: Area = {
         },
         {
           direction: 'up',
-          position: { x: 0, y: 0, z: 5 }  // Stairs
+          position: { x: -4, y: 0, z: 4 }  // Stairs
         },
         {
           direction: 'information',

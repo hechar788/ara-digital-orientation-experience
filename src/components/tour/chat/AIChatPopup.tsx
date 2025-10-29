@@ -4,6 +4,7 @@ import type { ConversationState } from '@/lib/ai'
 import { getChatResponse } from '@/lib/ai-client'
 import type { UseRouteNavigationReturn, RouteNavigationHandlerOptions } from '@/hooks/useRouteNavigation'
 import { usePopup } from '@/hooks/usePopup'
+import { useMinimapStore } from '@/hooks/useMinimapStore'
 import { formatLocationId } from './locationFormat'
 import { AvailableClassroomsPopup } from './AvailableClassroomsPopup'
 
@@ -292,6 +293,7 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const streamingTimeoutsRef = useRef<Map<string, number>>(new Map())
+  const minimap = useMinimapStore()
 
   const clearStreamingTimeouts = useCallback(() => {
     streamingTimeoutsRef.current.forEach(timeoutId => {
@@ -644,6 +646,15 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
           if (!error) {
             if (hasRoute && routeNavigation) {
               routeNavigation.cancelNavigation()
+            }
+
+            if (hasRoute) {
+              minimap.setPath(pathArray)
+            } else {
+              minimap.clearPath()
+            }
+
+            if (hasRoute && routeNavigation) {
               navigationAction = () => routeNavigation.startNavigation(pathArray, finalOrientation)
             } else if (onNavigate) {
               routeNavigation?.cancelNavigation()
@@ -658,6 +669,8 @@ export const AIChatPopup: React.FC<AIChatPopupProps> = ({
             appendAssistantMessage(acknowledgement)
             scheduleClose(navigationAction)
             return
+          } else {
+            minimap.clearPath()
           }
         }
       }
