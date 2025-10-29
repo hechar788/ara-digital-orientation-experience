@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { usePopup } from '@/hooks/usePopup'
 import { SkipOnboardingPopup } from './SkipOnboardingPopup'
 
 /**
@@ -39,7 +40,7 @@ export interface OnboardingStartPopupProps {
  * ```
  */
 export const OnboardingStartPopup: React.FC<OnboardingStartPopupProps> = ({ isOpen, onSkip, onGetStarted }) => {
-  const [isSkipPopupOpen, setIsSkipPopupOpen] = useState(false)
+  const skipPopup = usePopup()
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -48,16 +49,16 @@ export const OnboardingStartPopup: React.FC<OnboardingStartPopupProps> = ({ isOp
   }
 
   const handleSkipClick = () => {
-    setIsSkipPopupOpen(true)
+    skipPopup.open()
   }
 
   const handleSkipConfirm = () => {
-    setIsSkipPopupOpen(false)
+    skipPopup.close()
     onSkip()
   }
 
   const handleSkipCancel = () => {
-    setIsSkipPopupOpen(false)
+    skipPopup.close()
   }
 
   return (
@@ -109,7 +110,7 @@ export const OnboardingStartPopup: React.FC<OnboardingStartPopupProps> = ({ isOp
         </div>
       </DialogContent>
       <SkipOnboardingPopup
-        isOpen={isSkipPopupOpen}
+        isOpen={skipPopup.isOpen}
         onClose={handleSkipCancel}
         onConfirm={handleSkipConfirm}
       />

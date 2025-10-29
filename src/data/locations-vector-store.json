@@ -7,7 +7,7 @@
       "buildingBlock": "a",
       "floorLevel": 1,
       "roomNumbers": [
-        "A121 - Academic Records"
+        "Academic Records"
       ],
       "roomTypes": [
         "facility"
@@ -75,60 +75,6 @@
     "text": "N104 is a teaching classroom located in N Block on the first floor. This classroom is available for lectures and coursework, visible from photo n-f1-east-south-4 in the east south corridor."
   },
   {
-    "id": "n-f1-west-9",
-    "metadata": {
-      "areaId": "n-block-floor-1-main",
-      "areaName": "N Block",
-      "buildingBlock": "n",
-      "floorLevel": 1,
-      "roomNumbers": [
-        "S153"
-      ],
-      "roomTypes": [
-        "office"
-      ],
-      "synonyms": []
-    },
-    "text": "S153 is visible from photo n-f1-west-9. It sits in N Block (building N), floor 1."
-  },
-  {
-    "id": "n-f2-east-4",
-    "metadata": {
-      "areaId": "n-block-floor-2-main",
-      "areaName": "N Block",
-      "buildingBlock": "n",
-      "floorLevel": 2,
-      "roomNumbers": [
-        "N216",
-        "N215",
-        "N214",
-        "N213"
-      ],
-      "roomTypes": [
-        "office"
-      ],
-      "synonyms": []
-    },
-    "text": "N216 is visible from photo n-f2-east-4. It sits in N Block (building N), floor 2. Other rooms in view: N215, N214, N213."
-  },
-  {
-    "id": "n-f2-mid-3",
-    "metadata": {
-      "areaId": "n-block-floor-2-main",
-      "areaName": "N Block",
-      "buildingBlock": "n",
-      "floorLevel": 2,
-      "roomNumbers": [
-        "N226"
-      ],
-      "roomTypes": [
-        "office"
-      ],
-      "synonyms": []
-    },
-    "text": "N226 is visible from photo n-f2-mid-3. It sits in N Block (building N), floor 2."
-  },
-  {
     "id": "s-f1-mid-3",
     "metadata": {
       "areaId": "s-block-floor-1-main",
@@ -162,15 +108,14 @@
       "buildingBlock": "s",
       "floorLevel": 1,
       "roomNumbers": [
-        "S171",
         "S170"
       ],
       "roomTypes": [
-        "office"
+        "classroom"
       ],
       "synonyms": []
     },
-    "text": "S171 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170."
+    "text": "S170 is visible from photo s-f1-north-4. It sits in S Block (building S), floor 1. Other rooms in view: S170."
   },
   {
     "id": "s-f1-south-2-s154",
@@ -183,7 +128,7 @@
         "S154"
       ],
       "roomTypes": [
-        "office"
+        "classroom"
       ],
       "synonyms": [],
       "finalOrientation": 245
@@ -319,25 +264,7 @@
       "finalOrientation": 80
     },
     "text": "S265 is a teaching classroom located in S Block on the second floor. This classroom is available for lectures and coursework, visible from photo s-f2-south-5 in the south wing."
-  },
-  {
-    "id": "s-f2-south-5-s254",
-    "metadata": {
-      "areaId": "s-block-floor-2-main",
-      "areaName": "S Block",
-      "buildingBlock": "s",
-      "floorLevel": 2,
-      "roomNumbers": [
-        "S254"
-      ],
-      "roomTypes": [
-        "facility"
-      ],
-      "synonyms": [],
-      "finalOrientation": -95
-    },
-    "text": "S254 is visible from photo s-f2-south-5. It sits in S Block (building S), floor 2."
-  },
+  },  
   {
     "id": "s-f2-south-6",
     "metadata": {
@@ -450,14 +377,24 @@
       "buildingBlock": "s",
       "floorLevel": 4,
       "roomNumbers": [
+        "Peter and Ian's Office",
         "S469"
       ],
       "roomTypes": [
         "office"
       ],
-      "synonyms": []
+      "synonyms": [
+        "S469",
+        "S-469",
+        "S 469",
+        "room 469",
+        "office 469",
+        "peter's office",
+        "ian's office",
+        "peter and ians office"
+      ]
     },
-    "text": "S469 is visible from photo s-f4-mid-4. It sits in S Block (building S), floor 4."
+    "text": "Peter and Ian's Office (S469) is visible from photo s-f4-mid-4. It sits in S Block (building S), floor 4."
   },
   {
     "id": "s-f4-north-7",
@@ -649,7 +586,8 @@
       "buildingBlock": "w",
       "floorLevel": 2,
       "roomNumbers": [
-        "W220 - The Zone"
+        "The Zone",
+        "W220"
       ],
       "roomTypes": [
         "facility"
@@ -665,11 +603,16 @@
         "gym mezzanine",
         "fitness lounge",
         "viewing deck",
-        "sports viewing area"
+        "sports viewing area",
+        "W220",
+        "W-220",
+        "W 220",
+        "room 220",
+        "w220 zone"
       ],
       "finalOrientation": 90
     },
-    "text": "W220 - The Zone is visible from photo w-gym-overlook-1. The Zone is a Sports Science and Wellness Centre located at Ara's City campus in W Block on the 2nd floor. The Zone's health, wellbeing and sports performance services are available to all humans, including athletes of all levels, community groups and organisations. Services include body composition analysis, nutrition consultations, fitness testing and assessments, sports performance analysis, and personalised wellness programs. The Zone is a teaching clinic where Bachelor of Applied Science students gain real-life work experience while supporting individuals with their health and nutrition goals."
+    "text": "The Zone (W220) is visible from photo w-gym-overlook-1. The Zone is a Sports Science and Wellness Centre located at Ara's City campus in W Block on the 2nd floor. The Zone's health, wellbeing and sports performance services are available to all humans, including athletes of all levels, community groups and organisations. Services include body composition analysis, nutrition consultations, fitness testing and assessments, sports performance analysis, and personalised wellness programs. The Zone is a teaching clinic where Bachelor of Applied Science students gain real-life work experience while supporting individuals with their health and nutrition goals."
   },
   {
     "id": "w-gym-entry",
@@ -679,7 +622,7 @@
       "buildingBlock": "w",
       "floorLevel": 1,
       "roomNumbers": [
-        "W200 - Recreation Centre Entrance"
+        "Recreation Centre"
       ],
       "roomTypes": [
         "facility"
@@ -822,7 +765,7 @@
       "buildingBlock": "A",
       "floorLevel": 1,
       "roomNumbers": [
-        "The Library Entrance"
+        "The Library"
       ],
       "roomTypes": [
         "facility"
@@ -838,7 +781,7 @@
         "library foyer"
       ]
     },
-    "text": "The Library entrance is visible from photo library-f1-entrance. It sits in the Library building, floor 1."
+    "text": "The Library is visible from photo library-f1-entrance. It sits in the Library building, floor 1."
   },
   {
     "id": "library-f1-6",
@@ -848,7 +791,8 @@
       "buildingBlock": "library",
       "floorLevel": 1,
       "roomNumbers": [
-        "Learning Services"
+        "Learning Services",
+        "L116"
       ],
       "roomTypes": [
         "facility"
@@ -860,7 +804,11 @@
         "academic workshops",
         "quick questions hub",
         "pass study group",
-        "learning support centre"
+        "learning support centre",
+        "L116",
+        "L-116",
+        "L 116",
+        "room 116"
       ],
       "finalOrientation": 360
     },
@@ -874,7 +822,7 @@
       "buildingBlock": "library",
       "floorLevel": 1,
       "roomNumbers": [
-        "L130 - The POD"
+        "The Pod"
       ],
       "roomTypes": [
         "facility"
@@ -929,7 +877,8 @@
       "buildingBlock": "x",
       "floorLevel": 1,
       "roomNumbers": [
-        "L103 - Student Support"
+        "Student Support",
+        "L103"
       ],
       "roomTypes": [
         "facility"
@@ -939,10 +888,15 @@
         "support services",
         "student help centre",
         "student wellbeing",
-        "tautoko space"
+        "tautoko space",
+        "L103",
+        "L-103",
+        "L 103",
+        "room 103",
+        "l103 student support"
       ]
     },
-    "text": "L103 - Student Support is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. This team delivers holistic assistance with academic planning, policy navigation, and advocacy when issues arise with courses, tutors, or institutional processes. Advisors provide practical help for life concerns—housing, finances, and Government agency interactions such as StudyLink or Work and Income NZ—alongside referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources. Specialist staff offer culturally grounded guidance for Māori and Pacific learners, international student advice, disability services, and assessment accommodations. Other rooms in view: The Hub."
+    "text": "Student Support (L103) is visible from photo x-f1-mid-8. It sits in X Block (building X), floor 1. This team delivers holistic assistance with academic planning, policy navigation, and advocacy when issues arise with courses, tutors, or institutional processes. Advisors provide practical help for life concerns—housing, finances, and Government agency interactions such as StudyLink or Work and Income NZ—alongside referrals for mental health, alcohol and drug support, emergency counselling, and family violence resources. Specialist staff offer culturally grounded guidance for Māori and Pacific learners, international student advice, disability services, and assessment accommodations. Other rooms in view: The Hub."
   },
   {
     "id": "x-f1-west-10-finance",
@@ -952,7 +906,8 @@
       "buildingBlock": "x",
       "floorLevel": 1,
       "roomNumbers": [
-        "X110 - Student Finance"
+        "Student Finance",
+        "X110"
       ],
       "roomTypes": [
         "facility"
@@ -964,10 +919,15 @@
         "finance office",
         "student fees",
         "metro card",
-        "gym fees"
+        "gym fees",
+        "X110",
+        "X-110",
+        "X 110",
+        "room 110",
+        "x110 student finance"
       ]
     },
-    "text": "X110 - Student Finance is visible from photo x-f1-west-10. Student Finance helps with all your financial needs at Ara. The team can assist with student metro card applications and top-ups, gym fee payments for gym members, financial questions while studying at Ara, and course fee payments. Located in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment."
+    "text": "Student Finance (X110) is visible from photo x-f1-west-10. Student Finance helps with all your financial needs at Ara. The team can assist with student metro card applications and top-ups, gym fee payments for gym members, financial questions while studying at Ara, and course fee payments. Located in X Block (building X), floor 1. Other rooms in view: X108 - Careers & Employment."
   },
   {
     "id": "x-f1-west-10-careers",
@@ -977,7 +937,8 @@
       "buildingBlock": "x",
       "floorLevel": 1,
       "roomNumbers": [
-        "X108 - Careers & Employment"
+        "Careers & Employment",
+        "X108"
       ],
       "roomTypes": [
         "facility"
@@ -991,10 +952,15 @@
         "careers",
         "employment",
         "job search",
-        "career guidance"
+        "career guidance",
+        "X108",
+        "X-108",
+        "X 108",
+        "room 108",
+        "x108 careers"
       ]
     },
-    "text": "X108 - Careers & Employment is visible from photo x-f1-west-10. The Careers & Employment team provides support for your career development and job search. They can help with resume writing, interview preparation, career planning, job search strategies, and connecting with potential employers. Located in X Block (building X), floor 1. Other rooms in view: X110 - Student Finance."
+    "text": "Careers & Employment (X108) is visible from photo x-f1-west-10. The Careers & Employment team provides support for your career development and job search. They can help with resume writing, interview preparation, career planning, job search strategies, and connecting with potential employers. Located in X Block (building X), floor 1. Other rooms in view: X110 - Student Finance."
   },
   {
     "id": "x-f1-west-11",
@@ -1555,7 +1521,8 @@
       "buildingBlock": "n",
       "floorLevel": 1,
       "roomNumbers": [
-        "Sandy's Office"
+        "Sandy's Office",
+        "S153"
       ],
       "roomTypes": [
         "office"
@@ -1572,6 +1539,11 @@
         "it admin office",
         "computer administrator",
         "admin office",
+        "S153",
+        "S-153",
+        "S 153",
+        "room 153",
+        "office 153",
         "timetable clash",
         "timetable clashes",
         "schedule clash",
