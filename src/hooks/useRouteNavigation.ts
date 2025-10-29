@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { clearMinimapPath, setMinimapPath } from '../stores/minimapStore'
 
 /**
  * Navigation speed configuration describing the label shown to users and the delay between path steps.
@@ -48,7 +49,7 @@ interface InternalState extends NavigationState {
  * API returned by useRouteNavigation exposing state plus control actions.
  *
  * @property navigationState - Snapshot of the current sequential navigation progress
- * @property startNavigation - Begins walking a path from the first element onwards
+ * @property startNavigation - Prepares the supplied path and enters a paused state until resumed
  * @property skipToEnd - Immediately jumps to the final destination in the active path
  * @property cancelNavigation - Stops navigation and clears any remaining steps
  * @property setSpeed - Updates the active speed preset
@@ -157,6 +158,7 @@ export function useRouteNavigation(
   const advanceToNextStep = useCallback(
     async (path: string[], nextIndex: number) => {
       if (nextIndex >= path.length) {
+        clearMinimapPath()
         setState(prev => ({
           ...prev,
           isNavigating: false,
@@ -172,7 +174,7 @@ export function useRouteNavigation(
       const upcomingPhotoId = nextIndex + 1 < path.length ? path[nextIndex + 1] : undefined
       const isLastStep = nextIndex === path.length - 1
       const latestState = stateRef.current
-      
+
       await onNavigate(nextPhotoId, {
         isSequential: true,
         stepIndex: nextIndex,
@@ -184,6 +186,17 @@ export function useRouteNavigation(
       const navigationStillActive = latestState.isNavigating
       const pausedDuringStep = latestState.isPaused
       const shouldMaintainPending = navigationStillActive || pausedDuringStep
+      const remainingPath = path.slice(nextIndex)
+
+      if (navigationStillActive || pausedDuringStep) {
+        if (remainingPath.length > 0) {
+          setMinimapPath(remainingPath)
+        } else {
+          clearMinimapPath()
+        }
+      } else {
+        clearMinimapPath()
+      }
 
       setState(prev => ({
         ...prev,
@@ -212,12 +225,20 @@ export function useRouteNavigation(
     (path: string[], finalOrientation?: number) => {
       const cleanedPath = path.filter((value): value is string => typeof value === 'string' && value.length > 0)
       if (cleanedPath.length === 0) {
+        clearMinimapPath()
         return
       }
+
+      if (cleanedPath.length > 1) {
+        setMinimapPath(cleanedPath)
+      } else {
+        clearMinimapPath()
+      }
+
       clearScheduledStep()
       setState({
         isNavigating: true,
-        isPaused: false,
+        isPaused: true,
         currentStepIndex: -1,
         totalSteps: cleanedPath.length,
         currentPhotoId: null,
@@ -225,9 +246,6 @@ export function useRouteNavigation(
         pendingPath: cleanedPath,
         finalOrientation
       })
-      timeoutRef.current = setTimeout(() => {
-        void advanceToNextStep(cleanedPath, 0)
-      }, 10)
     },
     [advanceToNextStep, clearScheduledStep]
   )
@@ -245,6 +263,7 @@ export function useRouteNavigation(
       nextPhotoId: undefined,
       finalOrientation: stateRef.current.finalOrientation
     })
+    clearMinimapPath()
     setState(prev => ({
       ...prev,
       isNavigating: false,
@@ -283,6 +302,13 @@ export function useRouteNavigation(
         totalSteps: snapshot.path.length,
         nextPhotoId: upcomingPhotoId
       })
+
+      const remainingPath = snapshot.path.slice(boundedIndex)
+      if (remainingPath.length > 0) {
+        setMinimapPath(remainingPath)
+      } else {
+        clearMinimapPath()
+      }
 
       setState(prev => {
         const updatedPending = prev.path.slice(boundedIndex + 1)
@@ -326,6 +352,7 @@ export function useRouteNavigation(
       return
     }
     clearScheduledStep()
+    clearMinimapPath()
     setState(prev => ({
       ...prev,
       isNavigating: false,
