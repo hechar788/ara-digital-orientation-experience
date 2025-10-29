@@ -146,7 +146,13 @@ export const AvailableClassroomsPopup: React.FC<AvailableClassroomsPopupProps> =
     facilitiesList.sort(sortFn)
     classroomsList.sort(sortFn)
 
-    return { facilities: facilitiesList, classrooms: classroomsList }
+    const prioritizedFacilities = facilitiesList.filter(entry => !/\b(sandy|peter|ian)\b/i.test(entry.name))
+    const deprioritizedFacilities = facilitiesList.filter(entry => /\b(sandy|peter|ian)\b/i.test(entry.name))
+
+    return {
+      facilities: [...prioritizedFacilities, ...deprioritizedFacilities],
+      classrooms: classroomsList
+    }
   }, [])
 
   const handleLocationClick = (locationName: string) => {
@@ -258,4 +264,3 @@ export const AvailableClassroomsPopup: React.FC<AvailableClassroomsPopupProps> =
     </Dialog>
   )
 }
-

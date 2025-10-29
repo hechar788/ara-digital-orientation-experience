@@ -74,7 +74,14 @@ export const Tour: React.FC<TourProps> = ({
   const handleRouteNavigation = useCallback(
     async (photoId: string, options?: RouteNavigationHandlerOptions) => {
       if (onNavigateToPhoto) {
-        const jumpOptions: JumpToPhotoOptions | undefined = options?.isSequential
+        const jumpOptions: JumpToPhotoOptions | undefined = options?.forceJump
+          ? {
+              finalOrientation: options?.finalOrientation,
+              nextPhotoId: options?.nextPhotoId,
+              forceImmediate: true,
+              preserveOrientation: true
+            }
+          : options?.isSequential
           ? {
               previewDirection: true,
               previewDelayMs: 1350,
@@ -115,7 +122,7 @@ export const Tour: React.FC<TourProps> = ({
     <>
       <RouteNavigationStatus
         routeNavigation={routeNavigation}
-        className="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-[calc(1rem+env(safe-area-inset-left,0px))] z-40 w-[calc(100vw-2rem)] max-w-[27rem] lg:top-4 lg:left-4 lg:w-[27rem]"
+        className="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] left-[calc(0.25rem+env(safe-area-inset-left,0px))] z-40 w-[12.7rem] sm:left-[calc(1rem+env(safe-area-inset-left,0px))] sm:w-[calc(100vw-2rem)] sm:max-w-[27rem] lg:top-4 lg:left-4 lg:w-[27rem]"
       />
 
       <TourControls
