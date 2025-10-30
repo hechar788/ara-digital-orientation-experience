@@ -2,6 +2,26 @@
 
 A modern React web application built with TanStack Start, featuring file-based routing, state management, and comprehensive demo examples.
 
+## How to run this project
+
+### Prerequisites
+- Node.js 18+
+- npm (or pnpm)
+
+### Steps
+```bash
+npm install
+npm run dev
+```
+
+The application will be available at `http://localhost:3000`.
+
+## 🏗️ Production
+
+Alternatively it can be viewed at `https://ara.ac`.
+
+
+
 ## 🚀 Tech Stack
 
 ### Core Framework
@@ -45,37 +65,6 @@ src/
 ├── router.tsx          # Router configuration
 ├── routeTree.gen.ts    # Generated route tree
 └── styles.css          # Global styles
-```
-
-## 🛠️ Getting Started
-
-### Prerequisites
-- Node.js 18+ 
-- npm or pnpm
-
-### Installation & Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`
-
-### Building for Production
-
-```bash
-# Build for production
-npm run build
-
-# Preview production build
-npm run serve
-
-# Start production server
-npm start
 ```
 
 ## 🧪 Testing
