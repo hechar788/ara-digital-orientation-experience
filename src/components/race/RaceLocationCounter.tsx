@@ -61,7 +61,7 @@ export const RaceLocationCounter: React.FC<RaceLocationCounterProps> = ({
         className
       )}
     >
-      <span>Hidden Locations Found: {locationsFound}/{totalLocations}</span>
+      <span className="w-full text-center">Hidden Locations Found: {locationsFound}/{totalLocations}</span>
     </div>
   )
 }
