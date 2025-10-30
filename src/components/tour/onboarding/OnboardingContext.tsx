@@ -9,7 +9,7 @@ import React, { createContext, useCallback, useMemo, useReducer } from 'react'
 export type OnboardingStepId =
   | 'navigation-arrows' | 'drag-camera' | 'zoom-controls' | 'minimap-toggle' | 'minimap-popup'
   | 'fullscreen-toggle' | 'race-mode' | 'ai-assistant' | 'info-hub'
-  | 'stairs-hotspot' | 'elevator-hotspot' | 'door-hotspot'
+  | 'stairs-hotspot' | 'elevator-hotspot' | 'door-hotspot' | 'information-hotspot'
 
 /**
  * Target element types that can be highlighted during onboarding
@@ -47,7 +47,7 @@ export type OnboardingHighlightVariant = 'background' | 'overlay' | 'none'
  * Defines the instruction text, highlighted element, instruction box layout,
  * and highlight treatment for each step in the onboarding flow.
  *
- * @property step - Step number (1-9)
+ * @property step - Step number (1-13)
  * @property id - Stable identifier for the step
  * @property target - UI element to highlight during this step
  * @property text - Instruction text to display on desktop devices
@@ -68,7 +68,7 @@ export interface OnboardingStepConfig {
 /**
  * Onboarding step configurations
  *
- * Array defining all 12 steps of the onboarding flow with their respective
+ * Array defining all 13 steps of the onboarding flow with their respective
  * targets, instruction text, instruction box positioning, and highlight rules.
  */
 export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
@@ -175,6 +175,15 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
     mobileText: 'Door icons show entrances and exits between spaces.',
     layout: 'center-center',
     highlightVariant: 'none'
+  },
+  {
+    step: 13,
+    id: 'information-hotspot',
+    target: null,
+    text: 'Information bubbles reveal extra details about campus spaces. Click them to learn more abou those locations.',
+    mobileText: 'Tap information bubbles to open popups with details, media, or helpful links about each space.',
+    layout: 'center-center',
+    highlightVariant: 'none'
   }
 ]
 
@@ -185,7 +194,7 @@ export const ONBOARDING_STEPS: OnboardingStepConfig[] = [
  * the OnboardingFlow component to manage step progression and by
  * OnboardingHighlight components to determine visual highlighting.
  *
- * @property currentStep - Current step number (1-12)
+ * @property currentStep - Current step number (1-13)
  * @property currentStepId - Identifier for the current onboarding step
  * @property currentConfig - Configuration object for the active step
  * @property isActive - Whether onboarding is currently running

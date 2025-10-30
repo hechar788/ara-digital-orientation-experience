@@ -35,6 +35,7 @@ export interface RaceInformationPopupProps {
  */
 export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOpen, onClose }) => {
   const [activeIndex, setActiveIndex] = React.useState(0)
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
   const sections = raceInformationSections
   const activeSection = sections[activeIndex]
   const isLastSection = activeIndex === sections.length - 1
@@ -78,6 +79,50 @@ export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOp
   React.useEffect(() => {
     if (!isOpen) {
       setActiveIndex(0)
+    }
+  }, [isOpen])
+
+  React.useEffect(() => {
+    if (audioRef.current) {
+      return () => {
+        audioRef.current?.pause()
+        audioRef.current = null
+      }
+    }
+
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+
+    const audio = new Audio('/01 - Damned.mp3')
+    audio.loop = true
+    audioRef.current = audio
+
+    return () => {
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [])
+
+  React.useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) {
+      return
+    }
+
+    if (isOpen) {
+      void audio.play().catch(() => undefined)
+      return () => {
+        audio.pause()
+      }
+    }
+
+    audio.pause()
+    audio.currentTime = 0
+
+    return () => {
+      audio.pause()
+      audio.currentTime = 0
     }
   }, [isOpen])
 
