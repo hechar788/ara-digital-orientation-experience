@@ -35,7 +35,10 @@ export interface RaceInformationPopupProps {
  */
 export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOpen, onClose }) => {
   const [activeIndex, setActiveIndex] = React.useState(0)
+  const [isMuted, setIsMuted] = React.useState(false)
   const audioRef = React.useRef<HTMLAudioElement | null>(null)
+  const fadeIntervalRef = React.useRef<number | null>(null)
+  const baseVolume = 0.28
   const sections = raceInformationSections
   const activeSection = sections[activeIndex]
   const isLastSection = activeIndex === sections.length - 1
@@ -83,48 +86,97 @@ export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOp
   }, [isOpen])
 
   React.useEffect(() => {
-    if (audioRef.current) {
-      return () => {
-        audioRef.current?.pause()
-        audioRef.current = null
-      }
+    if (typeof Audio === 'undefined') {
+      return
     }
 
-    if (typeof window === 'undefined') {
-      return undefined
-    }
-
-    const audio = new Audio('/01 - Damned.mp3')
-    audio.loop = true
-    audioRef.current = audio
+    const audioElement = new Audio('/Crab_audio.mp3')
+    audioElement.volume = baseVolume
+    audioElement.preload = 'auto'
+    audioRef.current = audioElement
 
     return () => {
-      audio.pause()
+      if (fadeIntervalRef.current !== null) {
+        window.clearInterval(fadeIntervalRef.current)
+        fadeIntervalRef.current = null
+      }
+      audioElement.pause()
+      audioElement.currentTime = 0
       audioRef.current = null
     }
   }, [])
 
   React.useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) {
+    const audioElement = audioRef.current
+
+    if (!audioElement) {
       return
     }
 
     if (isOpen) {
-      void audio.play().catch(() => undefined)
-      return () => {
-        audio.pause()
+      if (fadeIntervalRef.current !== null) {
+        window.clearInterval(fadeIntervalRef.current)
+        fadeIntervalRef.current = null
       }
-    }
+      if (!isMuted) {
+        audioElement.volume = baseVolume
+      }
+      audioElement.currentTime = 0
+      const playbackPromise = audioElement.play()
 
-    audio.pause()
-    audio.currentTime = 0
+      if (typeof playbackPromise?.catch === 'function') {
+        playbackPromise.catch(() => undefined)
+      }
+    } else {
+      if (fadeIntervalRef.current !== null) {
+        window.clearInterval(fadeIntervalRef.current)
+        fadeIntervalRef.current = null
+      }
 
-    return () => {
-      audio.pause()
-      audio.currentTime = 0
+      if (isMuted) {
+        audioElement.pause()
+        audioElement.currentTime = 0
+        return
+      }
+
+      const fadeDurationMs = 3500
+      const fadeSteps = 35
+      const initialVolume = audioElement.volume || baseVolume
+      let currentStep = 0
+
+      fadeIntervalRef.current = window.setInterval(() => {
+        currentStep += 1
+        const progress = currentStep / fadeSteps
+        const newVolume = Math.max(0, initialVolume * (1 - progress))
+        audioElement.volume = newVolume
+
+        if (currentStep >= fadeSteps) {
+          if (fadeIntervalRef.current !== null) {
+            window.clearInterval(fadeIntervalRef.current)
+            fadeIntervalRef.current = null
+          }
+          audioElement.pause()
+          audioElement.currentTime = 0
+          audioElement.volume = baseVolume
+        }
+      }, fadeDurationMs / fadeSteps)
     }
   }, [isOpen])
+
+  React.useEffect(() => {
+    const audioElement = audioRef.current
+
+    if (!audioElement) {
+      return
+    }
+
+    audioElement.muted = isMuted
+    audioElement.volume = isMuted ? 0 : baseVolume
+  }, [isMuted])
+
+  const handleToggleMute = () => {
+    setIsMuted(current => !current)
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -142,23 +194,34 @@ export const RaceInformationPopup: React.FC<RaceInformationPopupProps> = ({ isOp
             <h2 className="text-xl font-semibold text-foreground sm:text-2xl">The Amazing Race</h2>
           </div>
           <hr className="border-t border-border" />
-          <nav aria-label="Race sections" className="hidden flex-wrap gap-2 py-2 sm:flex sm:py-3">
-            {sections.map((section, index) => (
-              <button
-                key={section.key}
-                type="button"
-                onClick={() => setActiveIndex(index)}
-                className={`rounded-sm border px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
-                  activeIndex === index
-                    ? 'border-border bg-muted text-foreground'
-                    : 'border-border/70 bg-background text-muted-foreground hover:bg-muted/50'
-                }`}
-                aria-current={activeIndex === index ? 'page' : undefined}
-              >
-                {section.tabLabel}
-              </button>
-            ))}
-          </nav>
+          <div className="flex items-center justify-end gap-2 py-2 sm:justify-between sm:py-3">
+            <nav aria-label="Race sections" className="hidden flex-wrap gap-2 sm:flex">
+              {sections.map((section, index) => (
+                <button
+                  key={section.key}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  className={`rounded-sm border px-3 py-1.5 text-xs font-medium transition cursor-pointer ${
+                    activeIndex === index
+                      ? 'border-border bg-muted text-foreground'
+                      : 'border-border/70 bg-background text-muted-foreground hover:bg-muted/50'
+                  }`}
+                  aria-current={activeIndex === index ? 'page' : undefined}
+                >
+                  {section.tabLabel}
+                </button>
+              ))}
+            </nav>
+            <button
+              type="button"
+              onClick={handleToggleMute}
+              aria-pressed={isMuted}
+              aria-label={isMuted ? 'Unmute Amazing Race information audio' : 'Mute Amazing Race information audio'}
+              className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted/60 cursor-pointer sm:text-sm"
+            >
+              {isMuted ? 'Unmute audio' : 'Mute audio'}
+            </button>
+          </div>
           <div className="space-y-3 sm:space-y-3.5">
             <h3 className="text-base font-semibold text-foreground sm:text-xl">{activeSection.heading}</h3>
             {customContent ?? (

@@ -83,7 +83,7 @@ function App() {
             <RaceLocationCounter
               locationsFound={hiddenLocationsCount}
               totalLocations={TOTAL_HIDDEN_LOCATIONS}
-              className="w-[11.55rem] lg:w-62"
+              className="w-[12.7rem] lg:w-[17.05rem]"
             />
           )}
         </div>
