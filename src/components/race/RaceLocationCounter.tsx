@@ -57,11 +57,11 @@ export const RaceLocationCounter: React.FC<RaceLocationCounterProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-center rounded-md bg-black/70 px-4 h-11 text-white text-sm font-medium',
+        'flex items-center justify-center rounded-md bg-black/70 px-4 h-11 text-white text-sm font-medium w-full',
         className
       )}
     >
-      <span>Locations Found: {locationsFound}/{totalLocations}</span>
+      <span>Hidden Locations Found: {locationsFound}/{totalLocations}</span>
     </div>
   )
 }

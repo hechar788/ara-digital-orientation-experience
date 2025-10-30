@@ -115,6 +115,9 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   const [pendingHiddenLocation, setPendingHiddenLocation] = useState<{ id: string, name: string, description: string } | null>(null)
   const [pendingInformation, setPendingInformation] = useState<{ title?: string, description?: string, tabs?: { title: string, description: string }[] } | null>(null)
   const hoveredHotspotRef = useRef<THREE.Object3D | null>(null)
+  const elevatorAudioRef = useRef<HTMLAudioElement | null>(null)
+  const elevatorAudioDurationRef = useRef<number | null>(null)
+  const elevatorAudioVolume = 0.32
 
   // Get hidden locations for current photo (race mode only) - memoized to prevent infinite loops
   const hiddenLocationsForPhoto = useMemo(() => {
@@ -151,6 +154,31 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
     })
   }, [fov, isTouchDevice])
 
+  useEffect(() => {
+    if (typeof Audio === 'undefined') {
+      return
+    }
+
+    const audioElement = new Audio('/Ding_elevator_arrival_audio.mp3')
+    audioElement.volume = elevatorAudioVolume
+    audioElement.preload = 'auto'
+    audioElement.load()
+    const handleLoadedMetadata = () => {
+      if (Number.isFinite(audioElement.duration) && audioElement.duration > 0) {
+        elevatorAudioDurationRef.current = audioElement.duration
+      }
+    }
+
+    audioElement.addEventListener('loadedmetadata', handleLoadedMetadata)
+    elevatorAudioRef.current = audioElement
+
+    return () => {
+      audioElement.pause()
+      audioElement.currentTime = 0
+      audioElement.removeEventListener('loadedmetadata', handleLoadedMetadata)
+      elevatorAudioRef.current = null
+    }
+  }, [])
 
   /**
    * Create and position hotspot meshes in the scene
@@ -569,16 +597,47 @@ export const PanoramicHotspots: React.FC<PanoramicHotspotsProps> = ({
   /**
    * Handle confirmation of navigation
    */
-  const handleConfirmNavigation = useCallback(() => {
+  const handleConfirmNavigation = useCallback(async () => {
     if (!pendingNavigation) return
 
-    if (pendingNavigation.destination && onNavigateToPhoto) {
-      void onNavigateToPhoto(pendingNavigation.destination)
-    } else {
-      onNavigate(pendingNavigation.direction)
+    const { destination, navigationType, direction } = pendingNavigation
+    setPendingNavigation(null)
+
+    if (navigationType === 'elevator') {
+      const audioElement = elevatorAudioRef.current
+
+      if (audioElement) {
+        audioElement.currentTime = 0
+        const fallbackDurationMs = 800
+        const maxAudibleDurationMs = 4000
+        const rawDurationMs =
+          elevatorAudioDurationRef.current && elevatorAudioDurationRef.current > 0
+            ? elevatorAudioDurationRef.current * 1000
+            : fallbackDurationMs
+        const waitDurationMs = Math.max(120, Math.min(rawDurationMs, maxAudibleDurationMs))
+
+        try {
+          await audioElement.play()
+        } catch {
+          // Ignore autoplay rejections; still proceed on timeout
+        }
+
+        await new Promise(resolve => {
+          window.setTimeout(resolve, waitDurationMs)
+        })
+
+        audioElement.pause()
+        audioElement.currentTime = 0
+      }
+
     }
 
-    setPendingNavigation(null)
+    if (destination && onNavigateToPhoto) {
+      await Promise.resolve(onNavigateToPhoto(destination))
+      return
+    }
+
+    onNavigate(direction)
   }, [pendingNavigation, onNavigate, onNavigateToPhoto])
 
   /**

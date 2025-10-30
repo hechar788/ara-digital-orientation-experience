@@ -67,6 +67,47 @@ export const HiddenLocationFoundPopup: React.FC<HiddenLocationFoundPopupProps> =
   description,
   onClose
 }) => {
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
+  const baseVolume = 0.35
+
+  React.useEffect(() => {
+    if (typeof Audio === 'undefined') {
+      return
+    }
+
+    const audioElement = new Audio('/Ding_location_fonud_audio.mp3')
+    audioElement.volume = baseVolume
+    audioElement.preload = 'auto'
+    audioRef.current = audioElement
+
+    return () => {
+      audioElement.pause()
+      audioElement.currentTime = 0
+      audioRef.current = null
+    }
+  }, [])
+
+  React.useEffect(() => {
+    const audioElement = audioRef.current
+
+    if (!audioElement) {
+      return
+    }
+
+    if (isOpen) {
+      audioElement.currentTime = 0
+      const playbackPromise = audioElement.play()
+
+      if (typeof playbackPromise?.catch === 'function') {
+        playbackPromise.catch(() => undefined)
+      }
+      return
+    }
+
+    audioElement.pause()
+    audioElement.currentTime = 0
+  }, [isOpen])
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md touch-none">
