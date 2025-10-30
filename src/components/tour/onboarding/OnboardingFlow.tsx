@@ -42,19 +42,19 @@ const INSTRUCTION_LAYOUT_PRESETS: Record<OnboardingInstructionLayout, { containe
   },
   'minimap-right': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[15.7rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[15.7rem] sm:top-4 sm:right-[calc(1rem+15.5rem+3.5rem)]'
   },
   'minimap-right-step5': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[16.65rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[16.65rem] sm:top-4 sm:right-[calc(1rem+15.5rem+3.5rem)]'
   },
   'minimap-right-minimap-closed': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+3.5rem)]'
   },
   'minimap-right-minimap-closed-step5': {
     container: 'fixed left-4 right-4 sm:left-auto sm:right-auto z-[45] pointer-events-auto',
-    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+1.5rem)]'
+    position: 'top-[8.5rem] sm:top-4 sm:right-[calc(1rem+15.5rem+3.5rem)]'
   },
   'controls-bottom': {
     container: 'fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-[45] pointer-events-auto',
@@ -155,7 +155,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
-  const isHotspotTutorialStep = currentStep >= 10 && currentStep <= 12
+  const isHotspotTutorialStep = currentStep >= 10 && currentStep <= 13
+  const isInformationHotspotStep = currentStep === 13
   const hotspotIcon = HOTSPOT_ICON_MAP[currentStep]
 
   const handleNext = () => {
@@ -212,9 +213,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </span>
             </div>
 
-            {/* Instruction text - with optional hotspot visual for steps 10-12 */}
+            {/* Instruction text - with optional hotspot visual for steps 10-13 */}
             <div className="mt-5 mb-9">
-              {isHotspotTutorialStep && hotspotIcon ? (
+              {isHotspotTutorialStep ? (
                 /* Hotspot tutorial step with visual example */
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                   {/* Text content */}
@@ -224,14 +225,41 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
                   {/* Hotspot visual example */}
                   <div className="flex-shrink-0 mt-3 sm:mt-0">
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full shadow-lg flex items-center justify-center border border-border">
-                      <img
-                        src={hotspotIcon}
-                        alt="Hotspot icon"
-                        className="w-8 h-8 sm:w-10 sm:h-10"
-                        style={{ filter: 'brightness(0)' }}
-                      />
-                    </div>
+                    {isInformationHotspotStep ? (
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full shadow-lg flex items-center justify-center bg-[#0C586E]">
+                        <svg
+                          className="w-10 h-10 sm:w-12 sm:h-12"
+                          viewBox="0 0 24 24"
+                          role="presentation"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="8" fill="none" stroke="white" strokeWidth="1.15" />
+                          <text
+                            x="12"
+                            y="13.1"
+                            textAnchor="middle"
+                            fill="white"
+                            fontSize="11.2"
+                            fontWeight="700"
+                            fontFamily="Arial, Helvetica, sans-serif"
+                            dominantBaseline="middle"
+                          >
+                            i
+                          </text>
+                        </svg>
+                      </div>
+                    ) : (
+                      hotspotIcon && (
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full shadow-lg flex items-center justify-center border border-border">
+                          <img
+                            src={hotspotIcon}
+                            alt="Hotspot icon"
+                            className="w-8 h-8 sm:w-10 sm:h-10"
+                            style={{ filter: 'brightness(0)' }}
+                          />
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
               ) : (
